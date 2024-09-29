@@ -1,0 +1,194 @@
+[2024/7/3 19:3:40:397]-[INFO]: =========== Begin ===========
+[2024/7/3 19:3:40:398]-[INFO]: 清除历史代码文件
+[2024/7/3 19:3:42:706]-[INFO]: generate font config file:
+[2024/7/3 19:3:42:707]-[INFO]: the numbers of font is: 1.
+[2024/7/3 19:3:42:708]-[INFO]: generate font config done.
+[2024/7/3 19:3:42:708]-[INFO]: 开始生成图片资源
+[2024/7/3 19:3:42:768]-[INFO]: start copy img files
+[2024/7/3 19:3:42:768]-[INFO]: img length:12
+[2024/7/3 19:3:42:823]-[INFO]: end copy img files
+[2024/7/3 19:3:42:824]-[INFO]: start cvt img files
+[2024/7/3 19:3:43:714]-[INFO]: 转码图片资源中, 请稍后...
+[2024/7/3 19:3:45:816]-[INFO]: end cvt img files
+[2024/7/3 19:3:45:817]-[INFO]: 开始生成代码
+[2024/7/3 19:3:45:930]-[INFO]: start create code
+[2024/7/3 19:3:45:954]-[INFO]: end create code
+[2024/7/3 19:3:45:954]-[INFO]: start create gt_ui.c
+[2024/7/3 19:3:45:955]-[INFO]: end create gt_ui.c
+[2024/7/3 19:3:45:955]-[INFO]: start create gt_ui.h
+[2024/7/3 19:3:45:956]-[INFO]: end create gt_ui.h
+[2024/7/3 19:3:45:957]-[INFO]: start create gt_ui.mk
+[2024/7/3 19:3:45:957]-[INFO]: end create gt_ui.mk
+[2024/7/3 19:3:45:958]-[INFO]: start create gt_conf.h
+[2024/7/3 19:3:45:958]-[INFO]: end create gt_conf.h
+[2024/7/3 19:3:45:959]-[INFO]: start create code
+[2024/7/3 19:3:45:971]-[INFO]: end create code
+[2024/7/3 19:3:45:971]-[INFO]: start create gt_ui.c
+[2024/7/3 19:3:45:972]-[INFO]: end create gt_ui.c
+[2024/7/3 19:3:45:973]-[INFO]: start create gt_ui.h
+[2024/7/3 19:3:45:973]-[INFO]: end create gt_ui.h
+[2024/7/3 19:3:45:974]-[INFO]: 开始编译
+[2024/7/3 19:3:47:682]-[INFO]: "Compiling ./Makefile/../drivers/display/monitor.c"
+[2024/7/3 19:3:47:984]-[INFO]: "Compiling ./Makefile/../drivers/display/icon.c"
+[2024/7/3 19:3:48:197]-[INFO]: "Compiling ./Makefile/../drivers/indev/keyboard.c"
+[2024/7/3 19:3:48:390]-[INFO]: "Compiling ./Makefile/../drivers/indev/mouse.c"
+[2024/7/3 19:3:48:599]-[INFO]: "Compiling ./Makefile/../drivers/indev/mousewheel.c"
+[2024/7/3 19:3:48:915]-[INFO]: "Compiling ./Makefile/../drivers/indev/evdev.c"
+[2024/7/3 19:3:49:233]-[INFO]: "Compiling ./Makefile/../drivers/indev/libinput.c"
+[2024/7/3 19:3:49:546]-[INFO]: "Compiling ./Makefile/../drivers/win_drv.c"
+[2024/7/3 19:3:49:845]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/driver/gt_port_disp.c"
+[2024/7/3 19:3:50:144]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/driver/gt_port_indev.c"
+[2024/7/3 19:3:50:556]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/driver/gt_port_src.c"
+[2024/7/3 19:3:50:764]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/driver/gt_port_vf.c"
+[2024/7/3 19:3:50:947]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_draw.c"
+[2024/7/3 19:3:51:69]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_disp.c"
+[2024/7/3 19:3:51:373]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_event.c"
+[2024/7/3 19:3:51:680]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_fs.c"
+[2024/7/3 19:3:51:891]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_graph_base.c"
+[2024/7/3 19:3:52:202]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_handler.c"
+[2024/7/3 19:3:52:399]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_img_decoder.c"
+[2024/7/3 19:3:52:599]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_indev.c"
+[2024/7/3 19:3:52:799]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_layout.c"
+[2024/7/3 19:3:52:999]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_mem.c"
+[2024/7/3 19:3:53:230]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_obj_pos.c"
+[2024/7/3 19:3:53:518]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_obj_scroll.c"
+[2024/7/3 19:3:53:726]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_refr.c"
+[2024/7/3 19:3:54:24]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_scr_stack.c"
+[2024/7/3 19:3:54:358]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_style.c"
+[2024/7/3 19:3:54:643]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/core/gt_timer.c"
+[2024/7/3 19:3:54:847]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/gt_extra.c"
+[2024/7/3 19:3:55:64]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/font/gt_font.c"
+[2024/7/3 19:3:55:263]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/font/gt_symbol.c"
+[2024/7/3 19:3:55:465]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_disp.c"
+[2024/7/3 19:3:55:666]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_file_header.c"
+[2024/7/3 19:3:55:877]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_fs.c"
+[2024/7/3 19:3:56:77]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_indev.c"
+[2024/7/3 19:3:56:275]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_src.c"
+[2024/7/3 19:3:56:397]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_tick.c"
+[2024/7/3 19:3:56:581]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/hal/gt_hal_vf.c"
+[2024/7/3 19:3:56:696]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_barcode.c"
+[2024/7/3 19:3:56:891]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_btn.c"
+[2024/7/3 19:3:57:19]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_btnmap.c"
+[2024/7/3 19:3:57:203]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_chat.c"
+[2024/7/3 19:3:57:512]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_checkbox.c"
+[2024/7/3 19:3:57:812]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_clock.c"
+[2024/7/3 19:3:57:940]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_dialog.c"
+[2024/7/3 19:3:58:226]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_gif.c"
+[2024/7/3 19:3:58:435]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_group.c"
+[2024/7/3 19:3:58:754]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_img.c"
+[2024/7/3 19:3:59:54]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_imgbtn.c"
+[2024/7/3 19:3:59:566]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_input_number.c"
+[2024/7/3 19:3:59:884]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_input.c"
+[2024/7/3 19:4:0:280]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_keypad.c"
+[2024/7/3 19:4:0:487]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_label.c"
+[2024/7/3 19:4:0:683]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_line.c"
+[2024/7/3 19:4:0:892]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_listview.c"
+[2024/7/3 19:4:1:106]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_obj_class.c"
+[2024/7/3 19:4:1:419]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_obj.c"
+[2024/7/3 19:4:1:829]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_option.c"
+[2024/7/3 19:4:2:245]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_player.c"
+[2024/7/3 19:4:2:644]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_progress_bar.c"
+[2024/7/3 19:4:3:44]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_qrcode.c"
+[2024/7/3 19:4:3:256]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_radio.c"
+[2024/7/3 19:4:3:563]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_rect.c"
+[2024/7/3 19:4:3:871]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_roller.c"
+[2024/7/3 19:4:4:168]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_slider.c"
+[2024/7/3 19:4:4:365]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_status_bar.c"
+[2024/7/3 19:4:4:691]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_switch.c"
+[2024/7/3 19:4:4:990]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_template.c"
+[2024/7/3 19:4:5:191]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_textarea.c"
+[2024/7/3 19:4:5:309]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_wordart.c"
+[2024/7/3 19:4:5:501]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/widgets/gt_view_pager.c"
+[2024/7/3 19:4:5:697]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_anim.c"
+[2024/7/3 19:4:6:8]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_area.c"
+[2024/7/3 19:4:6:211]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_color.c"
+[2024/7/3 19:4:6:643]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_effects.c"
+[2024/7/3 19:4:6:938]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_gc.c"
+[2024/7/3 19:4:7:252]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_ll.c"
+[2024/7/3 19:4:7:554]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_math.c"
+[2024/7/3 19:4:7:862]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_tlsf.c"
+[2024/7/3 19:4:8:68]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/others/gt_txt.c"
+[2024/7/3 19:4:8:359]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/utils/gt_stack.c"
+[2024/7/3 19:4:8:582]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/utils/gt_vector.c"
+[2024/7/3 19:4:8:777]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/draw/gt_draw_blend_with_argb888.c"
+[2024/7/3 19:4:9:85]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/draw/gt_draw_blend_with_rgb565.c"
+[2024/7/3 19:4:9:288]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/draw/gt_draw_blend_with_rgb888.c"
+[2024/7/3 19:4:9:491]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/draw/gt_draw_blend.c"
+[2024/7/3 19:4:9:708]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/png/gt_png.c"
+[2024/7/3 19:4:9:908]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/png/lodepng.c"
+[2024/7/3 19:4:10:222]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/jpeg/gt_sjpg.c"
+[2024/7/3 19:4:10:417]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/jpeg/tjpgd.c"
+[2024/7/3 19:4:10:622]-[INFO]: "Compiling ./Makefile/../../GT-HMI-Engine/src/extra/gif/gifdec.c"
+[2024/7/3 19:4:10:926]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_1.c"
+[2024/7/3 19:4:11:133]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_6.c"
+[2024/7/3 19:4:11:439]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_8.c"
+[2024/7/3 19:4:11:640]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_ui.c"
+[2024/7/3 19:4:11:851]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_5.c"
+[2024/7/3 19:4:12:162]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_9.c"
+[2024/7/3 19:4:12:466]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_10.c"
+[2024/7/3 19:4:12:881]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_4.c"
+[2024/7/3 19:4:13:74]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_3.c"
+[2024/7/3 19:4:13:283]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_2.c"
+[2024/7/3 19:4:13:600]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_7.c"
+[2024/7/3 19:4:13:898]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_11.c"
+[2024/7/3 19:4:14:215]-[INFO]: "Compiling ./Makefile/../../app/ui/gt_init_screen_home.c"
+[2024/7/3 19:4:14:525]-[INFO]: "Compiling ./Makefile/../../app/imgs/img_src_0.c"
+[2024/7/3 19:4:14:824]-[INFO]: "Compiling ./Makefile/../../app/imgs/img_src_10.c"
+[2024/7/3 19:4:15:130]-[INFO]: "Compiling ./Makefile/../../app/imgs/gt_src.c"
+[2024/7/3 19:4:15:437]-[INFO]: "Compiling ./Makefile/../../app/imgs/img_src_20.c"
+[2024/7/3 19:4:15:741]-[INFO]: "Compiling ./Makefile/../main.c"
+[2024/7/3 19:4:31:529]-[INFO]: "Linking app.exe"
+[2024/7/3 19:4:32:290]-[INFO]: 编译完成, 正在启动中...
+[2024/7/3 19:4:32:953]-[INFO]: 开始运行
+[2024/7/3 19:4:34:583]-[INFO]: Added 1843200 bytes from img_1024x600_10kk.png, offset: 0
+[2024/7/3 19:4:34:584]-[INFO]: Added 1228800 bytes from img_1024x600_12.png, offset: 1843200
+[2024/7/3 19:4:34:584]-[INFO]: Added 18981 bytes from img_171x37_40.png, offset: 3072000
+[2024/7/3 19:4:34:585]-[INFO]: Added 114816 bytes from img_184x208_1.png, offset: 3090981
+[2024/7/3 19:4:34:585]-[INFO]: Added 114816 bytes from img_184x208_2.png, offset: 3205797
+[2024/7/3 19:4:34:586]-[INFO]: Added 114816 bytes from img_184x208_3.png, offset: 3320613
+[2024/7/3 19:4:34:586]-[INFO]: Added 114816 bytes from img_184x208_4.png, offset: 3435429
+[2024/7/3 19:4:34:586]-[INFO]: Added 114816 bytes from img_184x208_5.png, offset: 3550245
+[2024/7/3 19:4:34:587]-[INFO]: Added 114816 bytes from img_184x208_6.png, offset: 3665061
+[2024/7/3 19:4:34:587]-[INFO]: Added 114816 bytes from img_184x208_7.png, offset: 3779877
+[2024/7/3 19:4:34:587]-[INFO]: Added 114816 bytes from img_184x208_8.png, offset: 3894693
+[2024/7/3 19:4:34:587]-[INFO]: Added 114816 bytes from img_184x208_9.png, offset: 4009509
+[2024/7/3 19:4:34:588]-[INFO]: Added 217083 bytes from img_269x269_Group_2.png, offset: 4124325
+[2024/7/3 19:4:34:588]-[INFO]: Added 192000 bytes from img_320x200_img32.png, offset: 4341408
+[2024/7/3 19:4:34:588]-[INFO]: Added 192000 bytes from img_320x200_img33.png, offset: 4533408
+[2024/7/3 19:4:34:588]-[INFO]: Added 319464 bytes from img_408x261_18.png, offset: 4725408
+[2024/7/3 19:4:34:589]-[INFO]: Added 8316 bytes from img_44x63_10.png, offset: 5044872
+[2024/7/3 19:4:34:589]-[INFO]: Added 8316 bytes from img_44x63_11.png, offset: 5053188
+[2024/7/3 19:4:34:589]-[INFO]: Added 492864 bytes from img_604x272_19.png, offset: 5061504
+[2024/7/3 19:4:34:590]-[INFO]: Added 14616 bytes from img_84x58_14.png, offset: 5554368
+[2024/7/3 19:4:34:590]-[INFO]: Added 198132 bytes from img_869x76_21.png, offset: 5568984
+[2024/7/3 19:4:34:590]-[INFO]: Added 198132 bytes from img_869x76_24.png, offset: 5767116
+[2024/7/3 19:4:34:590]-[INFO]: Added 200739 bytes from img_869x77_22.png, offset: 5965248
+[2024/7/3 19:4:34:591]-[INFO]: Added 200739 bytes from img_869x77_23.png, offset: 6165987
+[2024/7/3 19:4:34:591]-[INFO]: Added 865080 bytes from img_890x324_17.png, offset: 6366726
+[2024/7/3 19:4:34:591]-[INFO]: Added 1063953 bytes from img_977x363_20.png, offset: 7231806
+[2024/7/3 19:4:34:592]-[INFO]: Added 19899 bytes from img_99x67_30.png, offset: 8295759
+[2024/7/3 19:4:34:592]-[INFO]: Added 19899 bytes from img_99x67_31.png, offset: 8315658
+[2024/7/3 19:4:34:595]-[INFO]: Total size of binary data: 8335557 bytes
+[2024/7/3 19:4:34:599]-[INFO]: Begin to compound the font and source bin file.
+[2024/7/3 19:4:34:600]-[INFO]: Begin to export the font bin.
+[2024/7/3 19:4:34:850]-[INFO]: Begin to create lib source file...
+[2024/7/3 19:4:35:242]-[INFO]: Begin to export the whole resource bin file.
+[2024/7/3 19:4:35:248]-[INFO]: Begin to export images driver code.
+[2024/7/3 19:4:35:249]-[INFO]: Begin to build the font library.
+[2024/7/3 19:4:35:255]-[INFO]: Begin to exec keil5 cmd to build lib file...
+[2024/7/3 19:4:38:361]-[INFO]: 字库lib文件路径: C:\Program Files\GT-HMI Designer\gui-hmi-tools\gui-win\app\build\board.
+[2024/7/3 19:4:38:369]-[INFO]: build font lib or static lib by keil5.
+[2024/7/3 19:4:38:389]-[INFO]: Begin to compound the font and source bin file.
+[2024/7/3 19:4:38:389]-[INFO]: Begin to export the font bin.
+[2024/7/3 19:4:38:593]-[INFO]: Begin to create lib source file...
+[2024/7/3 19:4:38:977]-[INFO]: Begin to export the whole resource bin file.
+[2024/7/3 19:4:38:982]-[INFO]: Begin to export images driver code.
+[2024/7/3 19:4:38:983]-[INFO]: Begin to build the font library.
+[2024/7/3 19:4:38:988]-[INFO]: Begin to exec keil5 cmd to build lib file...
+[2024/7/3 19:4:41:672]-[INFO]: 字库lib文件路径: C:\Program Files\GT-HMI Designer\gui-hmi-tools\gui-win\app\build\out.
+[2024/7/3 19:4:41:676]-[INFO]: build font lib or static lib by keil5.
+[2024/7/3 19:4:42:32]-[INFO]: =========== Done ===========
+[2024/7/3 19:4:42:315]-[INFO]: 素材bin文件路径: C:\Users\Z\Desktop\HMI 测试文件\demo10_1\board.
+[2024/7/3 19:4:42:507]-[INFO]: 素材bin文件路径: C:\Users\Z\Desktop\HMI 测试文件\demo10_1\out.
+[2024/7/3 19:4:42:607]-[INFO]: 素材数组调用代码路径: C:\Users\Z\Desktop\HMI 测试文件\demo10_1\sources\ui.
+[2024/7/3 19:4:42:608]-[INFO]: 素材flash调用代码路径: C:\Users\Z\Desktop\HMI 测试文件\demo10_1\screen.

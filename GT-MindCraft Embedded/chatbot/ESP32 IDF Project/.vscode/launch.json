@@ -1,0 +1,29 @@
+{
+    "configurations": [
+      {
+        "name": "GDB",
+        "type": "cppdbg",
+        "request": "launch",
+        "MIMode": "gdb",
+        "miDebuggerPath": "${command:espIdf.getToolchainGdb}",
+        "program": "${workspaceFolder}/build/${command:espIdf.getProjectName}.elf",
+        "windows": {
+          "program": "${workspaceFolder}\\build\\${command:espIdf.getProjectName}.elf"
+        },
+        "cwd": "${workspaceFolder}",
+        "environment": [{ "name": "PATH", "value": "${config:idf.customExtraPaths}" }],
+        "setupCommands": [
+                { "text": "target remote :3333" },
+                { "text": "set remotetimeout 20" },
+            ],
+            "postRemoteConnectCommands": [
+                { "text": "mon reset halt" },
+                { "text": "maintenance flush register-cache"},
+            ],
+        "externalConsole": false,
+        "logging": {
+          "engineLogging": true
+        }
+      }
+    ]
+}

@@ -1,0 +1,1 @@
+使用立创EDA专业版打开 ProProject_高通AI开发板9.7.epro工程文件，立创EDA 为V2.1.64.版本
