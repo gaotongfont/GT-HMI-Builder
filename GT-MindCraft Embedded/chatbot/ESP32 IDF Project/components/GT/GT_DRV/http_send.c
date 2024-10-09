@@ -161,7 +161,7 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
     memset(local_response_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
 
     esp_http_client_config_t config = {
-        .url = "http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/",
+        .url =  "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",
         .event_handler = _http_event_handler,
         .user_data = local_response_buffer,        // Pass address of local buffer to get response
         .disable_auto_redirect = true,

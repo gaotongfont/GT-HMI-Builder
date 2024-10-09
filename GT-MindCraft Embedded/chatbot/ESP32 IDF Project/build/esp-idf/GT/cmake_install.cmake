@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/26743/Desktop/ESPAI/mindcraft-ai-development-board/components/GT
+# Install script for directory: C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/components/GT
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

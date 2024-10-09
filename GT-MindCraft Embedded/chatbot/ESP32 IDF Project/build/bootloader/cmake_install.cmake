@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/26743/Desktop/ESPAI/mindcraft-ai-development-board/build/bootloader/esp-idf/cmake_install.cmake")
+  include("C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/bootloader/esp-idf/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/26743/Desktop/ESPAI/mindcraft-ai-development-board/build/bootloader/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/bootloader/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
