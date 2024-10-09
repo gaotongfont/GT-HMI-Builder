@@ -1,0 +1,1202 @@
+From ce2b99b06ba168d27d2b77d5607126dd574ec4de Mon Sep 17 00:00:00 2001
+From: yang <1531133807@qq.com>
+Date: Mon, 26 Aug 2024 17:27:11 +0800
+Subject: [PATCH] add esp32-s3-gt borad
+
+---
+ components/audio_board/CMakeLists.txt         |   9 +
+ components/audio_board/Kconfig.projbuild      |   2 +
+ components/audio_board/component.mk           |   2 +-
+ components/audio_board/esp32_s3_gt/board.c    | 157 ++++++++++++
+ components/audio_board/esp32_s3_gt/board.h    | 112 +++++++++
+ .../audio_board/esp32_s3_gt/board_def.h       | 128 ++++++++++
+ .../esp32_s3_gt/board_pins_config.c           | 159 ++++++++++++
+ components/audio_hal/driver/es8388/es8388.c   |  23 +-
+ components/audio_stream/fatfs_stream.c        |   4 +-
+ components/audio_stream/include/http_stream.h |   2 +-
+ components/esp_peripherals/CMakeLists.txt     |   2 +
+ .../esp_peripherals/lib/xl9555/xl9555.c       | 230 ++++++++++++++++++
+ .../esp_peripherals/lib/xl9555/xl9555.h       | 189 ++++++++++++++
+ 13 files changed, 1012 insertions(+), 7 deletions(-)
+ create mode 100644 components/audio_board/esp32_s3_gt/board.c
+ create mode 100644 components/audio_board/esp32_s3_gt/board.h
+ create mode 100644 components/audio_board/esp32_s3_gt/board_def.h
+ create mode 100644 components/audio_board/esp32_s3_gt/board_pins_config.c
+ create mode 100644 components/esp_peripherals/lib/xl9555/xl9555.c
+ create mode 100644 components/esp_peripherals/lib/xl9555/xl9555.h
+
+diff --git a/components/audio_board/CMakeLists.txt b/components/audio_board/CMakeLists.txt
+index 2dfb3c64..2b583d94 100644
+--- a/components/audio_board/CMakeLists.txt
++++ b/components/audio_board/CMakeLists.txt
+@@ -106,6 +106,15 @@ set(COMPONENT_SRCS
+ )
+ endif()
+ 
++if(CONFIG_ESP32_S3_GT_BOARD)
++message(STATUS "Current board name is " CONFIG_ESP32_S3_GT_BOARD)
++list(APPEND COMPONENT_ADD_INCLUDEDIRS ./esp32_s3_gt)
++set(COMPONENT_SRCS
++./esp32_s3_gt/board.c
++./esp32_s3_gt/board_pins_config.c
++)
++endif()
++
+ if (CONFIG_ESP32_S3_BOX_3_BOARD)
+ message(STATUS "Current board name is " CONFIG_ESP32_S3_BOX_3_BOARD)
+ list(APPEND COMPONENT_ADD_INCLUDEDIRS ./esp32_s3_box_3)
+diff --git a/components/audio_board/Kconfig.projbuild b/components/audio_board/Kconfig.projbuild
+index 54e98419..bfd5eda1 100644
+--- a/components/audio_board/Kconfig.projbuild
++++ b/components/audio_board/Kconfig.projbuild
+@@ -29,6 +29,8 @@ config ESP32_S3_BOX_LITE_BOARD
+     bool "ESP32-S3-BOX-Lite"
+ config ESP32_S3_BOX_BOARD
+     bool "ESP32-S3-BOX"
++config ESP32_S3_GT_BOARD
++    bool "ESP32-S3-GT"
+ config ESP32_S3_BOX_3_BOARD
+     bool "ESP32-S3-BOX-3"
+ config ESP32_C3_LYRA_V2_BOARD
+diff --git a/components/audio_board/component.mk b/components/audio_board/component.mk
+index 61cf50f3..28025529 100644
+--- a/components/audio_board/component.mk
++++ b/components/audio_board/component.mk
+@@ -50,4 +50,4 @@ endif
+ ifdef CONFIG_ESP32_C3_LYRA_V2_BOARD
+ COMPONENT_ADD_INCLUDEDIRS += ./esp32_c3_lyra
+ COMPONENT_SRCDIRS += ./esp32_c3_lyra
+-endif
+\ No newline at end of file
++endif
+diff --git a/components/audio_board/esp32_s3_gt/board.c b/components/audio_board/esp32_s3_gt/board.c
+new file mode 100644
+index 00000000..92460ded
+--- /dev/null
++++ b/components/audio_board/esp32_s3_gt/board.c
+@@ -0,0 +1,157 @@
++/*
++ * ESPRESSIF MIT License
++ *
++ * Copyright (c) 2019 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
++ *
++ * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
++ * it is free of charge, to any person obtaining a copy of this software and associated
++ * documentation files (the "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
++ * to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all copies or
++ * substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#include "esp_log.h"
++#include "board.h"
++#include "audio_mem.h"
++
++#include "periph_sdcard.h"
++#include "led_indicator.h"
++#include "periph_touch.h"
++#include "periph_button.h"
++#include "xl9555.h"
++
++static const char *TAG = "AUDIO_BOARD";
++
++static audio_board_handle_t board_handle = 0;
++
++audio_board_handle_t audio_board_init(void)
++{
++    if (board_handle) {
++        ESP_LOGW(TAG, "The board has already been initialized!");
++        return board_handle;
++    }
++    board_handle = (audio_board_handle_t) audio_calloc(1, sizeof(struct audio_board_handle));
++    AUDIO_MEM_CHECK(TAG, board_handle, return NULL);
++
++    esp_xl9555_config_t pca_cfg = {
++        .i2c_scl = GPIO_NUM_42,
++        .i2c_sda = GPIO_NUM_41,
++        .interrupt_output = -1,
++    };
++    xl9555_init(&pca_cfg);
++    // pa
++    xl9555_set_io_config(PA_ENABLE_GPIO, XL9555_IO_OUTPUT);
++    xl9555_set_output_state(PA_ENABLE_GPIO, XL9555_IO_HIGH);
++    //
++    board_handle->audio_hal = audio_board_codec_init();
++
++    return board_handle;
++}
++
++audio_hal_handle_t audio_board_codec_init(void)
++{
++    audio_hal_codec_config_t audio_codec_cfg = AUDIO_CODEC_DEFAULT_CONFIG();
++    audio_hal_handle_t codec_hal = audio_hal_init(&audio_codec_cfg, &AUDIO_CODEC_ES8388_DEFAULT_HANDLE);
++    AUDIO_NULL_CHECK(TAG, codec_hal, return NULL);
++    return codec_hal;
++}
++
++display_service_handle_t audio_board_led_init(void)
++{
++    led_indicator_handle_t led = led_indicator_init((gpio_num_t)get_green_led_gpio());
++    display_service_config_t display = {
++        .based_cfg = {
++            .task_stack = 0,
++            .task_prio  = 0,
++            .task_core  = 0,
++            .task_func  = NULL,
++            .service_start = NULL,
++            .service_stop = NULL,
++            .service_destroy = NULL,
++            .service_ioctl = led_indicator_pattern,
++            .service_name = "DISPLAY_serv",
++            .user_data = NULL,
++        },
++        .instance = led,
++    };
++
++    return display_service_create(&display);
++}
++
++esp_err_t audio_board_key_init(esp_periph_set_handle_t set)
++{
++    periph_button_cfg_t btn_cfg = {
++        .gpio_mask = (1ULL << get_input_rec_id()) | (1ULL << get_input_mode_id()), //REC BTN & MODE BTN
++    };
++    esp_periph_handle_t button_handle = periph_button_init(&btn_cfg);
++    AUDIO_NULL_CHECK(TAG, button_handle, return ESP_ERR_ADF_MEMORY_LACK);
++    esp_err_t ret = ESP_OK;
++    ret = esp_periph_start(set, button_handle);
++    if (ret != ESP_OK) {
++        return ret;
++    }
++    periph_touch_cfg_t touch_cfg = {
++        .touch_mask = TOUCH_PAD_SEL4 | TOUCH_PAD_SEL7 | TOUCH_PAD_SEL8 | TOUCH_PAD_SEL9,
++        .tap_threshold_percent = 70,
++    };
++    esp_periph_handle_t touch_periph = periph_touch_init(&touch_cfg);
++    AUDIO_NULL_CHECK(TAG, touch_periph, return ESP_ERR_ADF_MEMORY_LACK);
++    ret = esp_periph_start(set, touch_periph);
++    return ret;
++}
++
++esp_err_t audio_board_sdcard_init(esp_periph_set_handle_t set, periph_sdcard_mode_t mode)
++{
++    if (mode >= SD_MODE_4_LINE) {
++        ESP_LOGE(TAG, "Please select the correct sd mode!, current mode is %d", mode);
++        return ESP_FAIL;
++    }
++    periph_sdcard_cfg_t sdcard_cfg = {
++        .root = "/sdcard",
++        .card_detect_pin = get_sdcard_intr_gpio(), // GPIO_NUM_34
++        .mode = mode,
++    };
++    esp_periph_handle_t sdcard_handle = periph_sdcard_init(&sdcard_cfg);
++    esp_err_t ret = esp_periph_start(set, sdcard_handle);
++    int retry_time = 5;
++    bool mount_flag = false;
++    while (retry_time --) {
++        if (periph_sdcard_is_mounted(sdcard_handle)) {
++            mount_flag = true;
++            break;
++        } else {
++            vTaskDelay(500 / portTICK_PERIOD_MS);
++        }
++    }
++    if (mount_flag == false) {
++        ESP_LOGE(TAG, "Sdcard mount failed");
++        return ESP_FAIL;
++    }
++    return ret;
++}
++
++audio_board_handle_t audio_board_get_handle(void)
++{
++    return board_handle;
++}
++
++esp_err_t audio_board_deinit(audio_board_handle_t audio_board)
++{
++    esp_err_t ret = ESP_OK;
++    ret = audio_hal_deinit(audio_board->audio_hal);
++    audio_free(audio_board);
++    board_handle = NULL;
++    return ret;
++}
+diff --git a/components/audio_board/esp32_s3_gt/board.h b/components/audio_board/esp32_s3_gt/board.h
+new file mode 100644
+index 00000000..935addfe
+--- /dev/null
++++ b/components/audio_board/esp32_s3_gt/board.h
+@@ -0,0 +1,112 @@
++/*
++ * ESPRESSIF MIT License
++ *
++ * Copyright (c) 2019 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
++ *
++ * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
++ * it is free of charge, to any person obtaining a copy of this software and associated
++ * documentation files (the "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
++ * to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all copies or
++ * substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#ifndef _AUDIO_BOARD_H_
++#define _AUDIO_BOARD_H_
++
++#include "audio_hal.h"
++#include "board_def.h"
++#include "board_pins_config.h"
++#include "esp_peripherals.h"
++#include "display_service.h"
++#include "periph_sdcard.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * @brief Audio board handle
++ */
++struct audio_board_handle {
++    audio_hal_handle_t audio_hal; /*!< audio hardware abstract layer handle */
++};
++
++typedef struct audio_board_handle *audio_board_handle_t;
++
++/**
++ * @brief Initialize audio board
++ *
++ * @return The audio board handle
++ */
++audio_board_handle_t audio_board_init(void);
++
++/**
++ * @brief Initialize codec chip
++ *
++ * @return The audio hal handle
++ */
++audio_hal_handle_t audio_board_codec_init(void);
++
++/**
++ * @brief Initialize led peripheral and display service
++ *
++ * @return The audio display service handle
++ */
++display_service_handle_t audio_board_led_init(void);
++
++/**
++ * @brief Initialize key peripheral
++ *
++ * @param set The handle of esp_periph_set_handle_t
++ *
++ * @return
++ *     - ESP_OK, success
++ *     - Others, fail
++ */
++esp_err_t audio_board_key_init(esp_periph_set_handle_t set);
++
++/**
++ * @brief Initialize sdcard peripheral
++ *
++ * @param set The handle of esp_periph_set_handle_t
++ *
++ * @return
++ *     - ESP_OK, success
++ *     - Others, fail
++ */
++esp_err_t audio_board_sdcard_init(esp_periph_set_handle_t set, periph_sdcard_mode_t mode);
++
++/**
++ * @brief Query audio_board_handle
++ *
++ * @return The audio board handle
++ */
++audio_board_handle_t audio_board_get_handle(void);
++
++/**
++ * @brief Uninitialize the audio board
++ *
++ * @param audio_board The handle of audio board
++ *
++ * @return  0       success,
++ *          others  fail
++ */
++esp_err_t audio_board_deinit(audio_board_handle_t audio_board);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff --git a/components/audio_board/esp32_s3_gt/board_def.h b/components/audio_board/esp32_s3_gt/board_def.h
+new file mode 100644
+index 00000000..19e0caef
+--- /dev/null
++++ b/components/audio_board/esp32_s3_gt/board_def.h
+@@ -0,0 +1,128 @@
++/*
++ * ESPRESSIF MIT License
++ *
++ * Copyright (c) 2019 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
++ *
++ * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
++ * it is free of charge, to any person obtaining a copy of this software and associated
++ * documentation files (the "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
++ * to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all copies or
++ * substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#ifndef _AUDIO_BOARD_DEFINITION_H_
++#define _AUDIO_BOARD_DEFINITION_H_
++
++#include "driver/touch_pad.h"
++
++/**
++ * @brief SDCARD Function Definition
++ */
++#define FUNC_SDCARD_EN            (1)
++#define SDCARD_OPEN_FILE_NUM_MAX  (5)
++#define SDCARD_INTR_GPIO          (-1) // GPIO_NUM_34
++#define ESP_SD_PIN_CLK            (GPIO_NUM_12) // GPIO_NUM_14
++#define ESP_SD_PIN_CMD            (GPIO_NUM_11) // GPIO_NUM_15
++#define ESP_SD_PIN_D0             (GPIO_NUM_13) // GPIO_NUM_2
++#define ESP_SD_PIN_D1             (-1) // GPIO_NUM_4
++#define ESP_SD_PIN_D2             (-1) // GPIO_NUM_12
++#define ESP_SD_PIN_D3             (GPIO_NUM_2) // GPIO_NUM_13
++#define ESP_SD_PIN_D4             (-1)
++#define ESP_SD_PIN_D5             (-1)
++#define ESP_SD_PIN_D6             (-1)
++#define ESP_SD_PIN_D7             (-1)
++#define ESP_SD_PIN_CD             (-1)
++#define ESP_SD_PIN_WP             (-1)
++
++/**
++ * @brief LED Function Definition
++ */
++#define FUNC_SYS_LEN_EN           (1)
++#define GREEN_LED_GPIO            (-1) //GPIO_NUM_22
++
++
++/**
++ * @brief Audio Codec Chip Function Definition
++ */
++#define FUNC_AUDIO_CODEC_EN       (1)
++#define AUXIN_DETECT_GPIO         (-1) // GPIO_NUM_12
++#define HEADPHONE_DETECT          (-1) // GPIO_NUM_19
++#define PA_ENABLE_GPIO            (BIT(3)) // (-1) // GPIO_NUM_21
++#define CODEC_ADC_I2S_PORT        (0)
++#define CODEC_ADC_BITS_PER_SAMPLE (16) /* 16bit */
++#define CODEC_ADC_SAMPLE_RATE     (48000)
++#define RECORD_HARDWARE_AEC       (false)
++#define BOARD_PA_GAIN             (10) /* Power amplifier gain defined by board (dB) */
++
++extern audio_hal_func_t AUDIO_CODEC_ES8388_DEFAULT_HANDLE;
++#define AUDIO_CODEC_DEFAULT_CONFIG(){                   \
++        .adc_input  = AUDIO_HAL_ADC_INPUT_LINE1,        \
++        .dac_output = AUDIO_HAL_DAC_OUTPUT_ALL,         \
++        .codec_mode = AUDIO_HAL_CODEC_MODE_BOTH,        \
++        .i2s_iface = {                                  \
++            .mode = AUDIO_HAL_MODE_SLAVE,               \
++            .fmt = AUDIO_HAL_I2S_NORMAL,                \
++            .samples = AUDIO_HAL_48K_SAMPLES,           \
++            .bits = AUDIO_HAL_BIT_LENGTH_16BITS,        \
++        },                                              \
++};
++
++
++/**
++ * @brief Button Function Definition
++ */
++#define FUNC_BUTTON_EN            (1)
++#define INPUT_KEY_NUM             6
++#define BUTTON_REC_ID             (-1) // GPIO_NUM_36
++#define BUTTON_MODE_ID            (-1) // GPIO_NUM_39
++#define BUTTON_SET_ID             (-1) // TOUCH_PAD_NUM9
++#define BUTTON_PLAY_ID            (-1) // TOUCH_PAD_NUM8
++#define BUTTON_VOLUP_ID           (-1) // TOUCH_PAD_NUM7
++#define BUTTON_VOLDOWN_ID         (-1) // TOUCH_PAD_NUM4
++
++#define INPUT_KEY_DEFAULT_INFO() {                      \
++     {                                                  \
++        .type = PERIPH_ID_BUTTON,                       \
++        .user_id = INPUT_KEY_USER_ID_REC,               \
++        .act_id = BUTTON_REC_ID,                        \
++    },                                                  \
++    {                                                   \
++        .type = PERIPH_ID_BUTTON,                       \
++        .user_id = INPUT_KEY_USER_ID_MODE,              \
++        .act_id = BUTTON_MODE_ID,                       \
++    },                                                  \
++    {                                                   \
++        .type = PERIPH_ID_TOUCH,                        \
++        .user_id = INPUT_KEY_USER_ID_SET,               \
++        .act_id = BUTTON_SET_ID,                        \
++    },                                                  \
++    {                                                   \
++        .type = PERIPH_ID_TOUCH,                        \
++        .user_id = INPUT_KEY_USER_ID_PLAY,              \
++        .act_id = BUTTON_PLAY_ID,                       \
++    },                                                  \
++    {                                                   \
++        .type = PERIPH_ID_TOUCH,                        \
++        .user_id = INPUT_KEY_USER_ID_VOLUP,             \
++        .act_id = BUTTON_VOLUP_ID,                      \
++    },                                                  \
++    {                                                   \
++        .type = PERIPH_ID_TOUCH,                        \
++        .user_id = INPUT_KEY_USER_ID_VOLDOWN,           \
++        .act_id = BUTTON_VOLDOWN_ID,                    \
++    }                                                   \
++}
++
++#endif
+diff --git a/components/audio_board/esp32_s3_gt/board_pins_config.c b/components/audio_board/esp32_s3_gt/board_pins_config.c
+new file mode 100644
+index 00000000..4db710b0
+--- /dev/null
++++ b/components/audio_board/esp32_s3_gt/board_pins_config.c
+@@ -0,0 +1,159 @@
++/*
++ * ESPRESSIF MIT License
++ *
++ * Copyright (c) 2019 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
++ *
++ * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
++ * it is free of charge, to any person obtaining a copy of this software and associated
++ * documentation files (the "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
++ * to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all copies or
++ * substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#include "esp_log.h"
++#include "driver/gpio.h"
++#include <string.h>
++#include "board.h"
++#include "audio_error.h"
++#include "audio_mem.h"
++#include "soc/io_mux_reg.h"
++#include "soc/soc_caps.h"
++
++static const char *TAG = "GT_ESP32_Board";
++
++esp_err_t get_i2c_pins(i2c_port_t port, i2c_config_t *i2c_config)
++{
++    AUDIO_NULL_CHECK(TAG, i2c_config, return ESP_FAIL);
++    if (port == I2C_NUM_0)
++    {
++        i2c_config->sda_io_num = GPIO_NUM_41;
++        i2c_config->scl_io_num = GPIO_NUM_42;
++    }
++    else if(port == I2C_NUM_1)
++    {
++        i2c_config->sda_io_num = GPIO_NUM_5;
++        i2c_config->scl_io_num = GPIO_NUM_4;
++    } else {
++        i2c_config->sda_io_num = -1;
++        i2c_config->scl_io_num = -1;
++        ESP_LOGE(TAG, "i2c port %d is not supported", port);
++        return ESP_FAIL;
++    }
++    return ESP_OK;
++}
++
++esp_err_t get_i2s_pins(int port, board_i2s_pin_t *i2s_config)
++{
++    AUDIO_NULL_CHECK(TAG, i2s_config, return ESP_FAIL);
++    if (port == 0 || port == 1) {
++        i2s_config->bck_io_num = GPIO_NUM_46;
++        i2s_config->ws_io_num = GPIO_NUM_9;
++        i2s_config->data_out_num = GPIO_NUM_10;
++        i2s_config->data_in_num = GPIO_NUM_14;
++        i2s_config->mck_io_num = GPIO_NUM_3;
++    } else {
++        memset(i2s_config, -1, sizeof(board_i2s_pin_t));
++        ESP_LOGE(TAG, "i2s port %d is not supported", port);
++        return ESP_FAIL;
++    }
++    return ESP_OK;
++}
++
++esp_err_t get_spi_pins(spi_bus_config_t *spi_config, spi_device_interface_config_t *spi_device_interface_config)
++{
++    AUDIO_NULL_CHECK(TAG, spi_config, return ESP_FAIL);
++    AUDIO_NULL_CHECK(TAG, spi_device_interface_config, return ESP_FAIL);
++
++    spi_config->mosi_io_num = -1;
++    spi_config->miso_io_num = -1;
++    spi_config->sclk_io_num = -1;
++    spi_config->quadwp_io_num = -1;
++    spi_config->quadhd_io_num = -1;
++
++    spi_device_interface_config->spics_io_num = -1;
++
++    ESP_LOGW(TAG, "SPI interface is not supported");
++    return ESP_OK;
++}
++
++// sdcard
++
++int8_t get_sdcard_intr_gpio(void)
++{
++    return SDCARD_INTR_GPIO;
++}
++
++int8_t get_sdcard_open_file_num_max(void)
++{
++    return SDCARD_OPEN_FILE_NUM_MAX;
++}
++
++// input-output pins
++
++int8_t get_auxin_detect_gpio(void)
++{
++    return AUXIN_DETECT_GPIO;
++}
++
++int8_t get_headphone_detect_gpio(void)
++{
++    return HEADPHONE_DETECT;
++}
++
++int8_t get_pa_enable_gpio(void)
++{
++    return PA_ENABLE_GPIO;
++}
++
++// button pins
++
++int8_t get_input_rec_id(void)
++{
++    return BUTTON_REC_ID;
++}
++
++int8_t get_input_mode_id(void)
++{
++    return BUTTON_MODE_ID;
++}
++
++// touch pins
++
++int8_t get_input_set_id(void)
++{
++    return BUTTON_SET_ID;
++}
++
++int8_t get_input_play_id(void)
++{
++    return BUTTON_PLAY_ID;
++}
++
++int8_t get_input_volup_id(void)
++{
++    return BUTTON_VOLUP_ID;
++}
++
++int8_t get_input_voldown_id(void)
++{
++    return BUTTON_VOLDOWN_ID;
++}
++
++// led pins
++
++int8_t get_green_led_gpio(void)
++{
++    return GREEN_LED_GPIO;
++}
+diff --git a/components/audio_hal/driver/es8388/es8388.c b/components/audio_hal/driver/es8388/es8388.c
+index 144e7281..d00e16f6 100755
+--- a/components/audio_hal/driver/es8388/es8388.c
++++ b/components/audio_hal/driver/es8388/es8388.c
+@@ -33,6 +33,10 @@
+ #include "headphone_detect.h"
+ #endif
+ 
++#ifdef CONFIG_ESP32_S3_GT_BOARD
++#include "xl9555.h"
++#endif
++
+ static const char *ES_TAG = "ES8388_DRIVER";
+ static i2c_bus_handle_t i2c_handle;
+ static codec_dac_volume_config_t *dac_vol_handle;
+@@ -296,8 +300,8 @@ esp_err_t es8388_init(audio_hal_codec_config_t *cfg)
+ 
+     res |= es_write_reg(ES8388_ADDR, ES8388_DACCONTROL24, 0x1E); // Set L1 R1 L2 R2 volume. 0x00: -30dB, 0x1E: 0dB, 0x21: 3dB
+     res |= es_write_reg(ES8388_ADDR, ES8388_DACCONTROL25, 0x1E);
+-    res |= es_write_reg(ES8388_ADDR, ES8388_DACCONTROL26, 0);
+-    res |= es_write_reg(ES8388_ADDR, ES8388_DACCONTROL27, 0);
++    res |= es_write_reg(ES8388_ADDR, ES8388_DACCONTROL26, 0x1E);
++    res |= es_write_reg(ES8388_ADDR, ES8388_DACCONTROL27, 0x1E);
+     // res |= es8388_set_adc_dac_volume(ES_MODULE_DAC, 0, 0);       // 0db
+     int tmp = 0;
+     if (AUDIO_HAL_DAC_OUTPUT_LINE2 == cfg->dac_output) {
+@@ -326,12 +330,16 @@ esp_err_t es8388_init(audio_hal_codec_config_t *cfg)
+     //ALC for Microphone
+     res |= es8388_set_adc_dac_volume(ES_MODULE_ADC, 0, 0);      // 0db
+     res |= es_write_reg(ES8388_ADDR, ES8388_ADCPOWER, 0x09);    // Power on ADC, enable LIN&RIN, power off MICBIAS, and set int1lp to low power mode
+-    
++
+     /* es8388 PA gpio_config */
+     gpio_config_t  io_conf;
+     memset(&io_conf, 0, sizeof(io_conf));
+     io_conf.mode = GPIO_MODE_OUTPUT;
++#ifdef CONFIG_ESP32_S3_GT_BOARD
++    io_conf.pin_bit_mask = -1;
++#else
+     io_conf.pin_bit_mask = BIT64(get_pa_enable_gpio());
++#endif
+     io_conf.pull_down_en = 0;
+     io_conf.pull_up_en = 0;
+     gpio_config(&io_conf);
+@@ -573,10 +581,19 @@ esp_err_t es8388_config_i2s(audio_hal_codec_mode_t mode, audio_hal_codec_i2s_ifa
+ esp_err_t es8388_pa_power(bool enable)
+ {
+     esp_err_t res = ESP_OK;
++#ifdef CONFIG_ESP32_S3_GT_BOARD
++    ESP_LOGE("TAG", "pa power control by xl9555 enable:%d\n", enable);
++    if(enable){
++        res = xl9555_set_output_state(get_pa_enable_gpio(), 0);
++    }else {
++        res = xl9555_set_output_state(get_pa_enable_gpio(), 1);
++    }
++#else
+     if (enable) {
+         res = gpio_set_level(get_pa_enable_gpio(), 1);
+     } else {
+         res = gpio_set_level(get_pa_enable_gpio(), 0);
+     }
++#endif
+     return res;
+ }
+diff --git a/components/audio_stream/fatfs_stream.c b/components/audio_stream/fatfs_stream.c
+index 4afe8f4f..4fde033c 100644
+--- a/components/audio_stream/fatfs_stream.c
++++ b/components/audio_stream/fatfs_stream.c
+@@ -88,7 +88,7 @@ static wr_stream_type_t get_type(const char *str)
+     }
+ }
+ 
+-static char* get_mount_path(char* uri) 
++static char* get_mount_path(char* uri)
+ {
+     /* support format: /sdcard, /spiffs, /storage etc ... */
+     if (uri[0] == '/') return uri;
+@@ -300,4 +300,4 @@ _fatfs_init_exit:
+     audio_free(fatfs);
+     return NULL;
+ }
+-// Example of using an audio element - END
+\ No newline at end of file
++// Example of using an audio element - END
+diff --git a/components/audio_stream/include/http_stream.h b/components/audio_stream/include/http_stream.h
+index b12d3d0a..f565a7ff 100644
+--- a/components/audio_stream/include/http_stream.h
++++ b/components/audio_stream/include/http_stream.h
+@@ -90,7 +90,7 @@ typedef struct {
+                                                              bundle for server verification, must be enabled in menuconfig */
+     int                         request_size;           /*!< Request data size each time from `http_client`
+                                                              Defaults use DEFAULT_ELEMENT_BUFFER_LENGTH if set to 0
+-                                                             Need care this setting if audio frame size is small and want low latency playback */                                                         
++                                                             Need care this setting if audio frame size is small and want low latency playback */
+     int                         request_range_size;     /*!< Range size setting for header `Range: bytes=start-end`
+                                                              Request full range of resource if set to 0
+                                                              Range size bigger than request size is recommended */
+diff --git a/components/esp_peripherals/CMakeLists.txt b/components/esp_peripherals/CMakeLists.txt
+index f192e6ff..94f5616d 100644
+--- a/components/esp_peripherals/CMakeLists.txt
++++ b/components/esp_peripherals/CMakeLists.txt
+@@ -8,6 +8,7 @@ list(APPEND COMPONENT_ADD_INCLUDEDIRS ./include
+                 ./lib/IS31FL3216
+                 ./lib/aw2013
+                 ./lib/tca9554
++                ./lib/xl9555
+                 ./driver/i2c_bus)
+ 
+ list(APPEND COMPONENT_SRCS ./esp_peripherals.c
+@@ -28,6 +29,7 @@ list(APPEND COMPONENT_SRCS ./esp_peripherals.c
+                 ./lib/adc_button/adc_button.c
+                 ./lib/IS31FL3216/IS31FL3216.c
+                 ./lib/tca9554/tca9554.c
++                ./lib/xl9555/xl9555.c
+                 ./lib/gpio_isr/gpio_isr.c)
+ 
+ if("${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}" VERSION_LESS "5.3")
+diff --git a/components/esp_peripherals/lib/xl9555/xl9555.c b/components/esp_peripherals/lib/xl9555/xl9555.c
+new file mode 100644
+index 00000000..5e5081c0
+--- /dev/null
++++ b/components/esp_peripherals/lib/xl9555/xl9555.c
+@@ -0,0 +1,230 @@
++/*
++ * ESPRESSIF MIT License
++ *
++ * Copyright (c) 2021 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
++ *
++ * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
++ * it is free of charge, to any person obtaining a copy of this software and associated
++ * documentation files (the "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
++ * to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all copies or
++ * substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#include <string.h>
++#include "i2c_bus.h"
++#include "board.h"
++#include "esp_log.h"
++#include "xl9555.h"
++
++static char *TAG = "XL9555";
++static i2c_bus_handle_t i2c_handle;
++
++#define SET_BITS(_m, _s, _v)  ((_v) ? (_m)|((_s)) : (_m)&~((_s)))
++#define GET_BITS(_m, _s)      (((_m) & (_s)) ? true : false)
++
++typedef struct {
++    uint8_t addr;
++    char *name;
++} xl9555_dev_t;
++
++static xl9555_dev_t dev_list[] = {
++    { XL9555_ADDR, "XL9555"},
++};
++
++static uint8_t xl9555_addr;
++
++static esp_err_t expander_dev_prob()
++{
++    for (size_t i = 0; i < sizeof(dev_list) / sizeof(dev_list[0]); i++) {
++        if (ESP_OK == i2c_bus_probe_addr(i2c_handle, dev_list[i].addr)) {
++            ESP_LOGI(TAG, "Detected IO expander device at 0x%02X, name is: %s",
++                     dev_list[i].addr, dev_list[i].name);
++            xl9555_addr = dev_list[i].addr;
++            return ESP_OK;
++        }
++    }
++    xl9555_addr = 0;
++    ESP_LOGE(TAG, "IO expander device has not detected");
++    return ESP_ERR_NOT_FOUND;
++}
++
++static esp_err_t xl9555_write_reg(uint8_t reg_addr, uint8_t *data, size_t len)
++{
++    return i2c_bus_write_bytes(i2c_handle, xl9555_addr, &reg_addr, sizeof(reg_addr), data, len);
++}
++
++static char xl9555_read_reg(uint8_t reg_addr, uint8_t *data, size_t len)
++{
++    return i2c_bus_read_bytes(i2c_handle, xl9555_addr, &reg_addr, sizeof(reg_addr), data, len);
++}
++
++static int i2c_init(gpio_num_t clk, gpio_num_t sda)
++{
++    int res = 0;
++    i2c_config_t es_i2c_cfg = {
++        .mode = I2C_MODE_MASTER,
++        .sda_pullup_en = GPIO_PULLUP_ENABLE,
++        .scl_pullup_en = GPIO_PULLUP_ENABLE,
++        .master.clk_speed = 100000,
++        .scl_io_num = clk,
++        .sda_io_num = sda,
++    };
++    i2c_handle = i2c_bus_create(I2C_NUM_0, &es_i2c_cfg);
++    return res;
++}
++
++
++esp_xl9555_io_level_t xl9555_get_input_state(esp_xl9555_gpio_num_t gpio_num)
++{
++    uint16_t ret;
++    uint8_t data[2];
++
++    if (gpio_num < XL9555_GPIO_NUM_MAX) {
++        xl9555_read_reg(XL9555_INPUT_PORT0_REG, data, 2);
++    } else {
++        ESP_LOGE(TAG, "gpio num is error, current gpio: %d", gpio_num);
++        return XL9555_LEVEL_ERROR;
++    }
++
++    ret = data[1] << 8 | data[0];
++     ESP_LOGI(TAG, "ret value: 0x%X", ret);
++    return GET_BITS(ret, gpio_num);
++}
++
++
++esp_xl9555_io_level_t xl9555_get_output_state(esp_xl9555_gpio_num_t gpio_num)
++{
++    uint16_t ret;
++    uint8_t data[2];
++    if (gpio_num < XL9555_GPIO_NUM_MAX) {
++        xl9555_read_reg(XL9555_OUTPUT_PORT0_REG, data, 2);
++    } else {
++        ESP_LOGE(TAG, "gpio num is error, current gpio: %d", gpio_num);
++        return XL9555_LEVEL_ERROR;
++    }
++
++    ret = data[1] << 8 | data[0];
++     ESP_LOGI(TAG, "ret value: 0x%X", ret);
++
++    return GET_BITS(ret, gpio_num);
++}
++
++esp_err_t xl9555_set_output_state(esp_xl9555_gpio_num_t gpio_num, esp_xl9555_io_level_t level)
++{
++    uint8_t data[2];
++    esp_err_t res = ESP_FAIL;
++    if (gpio_num < XL9555_GPIO_NUM_MAX) {
++        xl9555_read_reg(XL9555_OUTPUT_PORT0_REG, data, 2);
++        if (gpio_num <= GBC_KEY_IO)
++        {
++            data[0] = SET_BITS(data[0], (uint8_t)(0xFF & gpio_num), level);
++        }
++        else
++        {
++            data[1] = SET_BITS(data[1], (uint8_t)(0xFF & (gpio_num >> 8)), level);
++        }
++
++        res = xl9555_write_reg(XL9555_OUTPUT_PORT0_REG, data, 2);
++    } else {
++        ESP_LOGE(TAG, "gpio num is error, current gpio: %d", gpio_num);
++    }
++    return res;
++}
++
++
++esp_err_t xl9555_set_polarity_inversion(esp_xl9555_gpio_num_t gpio_num, esp_xl9555_io_polarity_t polarity)
++{
++    uint8_t data[2];
++    esp_err_t res = ESP_FAIL;
++    if (gpio_num < XL9555_GPIO_NUM_MAX) {
++        xl9555_read_reg(XL9555_INVERSION_PORT0_REG, data, 2);
++        if (gpio_num <= GBC_KEY_IO)
++        {
++            data[0] = SET_BITS(data[0], (uint8_t)(0xFF & gpio_num), polarity);
++        }
++        else
++        {
++            data[1] = SET_BITS(data[1], (uint8_t)(0xFF & (gpio_num >> 8)), polarity);
++        }
++        res = xl9555_write_reg(XL9555_INVERSION_PORT0_REG, data, 2);
++    } else {
++        ESP_LOGE(TAG, "gpio num is error, current gpio: %d", gpio_num);
++    }
++    return res;
++}
++
++
++esp_xl9555_io_config_t xl9555_get_io_config(esp_xl9555_gpio_num_t gpio_num)
++{
++    uint16_t ret;
++    uint8_t data[2];
++    if (gpio_num < XL9555_GPIO_NUM_MAX) {
++        xl9555_read_reg(XL9555_CONFIG_PORT0_REG, data, 2);
++    } else {
++        ESP_LOGE(TAG, "gpio num is error, current gpio: %d", gpio_num);
++        return XL9555_LEVEL_ERROR;
++    }
++
++    ret = data[1] << 8 | data[0];
++    return GET_BITS(ret, gpio_num);
++}
++
++
++esp_err_t xl9555_set_io_config(esp_xl9555_gpio_num_t gpio_num, esp_xl9555_io_config_t io_config)
++{
++    uint8_t data[2];
++    esp_err_t res = ESP_FAIL;
++    if (gpio_num < XL9555_GPIO_NUM_MAX) {
++        xl9555_read_reg(XL9555_CONFIG_PORT0_REG, data, 2);
++        if (gpio_num <= GBC_KEY_IO)
++        {
++            data[0] = SET_BITS(data[0], (uint8_t)(0xFF & gpio_num), io_config);
++        }
++        else
++        {
++            data[1] = SET_BITS(data[1], (uint8_t)(0xFF & (gpio_num >> 8)), io_config);
++        }
++        res = xl9555_write_reg(XL9555_CONFIG_PORT0_REG, data, 2);
++    } else {
++        ESP_LOGE(TAG, "gpio num is error, current gpio: %d", gpio_num);
++    }
++    return res;
++}
++
++
++void xl9555_read_all()
++{
++    uint8_t data[2];
++    for (int i = 0; i < 0x08; i++) {
++        uint8_t reg = xl9555_read_reg(i, data, 2);
++        ESP_LOGI(TAG, "REG:%02x, %02x", i, reg);
++    }
++}
++
++esp_err_t xl9555_init(esp_xl9555_config_t *cfg)
++{
++    esp_err_t ret = ESP_OK;
++    i2c_init(cfg->i2c_scl, cfg->i2c_sda);
++
++    expander_dev_prob();
++
++    return ret;
++}
++
++esp_err_t xl9555_deinit()
++{
++    i2c_bus_delete(i2c_handle);
++    return ESP_OK;
++}
+diff --git a/components/esp_peripherals/lib/xl9555/xl9555.h b/components/esp_peripherals/lib/xl9555/xl9555.h
+new file mode 100644
+index 00000000..22840613
+--- /dev/null
++++ b/components/esp_peripherals/lib/xl9555/xl9555.h
+@@ -0,0 +1,189 @@
++/*
++ * ESPRESSIF MIT License
++ *
++ * Copyright (c) 2021 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
++ *
++ * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
++ * it is free of charge, to any person obtaining a copy of this software and associated
++ * documentation files (the "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
++ * to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all copies or
++ * substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#ifndef _XL9555_H
++#define _XL9555_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include "driver/gpio.h"
++
++/* 引脚与相关参数定义 */
++// #define XL9555_INT_IO               GPIO_NUM_40                     /* XL9555_INT引脚 */
++// #define XL9555_INT                  gpio_get_level(XL9555_INT_IO)   /* 读取XL9555_INT的电平 */
++
++/* XL9555命令宏 */
++#define XL9555_INPUT_PORT0_REG      0                               /* 输入寄存器0地址 */
++#define XL9555_INPUT_PORT1_REG      1                               /* 输入寄存器1地址 */
++#define XL9555_OUTPUT_PORT0_REG     2                               /* 输出寄存器0地址 */
++#define XL9555_OUTPUT_PORT1_REG     3                               /* 输出寄存器1地址 */
++#define XL9555_INVERSION_PORT0_REG  4                               /* 极性反转寄存器0地址 */
++#define XL9555_INVERSION_PORT1_REG  5                               /* 极性反转寄存器1地址 */
++#define XL9555_CONFIG_PORT0_REG     6                               /* 方向配置寄存器0地址 */
++#define XL9555_CONFIG_PORT1_REG     7                               /* 方向配置寄存器1地址 */
++
++#define XL9555_ADDR                 0x40 // 0X20                            /* XL9555地址(左移了一位)-->请看手册（9.1. Device Address） */
++
++typedef enum {
++    AP_INT_IO    = BIT(0),
++    QMA_INT_IO   = BIT(1),
++    SPK_EN_IO    = BIT(2),
++    BEEP_IO      = BIT(3),
++    OV_PWDN_IO   = BIT(4),
++    OV_RESET_IO  = BIT(5),
++    GBC_LED_IO   = BIT(6),
++    GBC_KEY_IO   = BIT(7),
++    LCD_BL_IO    = BIT(8),
++    CT_RST_IO    = BIT(9),
++    SLCD_RST_IO  = BIT(10),
++    SLCD_PWR_IO  = BIT(11),
++    KEY3_IO      = BIT(12),
++    KEY2_IO      = BIT(13),
++    KEY1_IO      = BIT(14),
++    KEY0_IO      = BIT(15),
++    XL9555_GPIO_NUM_MAX
++} esp_xl9555_gpio_num_t;
++
++
++typedef enum {
++    XL9555_IO_LOW,
++    XL9555_IO_HIGH,
++    XL9555_LEVEL_ERROR
++} esp_xl9555_io_level_t;
++
++typedef enum {
++    XL9555_IO_RETAINED,
++    XL9555_IO_INVERTED
++} esp_xl9555_io_polarity_t;
++
++typedef enum {
++    XL9555_IO_OUTPUT,
++    XL9555_IO_INPUT
++} esp_xl9555_io_config_t;
++
++typedef struct {
++    gpio_num_t i2c_sda;
++    gpio_num_t i2c_scl;
++    gpio_num_t interrupt_output;
++} esp_xl9555_config_t;
++
++/*
++ * @brief Initialize XL9555 chip
++ *
++ * @param codec_cfg  configuration of XL9555
++ *
++ * @return
++ *      - ESP_OK
++ *      - ESP_FAIL
++ */
++esp_err_t xl9555_init(esp_xl9555_config_t *cfg);
++
++/**
++ * @brief Deinitialize XL9555 chip
++ *
++ * @return
++ *     - ESP_OK
++ *     - ESP_FAIL
++ */
++esp_err_t xl9555_deinit(void);
++
++/*
++ * @brief Get XL9555 input level
++ *
++ * @param gpio_num  GPIO of XL9555
++ *
++ * @return
++ *      - esp_xl9555_io_level_t
++ */
++esp_xl9555_io_level_t xl9555_get_input_state(esp_xl9555_gpio_num_t gpio_num);
++
++/*
++ * @brief Get PCA95xian39 output level
++ *
++ * @param gpio_num  GPIO of XL9555
++ *
++ * @return
++ *      - esp_xl9555_io_level_t
++ */
++esp_xl9555_io_level_t xl9555_get_output_state(esp_xl9555_gpio_num_t gpio_num);
++
++/*
++ * @brief Get XL9555 output state
++ *
++ * @param gpio_num  GPIO of XL9555
++ *
++ * @return
++ *      - esp_xl9555_io_level_t
++ */
++esp_err_t xl9555_set_output_state(esp_xl9555_gpio_num_t gpio_num, esp_xl9555_io_level_t level);
++
++/*
++ * @brief Set XL9555 polarity
++ *
++ * @param gpio_num  GPIO of XL9555
++ *        polarity  polarity
++ *
++ * @return
++ *      - ESP_OK
++ *      - ESP_FAIL
++ */
++esp_err_t xl9555_set_polarity_inversion(esp_xl9555_gpio_num_t gpio_num, esp_xl9555_io_polarity_t polarity);
++
++/*
++ * @brief Get XL9555 output level
++ *
++ * @param gpio_num  GPIO of XL9555
++ *
++ * @return
++ *      - esp_xl9555_io_level_t
++ */
++esp_xl9555_io_config_t xl9555_get_io_config(esp_xl9555_gpio_num_t gpio_num);
++
++/*
++ * @brief Set XL9555 io config
++ *
++ * @param gpio_num  GPIO of XL9555
++ *        io_config  io config
++ *
++ * @return
++ *      - ESP_OK
++ *      - ESP_FAIL
++ */
++esp_err_t xl9555_set_io_config(esp_xl9555_gpio_num_t gpio_num, esp_xl9555_io_config_t io_config);
++
++/**
++ * @brief Print all XL9555 registers
++ *
++ * @return
++ *     - void
++ */
++void xl9555_read_all();
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+-- 
+2.38.1.windows.1
+
