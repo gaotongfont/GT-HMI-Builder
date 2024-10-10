@@ -1028,11 +1028,10 @@ K]
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M33 --fpu=SoftVF
-P --depend=.\out\startup_swm341.d -o.\out\startup_swm341.o -ID:\software\Keil\A
-RM\PACK\Synwit\SWM32_DFP\1.20.4\CSL\SWM341\CMSIS\DeviceSupport -ID:\software\Ke
-il\ARM\CMSIS\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VER
-SION SETA 533" --list=.\out\startup_swm341.lst CSL\CMSIS\DeviceSupport\startup\
-arm\startup_SWM341.s
+P --depend=.\out\startup_swm341.d -o.\out\startup_swm341.o -IC:\Users\Z\AppData
+\Local\Arm\Packs\Synwit\SWM32_DFP\1.20.8\CSL\SWM341\CMSIS\DeviceSupport --prede
+fine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 534" --list=.\out\
+startup_swm341.lst CSL\CMSIS\DeviceSupport\startup\arm\startup_SWM341.s
 
 
 

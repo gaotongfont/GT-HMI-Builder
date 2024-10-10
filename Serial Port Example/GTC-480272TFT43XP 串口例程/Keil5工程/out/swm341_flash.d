@@ -1,14 +1,14 @@
 ./out/swm341_flash.o: CSL\SWM341_StdPeriph_Driver\SWM341_flash.c \
   CSL\CMSIS\DeviceSupport\SWM341.h \
-  D:\software\Keil\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  D:\software\Keil\ARM\ARMCLANG\Bin\..\include\stdint.h \
-  D:\software\Keil\ARM\ARMCLANG\Bin\..\include\stdbool.h \
+  D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
+  D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h \
   CSL\CMSIS\CoreSupport\core_cm33.h \
   CSL\CMSIS\CoreSupport\cmsis_version.h \
   CSL\CMSIS\CoreSupport\cmsis_compiler.h \
   CSL\CMSIS\CoreSupport\cmsis_armclang.h \
-  D:\software\Keil\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
-  D:\software\Keil\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
+  D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
+  D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
   CSL\CMSIS\CoreSupport\mpu_armv8.h \
   CSL\CMSIS\DeviceSupport\system_SWM341.h \
   CSL\SWM341_StdPeriph_Driver\SWM341_port.h \

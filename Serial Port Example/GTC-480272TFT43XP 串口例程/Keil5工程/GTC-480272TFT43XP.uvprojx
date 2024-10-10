@@ -10,13 +10,13 @@
       <TargetName>SWM341</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6150000::V6.15::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>SWM341xE</Device>
           <Vendor>Synwit</Vendor>
-          <PackID>Synwit.SWM32_DFP.1.20.4</PackID>
+          <PackID>Synwit.SWM32_DFP.1.20.8</PackID>
           <PackURL>http://www.synwit.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x10000) IROM(0x00000000,0x80000) CPUTYPE("Cortex-M33") FPU3(SFPU) DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -133,7 +133,7 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
-            <Capability>0</Capability>
+            <Capability>1</Capability>
             <DriverSelection>4102</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
@@ -614,6 +614,11 @@
           <GroupName>GT-HMI-Engine/driver</GroupName>
           <Files>
             <File>
+              <FileName>gt_font_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\driver\gt_font_config.c</FilePath>
+            </File>
+            <File>
               <FileName>gt_gui_driver.lib</FileName>
               <FileType>4</FileType>
               <FilePath>.\GT-HMI-Engine\driver\gt_gui_driver.lib</FilePath>
@@ -684,6 +689,11 @@
               <FilePath>.\GT-HMI-Engine\src\core\gt_indev.c</FilePath>
             </File>
             <File>
+              <FileName>gt_layout.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\core\gt_layout.c</FilePath>
+            </File>
+            <File>
               <FileName>gt_mem.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\core\gt_mem.c</FilePath>
@@ -702,6 +712,11 @@
               <FileName>gt_refr.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\core\gt_refr.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_scr_stack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\core\gt_scr_stack.c</FilePath>
             </File>
             <File>
               <FileName>gt_style.c</FileName>
@@ -732,6 +747,46 @@
               <FileName>gt_draw_blend.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\extra\draw\gt_draw_blend.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_draw_blend_with_argb888.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\extra\draw\gt_draw_blend_with_argb888.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_draw_blend_with_rgb565.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\extra\draw\gt_draw_blend_with_rgb565.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_draw_blend_with_rgb888.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\extra\draw\gt_draw_blend_with_rgb888.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GT-HMI-Engine/src/extra/gif</GroupName>
+          <Files>
+            <File>
+              <FileName>gifdec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\extra\gif\gifdec.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>GT-HMI-Engine/src/extra/jpeg</GroupName>
+          <Files>
+            <File>
+              <FileName>gt_sjpg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\extra\jpeg\gt_sjpg.c</FilePath>
+            </File>
+            <File>
+              <FileName>tjpgd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\extra\jpeg\tjpgd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -772,6 +827,11 @@
               <FileName>gt_hal_disp.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\hal\gt_hal_disp.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_hal_file_header.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\hal\gt_hal_file_header.c</FilePath>
             </File>
             <File>
               <FileName>gt_hal_fs.c</FileName>
@@ -819,6 +879,11 @@
               <FilePath>.\GT-HMI-Engine\src\others\gt_color.c</FilePath>
             </File>
             <File>
+              <FileName>gt_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\others\gt_crc.c</FilePath>
+            </File>
+            <File>
               <FileName>gt_effects.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\others\gt_effects.c</FilePath>
@@ -857,6 +922,11 @@
               <FileName>gt_vector.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\utils\gt_vector.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_stack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\utils\gt_stack.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -987,6 +1057,56 @@
               <FileName>gt_textarea.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GT-HMI-Engine\src\widgets\gt_textarea.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_btnmap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_btnmap.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_chat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_chat.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_dialog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_dialog.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_gif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_gif.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_graphs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_graphs.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_media_player.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_media_player.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_roller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_roller.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_status_bar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_status_bar.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_view_pager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_view_pager.c</FilePath>
+            </File>
+            <File>
+              <FileName>gt_wordart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GT-HMI-Engine\src\widgets\gt_wordart.c</FilePath>
             </File>
           </Files>
         </Group>

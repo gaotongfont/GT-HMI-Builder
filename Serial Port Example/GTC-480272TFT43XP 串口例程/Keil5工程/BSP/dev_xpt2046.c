@@ -301,15 +301,15 @@ void TP_Adjust(void)
 			case 2:
 				LCD_Draw_color_Circle(LCD_WIDTH - 20, 20, 10, C_BLUE);
 				lcd_draw_point(LCD_WIDTH - 20, 20, C_WHITE);
-				lcd_draw_point(20, LCD_HEIGTH - 20, C_RED);
+				lcd_draw_point(20, LCD_HEIGHT - 20, C_RED);
 				break;
 			case 3:
-				LCD_Draw_color_Circle(20, LCD_HEIGTH - 20, 10, C_BLUE);
+				LCD_Draw_color_Circle(20, LCD_HEIGHT - 20, 10, C_BLUE);
 				lcd_draw_point(20, lcddev.height - 20, C_WHITE);
-				lcd_draw_point(LCD_WIDTH - 20, LCD_HEIGTH - 20, C_RED);
+				lcd_draw_point(LCD_WIDTH - 20, LCD_HEIGHT - 20, C_RED);
 				break;
 			case 4:
-				LCD_Draw_color_Circle(LCD_WIDTH - 20, LCD_HEIGTH - 20, 10, C_BLUE);
+				LCD_Draw_color_Circle(LCD_WIDTH - 20, LCD_HEIGHT - 20, 10, C_BLUE);
 
 				tem1 = abs(pos_temp[0][0] - pos_temp[1][0]); //x1-x2
 				tem2 = abs(pos_temp[0][1] - pos_temp[1][1]); //y1-y2
@@ -325,7 +325,7 @@ void TP_Adjust(void)
 				fac = (float)d1 / d2;
 				if (fac < 0.9 || fac > 1.1 || d1 == 0 || d2 == 0) {
 					cnt = 0;
-					lcd_draw_point(LCD_WIDTH - 20, LCD_HEIGTH - 20, C_WHITE);                                                                                           //�����?4
+					lcd_draw_point(LCD_WIDTH - 20, LCD_HEIGHT - 20, C_WHITE);                                                                                           //�����?4
 					lcd_draw_point(20, 20, C_RED);                                                                                                                            //����1
 					//                    TP_Adj_Info_Show(pos_temp[0][0], pos_temp[0][1], pos_temp[1][0], pos_temp[1][1], pos_temp[2][0], pos_temp[2][1], pos_temp[3][0], pos_temp[3][1], fac * 100); //��ʾ����
 					continue;
@@ -344,7 +344,7 @@ void TP_Adjust(void)
 				fac = (float)d1 / d2;
 				if (fac < 0.9 || fac > 1.1) {
 					cnt = 0;
-					lcd_draw_point(LCD_WIDTH - 20, LCD_HEIGTH - 20, C_WHITE);                                                                                           //�����?4
+					lcd_draw_point(LCD_WIDTH - 20, LCD_HEIGHT - 20, C_WHITE);                                                                                           //�����?4
 					lcd_draw_point(20, 20, C_RED);                                                                                                                            //����1
 					//TP_Adj_Info_Show(pos_temp[0][0], pos_temp[0][1], pos_temp[1][0], pos_temp[1][1], pos_temp[2][0], pos_temp[2][1], pos_temp[3][0], pos_temp[3][1], fac * 100); //��ʾ����
 					continue;
@@ -375,8 +375,8 @@ void TP_Adjust(void)
 				tp_dev.yfac = (float)(LCD_WIDTH - 40) / (pos_temp[1][0] - pos_temp[0][0]);
 				tp_dev.yoff = (LCD_WIDTH - tp_dev.yfac * (pos_temp[1][0] + pos_temp[0][0])) / 2;
 
-				tp_dev.xfac = (float)(LCD_HEIGTH - 40) / (pos_temp[2][1] - pos_temp[0][1]);
-				tp_dev.xoff = (LCD_HEIGTH - tp_dev.xfac * (pos_temp[2][1] + pos_temp[0][1])) / 2;
+				tp_dev.xfac = (float)(LCD_HEIGHT - 40) / (pos_temp[2][1] - pos_temp[0][1]);
+				tp_dev.xoff = (LCD_HEIGHT - tp_dev.xfac * (pos_temp[2][1] + pos_temp[0][1])) / 2;
 				if (fabs(tp_dev.xfac) > 2 || fabs(tp_dev.yfac) > 2) {
 					cnt = 0;
 					lcd_draw_point(lcddev.width - 20, lcddev.height - 20, C_WHITE);

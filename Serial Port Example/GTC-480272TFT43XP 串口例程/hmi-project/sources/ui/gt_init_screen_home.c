@@ -25,41 +25,38 @@ static gt_obj_st * lab9 = NULL;
 static gt_obj_st * imgbtn6 = NULL;
 static gt_obj_st * slider1 = NULL;
 
-
 static void imgbtn1_0_cb(gt_event_st * e) {
 	gt_input_number_increase(inputNum1);
 }
-
 
 static void imgbtn2_0_cb(gt_event_st * e) {
 	gt_input_number_decrease(inputNum1);
 }
 
-
 static void imgbtn3_0_cb(gt_event_st * e) {
 	gt_input_number_increase(inputNum2);
 }
-
 
 static void imgbtn4_0_cb(gt_event_st * e) {
 	gt_input_number_decrease(inputNum2);
 }
 
-
 static void imgbtn5_0_cb(gt_event_st * e) {
 	gt_input_number_increase(inputNum3);
 }
-
 
 static void imgbtn6_0_cb(gt_event_st * e) {
 	gt_input_number_decrease(inputNum3);
 }
 
-void gt_init_screen_home(void)
+gt_obj_st * gt_init_screen_home(void)
 {
 	screen_home = gt_obj_create(NULL);
+
 	gt_screen_set_bgcolor(screen_home, gt_color_hex(0x000011));
 
+
+	
 
 	/** rect1 */
 	rect1 = gt_rect_create(screen_home);
@@ -71,6 +68,7 @@ void gt_init_screen_home(void)
 	gt_rect_set_fill(rect1, 1);
 	gt_rect_set_border(rect1, 0);
 
+	
 
 	/** lab1 */
 	lab1 = gt_label_create(screen_home);
@@ -82,6 +80,7 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab1, GT_ALIGN_LEFT);
 	gt_label_set_text(lab1, "设备管理");
 
+	
 
 	/** lab2 */
 	lab2 = gt_label_create(screen_home);
@@ -93,6 +92,7 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab2, GT_ALIGN_LEFT);
 	gt_label_set_text(lab2, "设备启动");
 
+	
 
 	/** lab3 */
 	lab3 = gt_label_create(screen_home);
@@ -104,6 +104,7 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab3, GT_ALIGN_LEFT);
 	gt_label_set_text(lab3, "间隔时间");
 
+	
 
 	/** lab4 */
 	lab4 = gt_label_create(screen_home);
@@ -115,6 +116,7 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab4, GT_ALIGN_LEFT);
 	gt_label_set_text(lab4, "重复次数");
 
+	
 
 	/** lab5 */
 	lab5 = gt_label_create(screen_home);
@@ -126,6 +128,7 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab5, GT_ALIGN_LEFT);
 	gt_label_set_text(lab5, "工作温度");
 
+	
 
 	/** lab6 */
 	lab6 = gt_label_create(screen_home);
@@ -137,6 +140,7 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab6, GT_ALIGN_LEFT);
 	gt_label_set_text(lab6, "等待速度");
 
+	
 
 	/** switch1 */
 	switch1 = gt_switch_create(screen_home);
@@ -147,6 +151,7 @@ void gt_init_screen_home(void)
 	gt_switch_set_color_point(switch1, gt_color_hex(0xFFFFFF));
 	gt_obj_set_state(switch1, 1);
 
+	
 
 	/** inputNum1 */
 	inputNum1 = gt_input_number_create(screen_home);
@@ -164,6 +169,7 @@ void gt_init_screen_home(void)
 	gt_input_number_set_display_integer_length(inputNum1, 2);
 	gt_input_number_set_display_decimal_length(inputNum1, 0);
 
+	
 
 	/** lab7 */
 	lab7 = gt_label_create(screen_home);
@@ -175,30 +181,31 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab7, GT_ALIGN_LEFT);
 	gt_label_set_text(lab7, "min");
 
+	
 
 	/** imgbtn1 */
 	imgbtn1 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn1, 305, 108);
 	gt_obj_set_size(imgbtn1, 20, 17);
-	gt_imgbtn_set_src(imgbtn1, ".:img_20x17_1.png");
-	gt_obj_add_event_cb(imgbtn1, imgbtn1_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-
+	gt_imgbtn_set_src(imgbtn1, ".:img_1_20x17.png");
+	gt_obj_add_event_cb(imgbtn1, imgbtn1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	
 
 	/** imgbtn2 */
 	imgbtn2 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn2, 418, 108);
 	gt_obj_set_size(imgbtn2, 20, 17);
-	gt_imgbtn_set_src(imgbtn2, ".:img_20x17_2.png");
-	gt_obj_add_event_cb(imgbtn2, imgbtn2_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-
+	gt_imgbtn_set_src(imgbtn2, ".:img_2_20x17.png");
+	gt_obj_add_event_cb(imgbtn2, imgbtn2_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	
 
 	/** imgbtn3 */
 	imgbtn3 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn3, 305, 148);
 	gt_obj_set_size(imgbtn3, 20, 17);
-	gt_imgbtn_set_src(imgbtn3, ".:img_20x17_1.png");
-	gt_obj_add_event_cb(imgbtn3, imgbtn3_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-
+	gt_imgbtn_set_src(imgbtn3, ".:img_1_20x17.png");
+	gt_obj_add_event_cb(imgbtn3, imgbtn3_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	
 
 	/** inputNum2 */
 	inputNum2 = gt_input_number_create(screen_home);
@@ -216,6 +223,7 @@ void gt_init_screen_home(void)
 	gt_input_number_set_display_integer_length(inputNum2, 2);
 	gt_input_number_set_display_decimal_length(inputNum2, 0);
 
+	
 
 	/** lab8 */
 	lab8 = gt_label_create(screen_home);
@@ -227,22 +235,23 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab8, GT_ALIGN_LEFT);
 	gt_label_set_text(lab8, "次");
 
+	
 
 	/** imgbtn4 */
 	imgbtn4 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn4, 418, 148);
 	gt_obj_set_size(imgbtn4, 20, 17);
-	gt_imgbtn_set_src(imgbtn4, ".:img_20x17_2.png");
-	gt_obj_add_event_cb(imgbtn4, imgbtn4_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-
+	gt_imgbtn_set_src(imgbtn4, ".:img_2_20x17.png");
+	gt_obj_add_event_cb(imgbtn4, imgbtn4_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	
 
 	/** imgbtn5 */
 	imgbtn5 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn5, 305, 188);
 	gt_obj_set_size(imgbtn5, 20, 17);
-	gt_imgbtn_set_src(imgbtn5, ".:img_20x17_1.png");
-	gt_obj_add_event_cb(imgbtn5, imgbtn5_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-
+	gt_imgbtn_set_src(imgbtn5, ".:img_1_20x17.png");
+	gt_obj_add_event_cb(imgbtn5, imgbtn5_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	
 
 	/** inputNum3 */
 	inputNum3 = gt_input_number_create(screen_home);
@@ -260,6 +269,7 @@ void gt_init_screen_home(void)
 	gt_input_number_set_display_integer_length(inputNum3, 2);
 	gt_input_number_set_display_decimal_length(inputNum3, 0);
 
+	
 
 	/** lab9 */
 	lab9 = gt_label_create(screen_home);
@@ -272,14 +282,15 @@ void gt_init_screen_home(void)
 	gt_label_set_font_align(lab9, GT_ALIGN_LEFT);
 	gt_label_set_text(lab9, "℃");
 
+	
 
 	/** imgbtn6 */
 	imgbtn6 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn6, 418, 188);
 	gt_obj_set_size(imgbtn6, 20, 17);
-	gt_imgbtn_set_src(imgbtn6, ".:img_20x17_2.png");
-	gt_obj_add_event_cb(imgbtn6, imgbtn6_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-
+	gt_imgbtn_set_src(imgbtn6, ".:img_2_20x17.png");
+	gt_obj_add_event_cb(imgbtn6, imgbtn6_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	
 
 	/** slider1 */
 	slider1 = gt_slider_create(screen_home);
@@ -293,6 +304,7 @@ void gt_init_screen_home(void)
 	gt_slider_set_dir(slider1, GT_BAR_DIR_HOR_L2R);
 
 
-	gt_disp_load_scr(screen_home);
+
+	return screen_home;
 }
 

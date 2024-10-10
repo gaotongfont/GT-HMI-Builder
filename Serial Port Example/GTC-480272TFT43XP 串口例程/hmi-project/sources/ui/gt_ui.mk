@@ -1,8 +1,8 @@
-CSRCS += $(notdir $(wildcard $(GT_DIR)/app/ui/*.c))
+CSRCS += $(notdir $(wildcard $(APP_DIR)/ui/*.c))
 
-DEPPATH += --dep-path $(GT_DIR)/app/ui
+DEPPATH += --dep-path $(APP_DIR)/ui
 
-VPATH += :$(GT_DIR)/app/ui
+VPATH += :$(APP_DIR)/ui
 
-CFLAGS += "-I$(GT_DIR)/app/ui"
+CFLAGS += "-I$(APP_DIR)/ui"
 

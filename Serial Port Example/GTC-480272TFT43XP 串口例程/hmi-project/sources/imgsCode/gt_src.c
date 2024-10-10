@@ -2,8 +2,8 @@
 
 
 const gt_src_st user_src_list[] = {
-	{".:img_20x17_2.png", 20, 17, src_img_20x17_2, 1020, 1},
-	{".:img_20x17_1.png", 20, 17, src_img_20x17_1, 1020, 1},
+	{".:img_1_20x17.png", 20, 17, src_img_1_20x17, 1020, 1},
+	{".:img_2_20x17.png", 20, 17, src_img_2_20x17, 1020, 1},
 	{NULL, 0, 0, NULL, 0, 0},
 };
 

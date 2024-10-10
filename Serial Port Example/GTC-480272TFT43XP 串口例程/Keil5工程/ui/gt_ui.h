@@ -11,7 +11,13 @@ extern char update_sreen_status;
 void gt_ui_init(void);
 void send_pack(void);
 
-void gt_init_screen_home(void);
+gt_obj_st * gt_init_screen_home(void);
+
+
+typedef enum {
+        GT_ID_SCREEN_HOME = 0,
+} gt_scr_id_et;
+
 
 
 #endif

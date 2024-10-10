@@ -161,7 +161,7 @@ extern u32  BACK_COLOR; //背景颜色.默认为白色
 
 #define LCD_BUF_UT  uint16_t
 #define LCD_WIDTH   (480)
-#define LCD_HEIGTH  (272)
+#define LCD_HEIGHT  (272)
 #define LCD_DIR     (1)     // 1 / 0
 //
 #define LCD_ClkDiv      (10)

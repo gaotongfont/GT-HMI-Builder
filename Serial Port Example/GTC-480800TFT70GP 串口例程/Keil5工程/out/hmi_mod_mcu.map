@@ -11293,78 +11293,78 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-      1328          0          0          4          0       4496   bsp_lcd_rgb.o
-      1204          0          0          0          0       6452   bsp_sfc.o
-       668          0          0          0         32       3712   bsp_uart.o
-       140          0          0          0          4       5741   dev_systick.o
-        46          0          0          0         23       4467   dev_touch.o
-      1376         20          0          0          0       6047   gt911.o
-      1792         84         55          0         16      20686   gt_anim.o
-       646          0          0          0          0       4448   gt_area.o
-       152          0          0          4          0       2154   gt_color.o
-       106          0          0          0          0      26172   gt_dialog.o
-      4890        274        342          0          0      29497   gt_disp.o
-      5790        124       1398          0          0      54599   gt_draw.o
-       504          0          0          0          0       8986   gt_draw_blend.o
-      4156          0          0          0          0      15929   gt_draw_blend_with_rgb565.o
-       624         80         68          0          0       8963   gt_event.o
-        14          0          0          0          0        427   gt_extra.o
-       684         76          4          0          0       7490   gt_fs.o
-        36          0          0         60          0       8022   gt_gc.o
-        26          0          0          0          0       6355   gt_graph_base.o
-      1790        188        107          0          4      13673   gt_hal_disp.o
-       164        100          0          0          0       2376   gt_hal_fs.o
-       224         40          0          0         24       9229   gt_hal_indev.o
-       538         76         35          0          4       5309   gt_hal_src.o
-       116          0          0          0          8       1369   gt_hal_tick.o
-       784         76         34          1          8       6297   gt_hal_vf.o
-        82          0          0          0          1        918   gt_handler.o
-       492         76         51          0          0      12194   gt_img.o
-       870         96         65          0          0       9286   gt_img_decoder.o
-       752         24         54          0          0      14797   gt_imgbtn.o
-      2952         52         38          4         16      21692   gt_indev.o
-      2572        148          0          0         93      10469   gt_init_screen_home.o
-       468         84          0          0          0       6958   gt_layout.o
-       164          0       1024          0          0       3143   gt_math.o
-       182          0          0          0      49164       4367   gt_mem.o
-      1432        108         32          0          0      19686   gt_obj.o
-      1218          0         41          0          0      13038   gt_obj_class.o
-       918          0          8          0          0      11135   gt_obj_pos.o
-       450         84          0          0          0      10290   gt_obj_scroll.o
-      1748        100        132          0          0      23494   gt_player.o
-      1260         72         37          0          0       9847   gt_png.o
-        70          0          0          0     768012       1604   gt_port_disp.o
-        70          0          0          0         32       1850   gt_port_indev.o
-        14          0         20          0          0       1063   gt_port_src.o
-        30          0       2562          0          0       1045   gt_port_vf.o
-       120         16         14          0          0       6878   gt_refr.o
-       816         48         39          0          0      14673   gt_scr_stack.o
-      1752         20         47          0          0      12333   gt_sjpg.o
-       776          0         43          0          0       9053   gt_stack.o
-      4074        494        182          0          0      27999   gt_style.o
-       950        172         34          0          1       5914   gt_timer.o
-      2044         56        119          0          0      29761   gt_tlsf.o
-        36          0          8          0          0       6043   gt_ui.o
-       560          0         36          0          0       5149   gt_vector.o
-     36340        208       7089          0          0     159098   lodepng.o
-       650         24          5          0          0       6921   main.o
-       216         10        424          0       4096       4452   startup_swm341.o
-        20          0          0          0          0       2645   swm341_exti.o
-       166          0          0          0          0       2173   swm341_flash.o
-       406          0          0          0          0       7430   swm341_gpio.o
-       670          0          0          0          0       9510   swm341_i2c.o
-       240          0          0          0          0      10209   swm341_lcd.o
-        74          0          0          0          0       1241   swm341_port.o
-       214          4          0          0          0       6045   swm341_sdram.o
-       408          0          0          0          0       7267   swm341_sfc.o
-      1760          0          0          0          0      15484   swm341_timr.o
-       506         22          0          0          0      10307   swm341_uart.o
-       126          0          0          0          0       5985   swm341_wdt.o
-      1172          8          0          8          0      10449   system_swm341.o
-     12850         62       1216          0          0      31413   tjpgd.o
+      1328          0          0          4          0       4503   bsp_lcd_rgb.o
+      1204          0          0          0          0       6459   bsp_sfc.o
+       668          0          0          0         32       3755   bsp_uart.o
+       140          0          0          0          4       5748   dev_systick.o
+        46          0          0          0         23       4474   dev_touch.o
+      1376         20          0          0          0       6054   gt911.o
+      1792         84         55          0         16      20693   gt_anim.o
+       646          0          0          0          0       4455   gt_area.o
+       152          0          0          4          0       2161   gt_color.o
+       106          0          0          0          0      26179   gt_dialog.o
+      4890        274        342          0          0      29504   gt_disp.o
+      5790        124       1398          0          0      54606   gt_draw.o
+       504          0          0          0          0       8993   gt_draw_blend.o
+      4156          0          0          0          0      15936   gt_draw_blend_with_rgb565.o
+       624         80         68          0          0       8970   gt_event.o
+        14          0          0          0          0        433   gt_extra.o
+       684         76          4          0          0       7533   gt_fs.o
+        36          0          0         60          0       8029   gt_gc.o
+        26          0          0          0          0       6362   gt_graph_base.o
+      1790        188        107          0          4      13680   gt_hal_disp.o
+       164        100          0          0          0       2383   gt_hal_fs.o
+       224         40          0          0         24       9236   gt_hal_indev.o
+       538         76         35          0          4       5316   gt_hal_src.o
+       116          0          0          0          8       1376   gt_hal_tick.o
+       784         76         34          1          8       6304   gt_hal_vf.o
+        82          0          0          0          1        924   gt_handler.o
+       492         76         51          0          0      12201   gt_img.o
+       870         96         65          0          0       9293   gt_img_decoder.o
+       752         24         54          0          0      14804   gt_imgbtn.o
+      2952         52         38          4         16      21699   gt_indev.o
+      2572        148          0          0         93      10476   gt_init_screen_home.o
+       468         84          0          0          0       6965   gt_layout.o
+       164          0       1024          0          0       3150   gt_math.o
+       182          0          0          0      49164       4410   gt_mem.o
+      1432        108         32          0          0      19693   gt_obj.o
+      1218          0         41          0          0      13045   gt_obj_class.o
+       918          0          8          0          0      11142   gt_obj_pos.o
+       450         84          0          0          0      10297   gt_obj_scroll.o
+      1748        100        132          0          0      23501   gt_player.o
+      1260         72         37          0          0       9890   gt_png.o
+        70          0          0          0     768012       1611   gt_port_disp.o
+        70          0          0          0         32       1857   gt_port_indev.o
+        14          0         20          0          0       1070   gt_port_src.o
+        30          0       2562          0          0       1052   gt_port_vf.o
+       120         16         14          0          0       6885   gt_refr.o
+       816         48         39          0          0      14680   gt_scr_stack.o
+      1752         20         47          0          0      12412   gt_sjpg.o
+       776          0         43          0          0       9060   gt_stack.o
+      4074        494        182          0          0      28006   gt_style.o
+       950        172         34          0          1       5921   gt_timer.o
+      2044         56        119          0          0      29804   gt_tlsf.o
+        36          0          8          0          0       6050   gt_ui.o
+       560          0         36          0          0       5156   gt_vector.o
+     36340        208       7089          0          0     159177   lodepng.o
+       650         24          5          0          0       6928   main.o
+       216         10        424          0       4096       4464   startup_swm341.o
+        20          0          0          0          0       2652   swm341_exti.o
+       166          0          0          0          0       2180   swm341_flash.o
+       406          0          0          0          0       7437   swm341_gpio.o
+       670          0          0          0          0       9517   swm341_i2c.o
+       240          0          0          0          0      10216   swm341_lcd.o
+        74          0          0          0          0       1248   swm341_port.o
+       214          4          0          0          0       6052   swm341_sdram.o
+       408          0          0          0          0       7274   swm341_sfc.o
+      1760          0          0          0          0      15491   swm341_timr.o
+       506         22          0          0          0      10314   swm341_uart.o
+       126          0          0          0          0       5992   swm341_wdt.o
+      1172          8          0          8          0      10456   system_swm341.o
+     12850         62       1216          0          0      31456   tjpgd.o
 
     ----------------------------------------------------------------------
-    110816       3126      15400         84     821540     848204   Object Totals
+    110816       3126      15400         84     821540     849050   Object Totals
          0          0         32          0          0          0   (incl. Generated)
        328          0          5          3          2          0   (incl. Padding)
 
@@ -11428,8 +11428,8 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-    118052       3238      15972        152     821544     857423   Grand Totals
-    118052       3238      15972        152     821544     857423   ELF Image Totals
+    118052       3238      15972        152     821544     858269   Grand Totals
+    118052       3238      15972        152     821544     858269   ELF Image Totals
     118052       3238      15972        152          0          0   ROM Totals
 
 ==============================================================================

@@ -6,7 +6,8 @@
 
 
 /* private define -------------------------------------------------------*/
-
+#define IMG_1_20X17_PNG		0x0
+#define IMG_2_20X17_PNG		0x3fc
 
 
 /* private typedef ------------------------------------------------------*/
@@ -16,11 +17,10 @@
 /* static variables -----------------------------------------------------*/
 static const gt_vfs_st virt_file_sys[] ={
 	/* name, w, h, addr, size, is_alpha */
-    {"f:img_20x17_1.png", 20, 17, 3877212, 1020, 1},
-	{"f:img_20x17_2.png", 20, 17, 3878232, 1020, 1},
+    {"f:img_1_20x17.png", 20, 17, IMG_1_20X17_PNG, 1020, 1},
+	{"f:img_2_20x17.png", 20, 17, IMG_2_20X17_PNG, 1020, 1},
     {NULL,0,0,0,0},
 };
-static gt_fs_drv_st drv_vf;
 
 /* macros ---------------------------------------------------------------*/
 
@@ -50,15 +50,11 @@ extern uint32_t spi_wr(uint8_t * data_write, uint32_t len_write, uint8_t * data_
 void gt_port_vf_init(void)
 {
     gt_vf_init(virt_file_sys);
+
 #if GT_USE_MODE_FLASH
-	drv_vf.rw_cb = spi_wr;
-#else
-	drv_vf.rw_cb = NULL;
+	gt_vf_drv_register(spi_wr);
 #endif
-    gt_vf_drv_register(&drv_vf);
 }
-
-
 
 /* end ------------------------------------------------------------------*/
 

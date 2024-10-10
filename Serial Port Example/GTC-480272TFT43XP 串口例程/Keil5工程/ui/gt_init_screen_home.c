@@ -121,7 +121,7 @@ static void imgbtn6_0_cb(gt_event_st * e) {
 	send_pack();
 }
 
-void gt_init_screen_home(void)
+gt_obj_st * gt_init_screen_home(void)
 {
 	screen_home = gt_obj_create(NULL);//
 	gt_screen_set_bgcolor(screen_home, gt_color_hex(0x000011));//设置背景颜色
@@ -212,7 +212,7 @@ void gt_init_screen_home(void)
 	gt_switch_set_color_ina(switch1, gt_color_hex(0xebeef5));
 	gt_switch_set_color_point(switch1, gt_color_hex(0xFFFFFF));
 	gt_obj_set_state(switch1, 1);
-	gt_obj_add_event_cb(switch1, switch1_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_obj_add_event_cb(switch1, switch1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 	/** inputNum1 */
 	inputNum1 = gt_input_number_create(screen_home);
@@ -246,24 +246,24 @@ void gt_init_screen_home(void)
 	imgbtn1 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn1, 305, 108);
 	gt_obj_set_size(imgbtn1, 20, 17);
-	gt_imgbtn_set_src(imgbtn1, "f:img_20x17_1.png");
-	gt_obj_add_event_cb(imgbtn1, imgbtn1_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_imgbtn_set_src(imgbtn1, "f:img_1_20x17.png");
+	gt_obj_add_event_cb(imgbtn1, imgbtn1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	/** imgbtn2 */
 	imgbtn2 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn2, 418, 108);
 	gt_obj_set_size(imgbtn2, 20, 17);
-	gt_imgbtn_set_src(imgbtn2, "f:img_20x17_2.png");
-	gt_obj_add_event_cb(imgbtn2, imgbtn2_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_imgbtn_set_src(imgbtn2, "f:img_2_20x17.png");
+	gt_obj_add_event_cb(imgbtn2, imgbtn2_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	/** imgbtn3 */
 	imgbtn3 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn3, 305, 148);
 	gt_obj_set_size(imgbtn3, 20, 17);
-	gt_imgbtn_set_src(imgbtn3, "f:img_20x17_1.png");
-	gt_obj_add_event_cb(imgbtn3, imgbtn3_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_imgbtn_set_src(imgbtn3, "f:img_1_20x17.png");
+	gt_obj_add_event_cb(imgbtn3, imgbtn3_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	/** inputNum2 */
@@ -298,21 +298,21 @@ void gt_init_screen_home(void)
 	imgbtn4 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn4, 418, 148);
 	gt_obj_set_size(imgbtn4, 20, 17);
-	gt_imgbtn_set_src(imgbtn4, "f:img_20x17_2.png");
-	gt_obj_add_event_cb(imgbtn4, imgbtn4_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_imgbtn_set_src(imgbtn4, "f:img_2_20x17.png");
+	gt_obj_add_event_cb(imgbtn4, imgbtn4_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	/** imgbtn5 */
 	imgbtn5 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn5, 305, 188);
 	gt_obj_set_size(imgbtn5, 20, 17);
-	gt_imgbtn_set_src(imgbtn5, "f:img_20x17_1.png");
-	gt_obj_add_event_cb(imgbtn5, imgbtn5_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_imgbtn_set_src(imgbtn5, "f:img_1_20x17.png");
+	gt_obj_add_event_cb(imgbtn5, imgbtn5_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	/** inputNum3 */
 	inputNum3 = gt_input_number_create(screen_home);
-	gt_obj_set_pos(inputNum3, 356, 183);
+	gt_obj_set_pos(inputNum3, 346, 183);
 	gt_obj_set_size(inputNum3, 36, 24);
 	gt_input_number_set_font_color(inputNum3, gt_color_hex(0xffffff));
 	gt_input_number_set_font_size(inputNum3, 24);
@@ -329,7 +329,7 @@ void gt_init_screen_home(void)
 
 	/** lab9 */
 	lab9 = gt_label_create(screen_home);
-	gt_obj_set_pos(lab9, 388, 183);
+	gt_obj_set_pos(lab9, 379, 183);
 	gt_obj_set_size(lab9, 37, 24);
 	gt_label_set_font_color(lab9, gt_color_hex(0xffffff));
 	gt_label_set_font_size(lab9, 24);
@@ -343,8 +343,8 @@ void gt_init_screen_home(void)
 	imgbtn6 = gt_imgbtn_create(screen_home);
 	gt_obj_set_pos(imgbtn6, 418, 188);
 	gt_obj_set_size(imgbtn6, 20, 17);
-	gt_imgbtn_set_src(imgbtn6, "f:img_20x17_2.png");
-	gt_obj_add_event_cb(imgbtn6, imgbtn6_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_imgbtn_set_src(imgbtn6, "f:img_2_20x17.png");
+	gt_obj_add_event_cb(imgbtn6, imgbtn6_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	/** slider1 */
@@ -357,7 +357,7 @@ void gt_init_screen_home(void)
 	gt_slider_set_color_ina(slider1, gt_color_hex(0xebeef5));
 	gt_slider_set_tag_visible(slider1, 1);
 	gt_slider_set_dir(slider1, GT_BAR_DIR_HOR_L2R);
-	gt_obj_add_event_cb(slider1, slider1_0_cb, GT_EVENT_TYPE_INPUT_PROCESSED, NULL);
+	gt_obj_add_event_cb(slider1, slider1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
 	gt_disp_load_scr(screen_home);

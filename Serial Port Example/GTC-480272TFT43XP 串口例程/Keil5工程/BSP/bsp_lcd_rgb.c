@@ -87,7 +87,7 @@ void _lcd_init_sturct()
 	LCD_initStruct.ClkDiv = LCD_ClkDiv;
 	LCD_initStruct.Format = LCD_FMT_RGB565;
 	LCD_initStruct.HnPixel = LCD_WIDTH;
-	LCD_initStruct.VnPixel = LCD_HEIGTH;
+	LCD_initStruct.VnPixel = LCD_HEIGHT;
 	LCD_initStruct.Hfp = LCD_Hfp;
 	LCD_initStruct.Hbp = LCD_Hbp;
 	LCD_initStruct.Vfp = LCD_Vfp;
@@ -177,7 +177,7 @@ void lcd_draw_point(uint16_t x, uint16_t y, uint32_t c)
 #if LCD_DIR
 	_LCD_Buffer[y * LCD_WIDTH + x] = c;
 #else
-	_LCD_Buffer[(LCD_HEIGTH - x) * LCD_WIDTH + y] = c;
+	_LCD_Buffer[(LCD_HEIGHT - x) * LCD_WIDTH + y] = c;
 #endif
 }
 
