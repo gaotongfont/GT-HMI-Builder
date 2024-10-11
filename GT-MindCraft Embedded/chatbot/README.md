@@ -62,6 +62,11 @@
 
 <br/>
 
+**视频教程，陆续发布，敬请期待**
+<ul>
+<li style="margin-bottom: 4px;"><a href="https://www.bilibili.com/video/BV1qP22YSEQW/?spm_id_from=333.337.search-card.all.click&vd_source=0d93f7ed5a2d40d6e2d321f392d5e6f3">高通智匠AI开发板：整体框架的环境搭建</a></li>
+</ul>
+
 **智匠chatbot API接口文档**
 
 <ul>
