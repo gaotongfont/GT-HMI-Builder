@@ -73,7 +73,7 @@ gt_obj_st * gt_init_screen_home(void)
 	/** lab1 */
 	lab1 = gt_label_create(screen_home);
 	gt_obj_set_pos(lab1, 188, 6);
-	gt_obj_set_size(lab1, 110, 24);
+	gt_obj_set_size(lab1, 110, 33);
 	gt_label_set_font_color(lab1, gt_color_hex(0xffffff));
 	gt_label_set_font_size(lab1, 24);
 	gt_label_set_font_family_cn(lab1, 16);

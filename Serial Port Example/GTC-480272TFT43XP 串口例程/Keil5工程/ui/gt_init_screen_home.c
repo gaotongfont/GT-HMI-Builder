@@ -141,7 +141,7 @@ gt_obj_st * gt_init_screen_home(void)
 	/** lab1 */
 	lab1 = gt_label_create(screen_home);
 	gt_obj_set_pos(lab1, 188, 6);
-	gt_obj_set_size(lab1, 110, 24);
+	gt_obj_set_size(lab1, 110, 32);
 	gt_label_set_font_color(lab1, gt_color_hex(0xffffff));
 	gt_label_set_font_size(lab1, 24);
 	gt_label_set_font_family_cn(lab1, 16);
@@ -360,6 +360,6 @@ gt_obj_st * gt_init_screen_home(void)
 	gt_obj_add_event_cb(slider1, slider1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
 
-	gt_disp_load_scr(screen_home);
+	return screen_home;
 }
 
