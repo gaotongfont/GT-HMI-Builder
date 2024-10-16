@@ -185,7 +185,7 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
     size_t multipart_data_len = strlen(multipart_data);
 
     //要发送给服务器的参数
-    char *extra_param = (char *)audio_malloc(EXTRA_PARAM_SIZE);
+      char *extra_param = (char *)audio_malloc(EXTRA_PARAM_SIZE);
     memset(extra_param, 0, EXTRA_PARAM_SIZE);
     snprintf(extra_param, EXTRA_PARAM_SIZE,
         "\r\n--%s\r\n"
@@ -209,9 +209,12 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
         "\r\n--%s\r\n"
         "Content-Disposition: form-data; name=\"output_format\"\r\n\r\n"
         "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"stream\"\r\n\r\n"
+        "%s"
         "\r\n--%s\r\n",
         boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_age,boundary,send_data->bot_name,
-        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary);
+        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary,"false",boundary);
     size_t extra_pram_len = strlen(extra_param);
 
     char content_type_header[100] = {0};

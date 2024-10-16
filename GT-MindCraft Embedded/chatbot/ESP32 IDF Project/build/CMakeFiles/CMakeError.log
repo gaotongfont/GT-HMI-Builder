@@ -1,17 +1,17 @@
 Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
-Change Dir: C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/26743/Desktop/esp-stream-pipe-finish/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_d3a0f && [1/2] Building C object CMakeFiles/cmTC_d3a0f.dir/src.c.obj
-[2/2] Linking C executable cmTC_d3a0f
-FAILED: cmTC_d3a0f 
-cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  CMakeFiles/cmTC_d3a0f.dir/src.c.obj -o cmTC_d3a0f   && cd ."
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj:(.literal+0x10): warning: pthread_join is not implemented and will always fail
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj:(.literal+0x18): warning: pthread_exit is not implemented and will always fail
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj:(.literal+0x8): warning: pthread_detach is not implemented and will always fail
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj:(.literal+0x4): warning: pthread_create is not implemented and will always fail
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj:(.literal+0xc): warning: pthread_cancel is not implemented and will always fail
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj:(.literal+0x4): undefined reference to `pthread_atfork'
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_d3a0f.dir/src.c.obj: in function `main':
+Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_e1cbc && [1/2] Building C object CMakeFiles/cmTC_e1cbc.dir/src.c.obj
+[2/2] Linking C executable cmTC_e1cbc
+FAILED: cmTC_e1cbc 
+cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  CMakeFiles/cmTC_e1cbc.dir/src.c.obj -o cmTC_e1cbc   && cd ."
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj:(.literal+0x10): warning: pthread_join is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj:(.literal+0x18): warning: pthread_exit is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj:(.literal+0x8): warning: pthread_detach is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj:(.literal+0x4): warning: pthread_create is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj:(.literal+0xc): warning: pthread_cancel is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj:(.literal+0x4): undefined reference to `pthread_atfork'
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_e1cbc.dir/src.c.obj: in function `main':
 src.c:(.text+0x3f): undefined reference to `pthread_atfork'
 collect2.exe: error: ld returned 1 exit status
 ninja: build stopped: subcommand failed.
@@ -39,40 +39,40 @@ int main(void)
 }
 
 Determining if the function pthread_create exists in the pthreads failed with the following output:
-Change Dir: C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/26743/Desktop/esp-stream-pipe-finish/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_3307e && [1/2] Building C object CMakeFiles/cmTC_3307e.dir/CheckFunctionExists.c.obj
-[2/2] Linking C executable cmTC_3307e
-FAILED: cmTC_3307e 
-cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  -DCHECK_FUNCTION_EXISTS=pthread_create  CMakeFiles/cmTC_3307e.dir/CheckFunctionExists.c.obj -o cmTC_3307e  -lpthreads && cd ."
+Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_b0c92 && [1/2] Building C object CMakeFiles/cmTC_b0c92.dir/CheckFunctionExists.c.obj
+[2/2] Linking C executable cmTC_b0c92
+FAILED: cmTC_b0c92 
+cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  -DCHECK_FUNCTION_EXISTS=pthread_create  CMakeFiles/cmTC_b0c92.dir/CheckFunctionExists.c.obj -o cmTC_b0c92  -lpthreads && cd ."
 c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: cannot find -lpthreads: No such file or directory
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_3307e.dir/CheckFunctionExists.c.obj:(.literal+0x0): warning: pthread_create is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_b0c92.dir/CheckFunctionExists.c.obj:(.literal+0x0): warning: pthread_create is not implemented and will always fail
 collect2.exe: error: ld returned 1 exit status
 ninja: build stopped: subcommand failed.
 
 
 
 Determining if the function pthread_create exists in the pthread failed with the following output:
-Change Dir: C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/26743/Desktop/esp-stream-pipe-finish/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_662c4 && [1/2] Building C object CMakeFiles/cmTC_662c4.dir/CheckFunctionExists.c.obj
-[2/2] Linking C executable cmTC_662c4
-FAILED: cmTC_662c4 
-cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  -DCHECK_FUNCTION_EXISTS=pthread_create  CMakeFiles/cmTC_662c4.dir/CheckFunctionExists.c.obj -o cmTC_662c4  -lpthread && cd ."
+Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_9f802 && [1/2] Building C object CMakeFiles/cmTC_9f802.dir/CheckFunctionExists.c.obj
+[2/2] Linking C executable cmTC_9f802
+FAILED: cmTC_9f802 
+cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  -DCHECK_FUNCTION_EXISTS=pthread_create  CMakeFiles/cmTC_9f802.dir/CheckFunctionExists.c.obj -o cmTC_9f802  -lpthread && cd ."
 c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: cannot find -lpthread: No such file or directory
-c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_662c4.dir/CheckFunctionExists.c.obj:(.literal+0x0): warning: pthread_create is not implemented and will always fail
+c:/esp32-idf/esp-idf/tools/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin/../lib/gcc/xtensa-esp32s3-elf/12.2.0/../../../../xtensa-esp32s3-elf/bin/ld.exe: CMakeFiles/cmTC_9f802.dir/CheckFunctionExists.c.obj:(.literal+0x0): warning: pthread_create is not implemented and will always fail
 collect2.exe: error: ld returned 1 exit status
 ninja: build stopped: subcommand failed.
 
 
 
 Determining if compiler accepts -pthread failed with the following output:
-Change Dir: C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/26743/Desktop/esp-stream-pipe-finish/mindcraft-ai-development-board/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_1ea7a && [1/2] Building C object CMakeFiles/cmTC_1ea7a.dir/CheckForPthreads.c.obj
-[2/2] Linking C executable cmTC_1ea7a
-FAILED: cmTC_1ea7a 
-cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  CMakeFiles/cmTC_1ea7a.dir/CheckForPthreads.c.obj -o cmTC_1ea7a  -pthread && cd ."
+Run Build Command(s):C:/ESP32-IDF/esp-idf/tools/tools/ninja/1.10.2/ninja.exe cmTC_5e294 && [1/2] Building C object CMakeFiles/cmTC_5e294.dir/CheckForPthreads.c.obj
+[2/2] Linking C executable cmTC_5e294
+FAILED: cmTC_5e294 
+cmd.exe /C "cd . && C:\ESP32-IDF\esp-idf\tools\tools\xtensa-esp32s3-elf\esp-12.2.0_20230208\xtensa-esp32s3-elf\bin\xtensa-esp32s3-elf-gcc.exe -mlongcalls  CMakeFiles/cmTC_5e294.dir/CheckForPthreads.c.obj -o cmTC_5e294  -pthread && cd ."
 xtensa-esp32s3-elf-gcc.exe: error: unrecognized command-line option '-pthread'
 ninja: build stopped: subcommand failed.
 

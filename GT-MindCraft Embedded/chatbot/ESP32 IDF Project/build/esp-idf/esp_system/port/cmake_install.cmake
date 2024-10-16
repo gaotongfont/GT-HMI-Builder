@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/26743/Desktop/esp-stream-pipe/wifi_json_test/MindCraft_AI_pro_2/mindcraft-ai-development-board/build/esp-idf/esp_system/port/soc/esp32s3/cmake_install.cmake")
+  include("C:/Users/26743/Desktop/esp-stream-pipe-finish/mindcraft-ai-development-board/build/esp-idf/esp_system/port/soc/esp32s3/cmake_install.cmake")
 endif()
 
