@@ -40,6 +40,7 @@
 #include "aac_decoder.h"
 #include "http_stream.h"
 #include "wav_encoder.h"
+#include "http_send.h"
 
 /* private define -------------------------------------------------------*/
 
@@ -112,12 +113,18 @@ void gt_audio_player_init(void)
     esp_audio_codec_lib_add(_gt_player, AUDIO_CODEC_TYPE_DECODER, mp3_decoder_init(&mp3_dec_cfg));
 
     // Create writers and add to esp_audio
-#if (CONFIG_ESP32_S3_GT_KORVO2_V3_BOARD == 1) && (CONFIG_AFE_MIC_NUM == 1)
+// #if (CONFIG_ESP32_S3_GT_KORVO2_V3_BOARD == 1) && (CONFIG_AFE_MIC_NUM == 1)
+//     i2s_stream_cfg_t i2s_writer = I2S_STREAM_CFG_DEFAULT_WITH_PARA(I2S_NUM_0, GT_AUDIO_I2C_RATE, I2S_DATA_BIT_WIDTH_16BIT, AUDIO_STREAM_WRITER);
+// #else
+//     i2s_stream_cfg_t i2s_writer = I2S_STREAM_CFG_DEFAULT_WITH_PARA(I2S_NUM_0, GT_AUDIO_I2C_RATE, CODEC_ADC_BITS_PER_SAMPLE, AUDIO_STREAM_WRITER);
+//     i2s_writer.need_expand = (CODEC_ADC_BITS_PER_SAMPLE != 16);
+// #endif
+#if (CONFIG_ESP32_S3_GT_KORVO2_V3_BOARD == 1) && (USE_HTTP_STREAM == 1)
     i2s_stream_cfg_t i2s_writer = I2S_STREAM_CFG_DEFAULT_WITH_PARA(I2S_NUM_0, GT_AUDIO_I2C_RATE, I2S_DATA_BIT_WIDTH_16BIT, AUDIO_STREAM_WRITER);
-#else
+#else //!USE_HTTP_STREAM
     i2s_stream_cfg_t i2s_writer = I2S_STREAM_CFG_DEFAULT_WITH_PARA(I2S_NUM_0, GT_AUDIO_I2C_RATE, CODEC_ADC_BITS_PER_SAMPLE, AUDIO_STREAM_WRITER);
     i2s_writer.need_expand = (CODEC_ADC_BITS_PER_SAMPLE != 16);
-#endif
+#endif //!USE_HTTP_STREAM
     i2s_writer.stack_in_ext = true;
     audio_element_handle_t i2s_stream_writer = i2s_stream_init(&i2s_writer);
     esp_audio_output_stream_add(_gt_player, i2s_stream_writer);
@@ -214,6 +221,27 @@ audio_err_t gt_audio_player_vol_get(int* vol)
     return esp_audio_vol_get(_gt_player, vol);
 }
 
+audio_err_t gt_audio_player_stop_and_prepare_next(void)
+{
+    ESP_LOGI(TAG, "stop and prepare for next player music!");
+    if (!_gt_player) {
+        ESP_LOGW(TAG, "player is not init!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+
+    esp_err_t err = esp_audio_stop(_gt_player, TERMINATION_TYPE_NOW);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to stop player immediately!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+
+    esp_audio_state_t state;
+    esp_audio_state_get(_gt_player, &state);
+    state.status = AUDIO_STATUS_FINISHED;
+    ESP_LOGI(TAG, "Player state set to FINISHED.");
+
+    return ESP_OK;
+}
 
 /* end of file ----------------------------------------------------------*/
 

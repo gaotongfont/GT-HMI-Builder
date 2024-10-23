@@ -50,6 +50,7 @@
 #include "gt.h"
 #include "gt_ui.h"
 #include "http_send.h"
+#include "gt_pipe_send.h"
 #include "wifi_config.h"
 #include "freertos/queue.h"
 #include "audio_thread.h"
@@ -66,7 +67,10 @@ ChatbotData cb_data;
 
 QueueHandle_t mYxQueue;
 QueueHandle_t mYxQueue2;
-
+#if USE_HTTP_STREAM
+QueueHandle_t mYxQueue3 = NULL;
+QueueHandle_t audio_uri_queue = NULL;
+#endif //!USE_HTTP_STREAM
 
 void print_memory_info(void) {
     // 获取总的空闲堆内存
@@ -190,13 +194,45 @@ unsigned long r_dat_bat(unsigned long address, unsigned long DataLen, unsigned c
     return 1;
 }
 
+#if USE_HTTP_STREAM
+void gt_gui_task(void *pvParameters)
+{
+    ESP_LOGI(TAG, "--------------------------gt_gui_task\n");
+    int received_msg = 0;
+    ReceivedAnswerData* receive_evt = NULL;
+    while(1){
+        if (mYxQueue3 != NULL && xQueueReceive(mYxQueue3, &receive_evt, 1) == pdPASS) {
+            if (receive_evt != NULL/*received_msg >= 0 && received_msg < 6*//*ESP_OK == received_msg*/) {
+                ESP_LOGI(TAG,"<<<<<---------------receive_evt->is_first_response: %d\n", receive_evt->is_first_response);
+                if (receive_evt->is_first_response == true) {
+                    gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SUBTITLE, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
+                }
+                xQueueSend(audio_uri_queue, &receive_evt, portMAX_DELAY);
+                receive_evt = NULL;
+            } else {
+                //切换语音识别失败时的ui
+                identification_failed_ui();
+            }
+        }
+        if (xQueueReceive(mYxQueue2, &received_msg, 1) == pdPASS) {
+            ESP_LOGI(TAG, "mYxQueue2-------------------received_msg = %d\n", received_msg);
+            if (ESP_FAIL == received_msg) {
+                //切换语音识别失败时的ui
+                identification_failed_ui();
+            }
+        }
+        gt_task_handler();
+        // vTaskDelay(1);
+    }
+}
+#else //!USE_HTTP_STREAM
 void gt_gui_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "--------------------------gt_gui_task\n");
     int received_msg;
     while(1){
         if (xQueueReceive(mYxQueue2, &received_msg, 1) == pdPASS) {
-            ESP_LOGI(TAG, "2-------------------received_msg = %d\n", received_msg);
+            ESP_LOGI(TAG, "mYxQueue2-------------------received_msg = %d\n", received_msg);
             if (ESP_OK == received_msg) {
                 //启动音频播放器
                 gt_audio_player_start(cb_data.answer->tts_audio);
@@ -211,8 +247,47 @@ void gt_gui_task(void *pvParameters)
         // vTaskDelay(1);
     }
 }
-/* ------------------------------------------------------------------------ */
+#endif //!USE_HTTP_STREAM
 
+/* ------------------------------------------------------------------------ */
+#if USE_HTTP_STREAM
+void gt_streamAudio_task()
+{
+    ESP_LOGI(TAG, "-------------------gt_StreamAudio_task\n");
+    int audio_status = -1;
+    ReceivedAnswerData* receive_evt = NULL;
+    while(1)
+    {
+        audio_status = gt_audio_player_state_get();
+        ESP_LOGI(TAG,"audio_status ============== %d\n",audio_status);
+        if (audio_status != AUDIO_STATUS_RUNNING) {
+            if (audio_uri_queue != NULL && xQueueReceive(audio_uri_queue, &receive_evt, portMAX_DELAY) == pdPASS) {
+                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+
+                if (screen_id == GT_ID_SCREEN_SUBTITLE || screen_id == GT_ID_SCREEN_SETUP)
+                {
+                    update_subtitles(receive_evt);
+                    gt_audio_player_start(receive_evt->tts_audio);
+
+                    audio_free(receive_evt->tts_audio);
+                    receive_evt->tts_audio = NULL;
+
+                    audio_free(receive_evt->emotion_value);
+                    receive_evt->emotion_value = NULL;
+
+                    audio_free(receive_evt->llm_response);
+                    receive_evt->llm_response = NULL;
+                } else {
+                    audio_free(receive_evt);
+                    receive_evt = NULL;
+                }
+            }
+        }
+        vTaskDelay(500);  // 延迟100ms，避免过度占用CPU
+    }
+}
+#endif //!USE_HTTP_STREAM
 
 void app_main(void)
 {
@@ -228,6 +303,21 @@ void app_main(void)
         // 队列创建失败处理
         ESP_LOGE(TAG, "Failed to create queue");
     }
+
+#if USE_HTTP_STREAM
+    mYxQueue3 = xQueueCreate(16, sizeof(ReceivedAnswerData *));
+    if (mYxQueue3 == NULL) {
+        // 队列创建失败处理
+        ESP_LOGE(TAG, "Failed to create queue");
+    }
+
+    audio_uri_queue = xQueueCreate(16, sizeof(ReceivedAnswerData *));
+    if (audio_uri_queue == NULL) {
+        // 队列创建失败处理
+        ESP_LOGE(TAG, "Failed to create audio_uri_queue");
+    }
+#endif //!USE_HTTP_STREAM
+
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
         // NVS partition was truncated and needs to be erased
@@ -277,7 +367,12 @@ void app_main(void)
 
     gt_audio_player_init();             /* 初始化播放器 */
     gt_audio_player_vol_set(100);
+
+#if USE_HTTP_STREAM
+    gt_pipe_send_init();
+#else //!USE_HTTP_STREAM
     gt_recording_init();                /* 初始化录音 */
+#endif //!USE_HTTP_STREAM
 
     LCD_PWR(1);
 
@@ -298,8 +393,11 @@ void app_main(void)
 
     taskENTER_CRITICAL(&my_spinlock);
 
-    xTaskCreate(gt_gui_task, "gt_gui_task", 4096, NULL, 3, NULL);
+    xTaskCreate(gt_gui_task, "gt_gui_task", 3*1024, NULL, 3, NULL);
     xTaskCreate(&http_test_task, "http_test_task", 8*1024, &cb_data, 3, NULL);
+#if USE_HTTP_STREAM
+    xTaskCreate(gt_streamAudio_task, "gt_streamAudio_task", 3*1024, NULL, 2, NULL);
+#endif //!USE_HTTP_STREAM
 
     taskEXIT_CRITICAL(&my_spinlock);
     print_memory_info();

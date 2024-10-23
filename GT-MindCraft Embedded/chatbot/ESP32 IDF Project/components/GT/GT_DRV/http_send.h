@@ -22,22 +22,28 @@
 #include "gt_recording.h"
 #include "ff.h"
 
+#include "gt_pipe_send.h"
+
+#define USE_HTTP_STREAM 1 //使用流式代码宏,1:流式，0:非流式
+
 typedef struct{
     char emotion_output[15];
     char voice_id[15];
     int  user_age;
     char bot_name[10];
-    char bot_character[10];
+    char bot_character[20];
     char bot_personality[10];
     char output_format[10];
 }SendSettingsData;
 
 typedef struct{
-    char *asr_content;
     char *llm_response;
     char *emotion_value;
     char *tts_audio;
     float audio_seconds;
+#if USE_HTTP_STREAM
+    bool is_first_response;
+#endif //!USE_HTTP_STREAM
 } ReceivedAnswerData;
 
 typedef struct{
@@ -47,9 +53,18 @@ typedef struct{
 
 }ChatbotData;
 
+#if USE_HTTP_STREAM
+esp_err_t resolve_stream_answer_json(char *jbuf, ReceivedAnswerData* receive_buf);
+#else //!USE_HTTP_STREAM
 esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf);
+#endif //!USE_HTTP_STREAM
+
 void http_test_task(void *pvParameters);
 
+#if USE_HTTP_STREAM
+esp_err_t  stream_http_rest_with_url(SendSettingsData* send_data);
+#else //!USE_HTTP_STREAM
 esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* receive_data);
+#endif //!USE_HTTP_STREAM
 
 #endif

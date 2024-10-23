@@ -161,7 +161,8 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_color_pressed(btn1Copy, gt_color_hex(0x000000));
 	gt_btn_set_radius(btn1Copy, 8);
 	gt_btn_set_text(btn1Copy, "  %d", cb_data.settings->user_age);
-	gt_obj_add_event_cb(btn1Copy, disp_list_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	gt_obj_add_event_cb(btn1Copy, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    gt_obj_set_fixed(btn1Copy, true);
 
 	/** img7 */
 	img7 = gt_img_create(btn1Copy);
@@ -194,7 +195,8 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_color_pressed(btn1, gt_color_hex(0x000000));
 	gt_btn_set_radius(btn1, 6);
 	gt_btn_set_text(btn1, "  %s", cb_data.settings->bot_character);
-	gt_obj_add_event_cb(btn1, disp_list_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	gt_obj_add_event_cb(btn1, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    gt_obj_set_fixed(btn1, true);
 
 	/** img3 */
 	img3 = gt_img_create(btn1);
@@ -226,7 +228,8 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_color_pressed(btn5, gt_color_hex(0x000000));
 	gt_btn_set_radius(btn5, 6);
 	gt_btn_set_text(btn5, "  %s", cb_data.settings->bot_personality);
-	gt_obj_add_event_cb(btn5, disp_list_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	gt_obj_add_event_cb(btn5, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    gt_obj_set_fixed(btn5, true);
 
 
 	/** img8 */
@@ -259,7 +262,8 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_color_pressed(btn7, gt_color_hex(0x000000));
 	gt_btn_set_radius(btn7, 6);
 	gt_btn_set_text(btn7, "  %s", gt_timber_string_get(cb_data.settings->voice_id));
-	gt_obj_add_event_cb(btn7, disp_list_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	gt_obj_add_event_cb(btn7, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    gt_obj_set_fixed(btn7, true);
 
 
 	/** img9 */
@@ -293,7 +297,8 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_color_pressed(btn7Copy, gt_color_hex(0x000000));
 	gt_btn_set_radius(btn7Copy, 6);
 	gt_btn_set_text(btn7Copy, "  %s", cb_data.settings->bot_name);
-	gt_obj_add_event_cb(btn7Copy, disp_list_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+	gt_obj_add_event_cb(btn7Copy, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    gt_obj_set_fixed(btn7Copy, true);
 
 	/** img9Copy */
 	img9Copy = gt_img_create(btn7Copy);

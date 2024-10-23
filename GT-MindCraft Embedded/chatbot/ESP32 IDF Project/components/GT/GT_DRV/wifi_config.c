@@ -22,9 +22,9 @@
 
 
 /* 链接wifi名称 */
-#define DEFAULT_SSID        "zlzl"
+#define DEFAULT_SSID        "GT"//"GT"
 /* wifi密码 */
-#define DEFAULT_PWD         "66666666"
+#define DEFAULT_PWD         "83453881abc@"
 /* 事件标志 */
 static EventGroupHandle_t   wifi_event;
 #define WIFI_CONNECTED_BIT  BIT0

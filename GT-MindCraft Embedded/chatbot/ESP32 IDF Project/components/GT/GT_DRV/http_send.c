@@ -2,18 +2,303 @@
 #include "esp_heap_caps.h"
 #include "gt_ui.h"
 #include "audio_mem.h"
+#include "gt_pipe_send.h"
 
 extern QueueHandle_t mYxQueue;
 extern QueueHandle_t mYxQueue2;
-
+#if USE_HTTP_STREAM
+extern QueueHandle_t mYxQueue3;
+QueueHandle_t mYxQueue4 = NULL;
+#endif //!USE_HTTP_STREAM
 
 #define MAX_HTTP_RECV_BUFFER 512
-#define MAX_HTTP_OUTPUT_BUFFER 3000//2048
+#define MAX_HTTP_OUTPUT_BUFFER 512//3000//2048
 #define MULTIPART_DATA_SIZE 300//multipart_data
-#define EXTRA_PARAM_SIZE 800//extra_param
+#define EXTRA_PARAM_SIZE 1536//extra_param
 
 static const char *TAG = "HTTP_CLIENT";
+static bool flag = true;
 
+#if USE_HTTP_STREAM
+esp_err_t stream_http_event_handler(esp_http_client_event_t *evt)
+{
+    static char *output_buffer = NULL;  // Buffer to store response of http request from event handler
+    static int output_len = 0;       // Stores number of bytes read
+    char *evtdata_buff = NULL;
+    ReceivedAnswerData* receive_evt_data = NULL;
+    int num = -1;
+    int deleteNum = 0;
+    static int response_count = 0;
+
+    if(flag == false)
+    {
+        ESP_LOGI(TAG, "flag ================== false\n");
+        return ESP_FAIL;
+    }
+    if (xQueueReceive(mYxQueue4, &deleteNum, 1) == pdPASS) {
+        flag = false;
+        if(evt->user_data != NULL)
+        {
+            esp_http_client_close(evt->user_data);
+            ESP_LOGI(TAG, "esp_http_client_close =============================");
+            deleteNum = 0;
+            response_count = 0;
+
+        }
+        else {
+            ESP_LOGI(TAG, "Stopping HTTP connection from callback...");
+        }
+        xQueueReset(mYxQueue4);
+        num = uxQueueMessagesWaiting(mYxQueue4);
+        ESP_LOGI(TAG, "uxQueueMessagesWaitingmY-----------------xQueue4 = %d\n",num);
+        return ESP_FAIL;  // 提前退出回调2
+    }
+
+
+    switch(evt->event_id) {
+        case HTTP_EVENT_ERROR:
+            ESP_LOGD(TAG, "HTTP_EVENT_ERROR");
+            break;
+        case HTTP_EVENT_ON_CONNECTED:
+            ESP_LOGD(TAG, "HTTP_EVENT_ON_CONNECTED");
+            break;
+        case HTTP_EVENT_HEADER_SENT:
+            ESP_LOGD(TAG, "HTTP_EVENT_HEADER_SENT");
+            break;
+        case HTTP_EVENT_ON_HEADER:
+            ESP_LOGD(TAG, "HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
+            break;
+        case HTTP_EVENT_ON_DATA:
+            ESP_LOGI(TAG, "---------------HTTP_EVENT_ON_DATA, len=%d\n", evt->data_len);
+            if(evtdata_buff == NULL){
+                evtdata_buff = (char *)audio_malloc(evt->data_len + 1);
+                if(evtdata_buff == NULL){
+                    ESP_LOGI(TAG, "evtdata_buff heap is fail");
+                }
+                memset(evtdata_buff, 0, evt->data_len + 1);
+            }
+            if (receive_evt_data == NULL) {
+                receive_evt_data = (ReceivedAnswerData*)audio_malloc(sizeof(ReceivedAnswerData));
+                if(receive_evt_data == NULL) {
+                    ESP_LOGI(TAG, "receive_evt_data heap is fail");
+                    break;
+                }
+            }
+            // 复制数据到缓冲区
+            memset(evtdata_buff, 0, evt->data_len + 1);
+            //memcpy(evtdata_buff, (char *)evt->data + 6, evt->data_len);
+            ESP_LOGI(TAG, "----------evt->data Received JSON response: %s\n", evt->data);
+            ESP_LOGI(TAG, "----------evt->data Received JSON response data length: %d\n", strlen(evt->data));
+
+            memcpy(evtdata_buff, (char *)evt->data + 6, evt->data_len);
+
+            if (esp_http_client_is_chunked_response(evt->client)) {
+                ESP_LOGI(TAG, "Chunked response received");
+
+                response_count = (response_count + 1);
+
+                if (response_count == 1)
+                {
+                    receive_evt_data->is_first_response = true;
+                } else {
+                    receive_evt_data->is_first_response = false;
+                }
+
+                ESP_LOGI(TAG, "response_count ========================= %d",response_count);
+
+                resolve_stream_answer_json(evtdata_buff, receive_evt_data);
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                xQueueSendFromISR(mYxQueue3, &receive_evt_data, &xHigherPriorityTaskWoken);//发送http处理结果到gt_gui_task任务
+
+                audio_free(evtdata_buff); //用完接收到的json数据就释放
+                evtdata_buff = NULL;
+
+
+            } else {
+                // 非 chunked 响应的处理逻辑，可以在这里处理整个响应
+                ESP_LOGI(TAG, "No Chunked response received");
+            }
+            break;
+        case HTTP_EVENT_ON_FINISH:
+            ESP_LOGW(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>HTTP_EVENT_ON_FINISH\n");
+            response_count = 0;
+            if(evtdata_buff != NULL){
+                audio_free(evtdata_buff);
+                evtdata_buff = NULL;
+            }
+            receive_evt_data = NULL;
+            // if(receive_evt_data != NULL){
+            //     audio_free(receive_evt_data);
+            //     receive_evt_data = NULL;
+            // }
+            if (output_buffer != NULL) {
+                // Response is accumulated in output_buffer. Uncomment the below line to print the accumulated response
+                // ESP_LOG_BUFFER_HEX(TAG, output_buffer, output_len);
+                free(output_buffer);
+                output_buffer = NULL;
+            }
+            output_len = 0;
+            break;
+        case HTTP_EVENT_DISCONNECTED:
+            ESP_LOGI(TAG, "HTTP_EVENT_DISCONNECTED");
+            int mbedtls_err = 0;
+            esp_err_t err = esp_tls_get_and_clear_last_error((esp_tls_error_handle_t)evt->data, &mbedtls_err, NULL);
+            if (err != 0) {
+                ESP_LOGI(TAG, "Last esp error code: 0x%x", err);
+                ESP_LOGI(TAG, "Last mbedtls failure: 0x%x", mbedtls_err);
+            }
+            if (output_buffer != NULL) {
+                free(output_buffer);
+                output_buffer = NULL;
+            }
+            output_len = 0;
+            break;
+        case HTTP_EVENT_REDIRECT:
+            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
+            esp_http_client_set_header(evt->client, "From", "user@example.com");
+            esp_http_client_set_header(evt->client, "Accept", "text/html");
+            esp_http_client_set_redirection(evt->client);
+            break;
+    }
+    return ESP_OK;
+}
+
+esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
+{
+    // 停止播放和上传
+    ESP_LOGI(TAG, "[ * ] [Rec] key released, stop pipeline ...");
+
+    flag = true;
+    char *uuidStr = NULL;
+    const char boundary[] = {"----WebKitFormBoundary7MA4YWxkTrZu0gW"};//分隔符
+
+    esp_http_client_config_t config = {
+        .url = "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",
+        .event_handler = stream_http_event_handler,
+        .user_data = NULL,//local_response_buffer,        // Pass address of local buffer to get response
+        .buffer_size = 1024,
+        .disable_auto_redirect = true,
+        .cert_pem = NULL,
+        .timeout_ms = 15000, //超时时间
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);//初始化http客户端
+    esp_http_client_set_user_data(client, client);
+
+    if(mYxQueue4 == NULL)
+    {
+        mYxQueue4 = xQueueCreate(5, sizeof(int));
+        if (mYxQueue4 == NULL) {// 队列创建失败处理
+            ESP_LOGE(TAG, "Failed to create mYxQueue4"); 
+        }
+    }
+    if (uxQueueMessagesWaiting(mYxQueue4) > 0) {   // 队列中有数据
+        xQueueReset(mYxQueue4);
+        int num = uxQueueMessagesWaiting(mYxQueue4);
+        ESP_LOGI(TAG, "uxQueueMessagesWaiting(mYxQueue4) > 0 ==============> uxQueueMessagesWaiting = %d\n",num);
+    }
+
+    // POST请求
+    //要发送给服务器的参数
+    uuidStr = get_uuid();
+    char *extra_param = (char *)audio_malloc(EXTRA_PARAM_SIZE);
+    memset(extra_param, 0, EXTRA_PARAM_SIZE);
+    snprintf(extra_param, EXTRA_PARAM_SIZE,
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"emotion_output\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"voice_id\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"user_age\"\r\n\r\n"
+        "%d"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"bot_name\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"bot_character\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"bot_personality\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"output_format\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"asr_uuid\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"stream\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"mode\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"tts_model\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"max_tokens\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n",
+        boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_age,boundary,send_data->bot_name,
+        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary, uuidStr, boundary,"true",boundary,"customize",boundary,"speech-01-turbo-240228",boundary,"100",boundary);
+    size_t extra_pram_len = strlen(extra_param);
+    uuidStr = NULL;
+
+
+    char content_type_header[100] = {0};
+    snprintf(content_type_header, sizeof(content_type_header), "multipart/form-data; boundary=%s", boundary);
+    esp_http_client_set_method(client, HTTP_METHOD_POST);//设置 HTTP 请求的方法
+    esp_http_client_set_header(client, "Content-Type",content_type_header);//设置 HTTP 请求头
+    esp_http_client_set_header(client, "Authorization", "API keys");//设置请求头的时候要加上API keys
+
+    // 组合最终的 POST 请求数据
+    size_t end_boundary_len = strlen(boundary) + 6;
+    size_t total_data_len = extra_pram_len;
+    char *post_buffer = (char *)audio_malloc(total_data_len + 1);
+    memset(post_buffer, 0, total_data_len + 1);
+    memcpy(post_buffer, extra_param, extra_pram_len);
+    // 设置 POST 请求数据
+    esp_http_client_set_post_field(client, post_buffer, total_data_len + 1);
+
+    //打开客户端连接服务器
+    //esp_err_t err = esp_http_client_open(client, total_data_len);
+    esp_err_t err = esp_http_client_perform(client);
+
+    int status_code = esp_http_client_get_status_code(client);
+    ESP_LOGE(TAG, "HTTP POST Status = %d, content_length = %d\n", status_code, esp_http_client_get_content_length(client));
+    if (status_code != 200)
+    {
+        err = ESP_FAIL;
+        goto FREE_LABEL;
+    }
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
+        err = ESP_FAIL;
+        goto FREE_LABEL;
+    }
+
+    vTaskDelay(300);
+FREE_LABEL:
+    audio_free(extra_param);
+    extra_param =NULL;
+    audio_free(post_buffer);
+    post_buffer = NULL;
+    if(client != NULL && flag == false)
+    {
+        esp_http_client_cleanup(client);
+        client = NULL;
+    }
+    else if (client != NULL && flag == true)
+    {
+        esp_http_client_close(client);
+        esp_http_client_cleanup(client);
+        client = NULL;
+    }
+    return err;
+}
+#else //!USE_HTTP_STREAM
 esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 {
     static char *output_buffer;  // Buffer to store response of http request from event handler
@@ -161,7 +446,7 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
     memset(local_response_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
 
     esp_http_client_config_t config = {
-        .url =  "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",
+        .url = "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",
         .event_handler = _http_event_handler,
         .user_data = local_response_buffer,        // Pass address of local buffer to get response
         .disable_auto_redirect = true,
@@ -185,7 +470,7 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
     size_t multipart_data_len = strlen(multipart_data);
 
     //要发送给服务器的参数
-      char *extra_param = (char *)audio_malloc(EXTRA_PARAM_SIZE);
+   char *extra_param = (char *)audio_malloc(EXTRA_PARAM_SIZE);
     memset(extra_param, 0, EXTRA_PARAM_SIZE);
     snprintf(extra_param, EXTRA_PARAM_SIZE,
         "\r\n--%s\r\n"
@@ -212,16 +497,19 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
         "\r\n--%s\r\n"
         "Content-Disposition: form-data; name=\"stream\"\r\n\r\n"
         "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"mode\"\r\n\r\n"
+        "%s"
         "\r\n--%s\r\n",
         boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_age,boundary,send_data->bot_name,
-        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary,"false",boundary);
+        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary,"false",boundary,"pro",boundary);
     size_t extra_pram_len = strlen(extra_param);
 
     char content_type_header[100] = {0};
     snprintf(content_type_header, sizeof(content_type_header), "multipart/form-data; boundary=%s", boundary);
     esp_http_client_set_method(client, HTTP_METHOD_POST);//设置 HTTP 请求的方法
     esp_http_client_set_header(client, "Content-Type",content_type_header);//设置 HTTP 请求头
-    esp_http_client_set_header(client, "Authorization", "API keys");//设置请求头的时候要加上API keys
+    esp_http_client_set_header(client, "Authorization", "MC-4E98B66CC08B49A68B983C83AF2740E7");//设置请求头的时候要加上API keys
     size_t end_boundary_len = strlen(boundary) + 6;
     size_t total_data_len =  wav_size + multipart_data_len + extra_pram_len + end_boundary_len;
 
@@ -278,6 +566,7 @@ FREE_LABEL:
     esp_http_client_cleanup(client);
     return err;
 }
+#endif //!USE_HTTP_STREAM
 
 void http_test_task(void *pvParameters)
 {
@@ -290,9 +579,15 @@ void http_test_task(void *pvParameters)
     while (1) {
         // 等待接收消息，如果队列中有消息，则接收并处理
         if (xQueueReceive(mYxQueue, &received_msg, portMAX_DELAY) == pdPASS) {
-            ESP_LOGI(TAG, "1-------------------received_msg = %d\n", received_msg);
+            ESP_LOGI(TAG, "mYxQueue-------------------received_msg = %d\n", received_msg);
             if (1 == received_msg) {
-                esp_err_t result =http_rest_with_url(para->settings, para->answer);
+
+            #if USE_HTTP_STREAM
+                esp_err_t result = stream_http_rest_with_url(para->settings);
+            #else //!USE_HTTP_STREAM
+                esp_err_t result = http_rest_with_url(para->settings, para->answer);
+            #endif //!USE_HTTP_STREAM
+
                 ESP_LOGI(TAG,">>>>>result = %d\n", result);
 
                 //发送http处理结果到gt_gui_task任务
@@ -312,13 +607,81 @@ void http_test_task(void *pvParameters)
 #endif
 }
 
+#if USE_HTTP_STREAM
+esp_err_t resolve_stream_answer_json(char *jbuf, ReceivedAnswerData* receive_buf)
+{
+    // 解析 JSON 响应
+    cJSON *json = cJSON_Parse(jbuf);
+    if (json == NULL) {
+        ESP_LOGE(TAG, "Failed to parse JSON");
+        return ESP_FAIL;  // 返回失败
+    }
 
+    cJSON *llm_response = cJSON_GetObjectItem(json, "llm_response");//解析json数据,获取回复用户的文字内容
+    cJSON *emotion_value = cJSON_GetObjectItem(json, "emotion_value");//解析json数据，获取情绪值
+    cJSON *tts_audio = cJSON_GetObjectItem(json, "tts_audio");//解析json数据，获取音频链接
+    cJSON *audio_seconds = cJSON_GetObjectItem(json, "audio_seconds");//解析json数据，获取音频总时长
+
+    if (llm_response == NULL || tts_audio == NULL || emotion_value == NULL || audio_seconds == NULL) {
+        ESP_LOGE(TAG, "Missing required JSON fields");
+        cJSON_Delete(json);
+        return ESP_FAIL;  // 返回失败
+    }
+
+    // 检查字段是否为空字符串
+    if (llm_response->valuestring == NULL || emotion_value->valuestring == NULL || tts_audio->valuestring == NULL) {
+        ESP_LOGE(TAG, "JSON fields are null");
+        cJSON_Delete(json);
+        return ESP_FAIL;  // 返回失败
+    }
+
+    receive_buf->llm_response = (char *)audio_malloc(strlen(llm_response->valuestring) + 1);
+    if (receive_buf->llm_response == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for llm_response");
+        cJSON_Delete(json);
+        return ESP_FAIL;
+    }
+    strcpy(receive_buf->llm_response, llm_response->valuestring);
+
+    receive_buf->emotion_value = (char *)audio_malloc(strlen(emotion_value->valuestring) + 1);
+    if (receive_buf->emotion_value == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for emotion_value");
+        cJSON_Delete(json);
+        audio_free(receive_buf->llm_response);
+        return ESP_FAIL;
+    }
+    strcpy(receive_buf->emotion_value, emotion_value->valuestring);
+
+    receive_buf->tts_audio = (char *)audio_malloc(strlen(tts_audio->valuestring) + 1);
+    if (receive_buf->tts_audio == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for tts_audio");
+        cJSON_Delete(json);
+        audio_free(receive_buf->llm_response);
+        audio_free(receive_buf->emotion_value);
+        return ESP_FAIL;
+    }
+    strcpy(receive_buf->tts_audio, tts_audio->valuestring);
+
+    // 处理 audio_seconds，检查它是否为数字类型
+    if (cJSON_IsNumber(audio_seconds)) {
+        receive_buf->audio_seconds = (float)audio_seconds->valuedouble;
+    } else {
+        ESP_LOGE(TAG, "audio_seconds is not a number");
+        receive_buf->audio_seconds = 0.0f;  // 设为默认值
+    }
+
+    ESP_LOGI(TAG, "------------------receive_buf->llm_response: %s\n", receive_buf->llm_response);
+    ESP_LOGI(TAG, "------------------receive_buf->emotion_value: %s\n", receive_buf->emotion_value);
+    ESP_LOGI(TAG, "------------------receive_buf->tts_audio: %s\n", receive_buf->tts_audio);
+    ESP_LOGI(TAG, "------------------receive_buf->audio_seconds: %f\n", receive_buf->audio_seconds);
+
+    cJSON_Delete(json);
+    return ESP_OK;  // 返回成功
+
+}
+#else //!USE_HTTP_STREAM
 esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf) {
     // 判断接收服务器数据的结构体申请的堆空间是否为空
-    if (receive_buf->asr_content != NULL) {
-        audio_free(receive_buf->asr_content);
-        receive_buf->asr_content = NULL;
-    }
     if (receive_buf->llm_response != NULL) {
         audio_free(receive_buf->llm_response);
         receive_buf->llm_response = NULL;
@@ -346,38 +709,28 @@ esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf) {
         return ESP_FAIL;  // 返回失败
     }
 
-    cJSON *asr_content = cJSON_GetObjectItem(data, "asr_content");//解析json数据，获取用户语音的文字内容
     cJSON *llm_response = cJSON_GetObjectItem(data, "llm_response");//解析json数据,获取回复用户的文字内容
     cJSON *emotion_value = cJSON_GetObjectItem(data, "emotion_value");//解析json数据，获取情绪值
     cJSON *tts_audio = cJSON_GetObjectItem(data, "tts_audio");//解析json数据，获取音频链接
     cJSON *audio_seconds = cJSON_GetObjectItem(data, "audio_seconds");//解析json数据，获取音频总时长
 
-    if (asr_content == NULL || llm_response == NULL || tts_audio == NULL || emotion_value == NULL || audio_seconds == NULL) {
+    if (llm_response == NULL || tts_audio == NULL || emotion_value == NULL || audio_seconds == NULL) {
         ESP_LOGE(TAG, "Missing required JSON fields");
         cJSON_Delete(json);
         return ESP_FAIL;  // 返回失败
     }
 
     // 检查字段是否为空字符串
-    if (asr_content->valuestring == NULL || llm_response->valuestring == NULL || emotion_value->valuestring == NULL || tts_audio->valuestring == NULL) {
+    if (llm_response->valuestring == NULL || emotion_value->valuestring == NULL || tts_audio->valuestring == NULL) {
         ESP_LOGE(TAG, "JSON fields are null");
         cJSON_Delete(json);
         return ESP_FAIL;  // 返回失败
     }
 
-    receive_buf->asr_content = (char *)audio_malloc(strlen(asr_content->valuestring) + 1);
-    if (receive_buf->asr_content == NULL) {
-        ESP_LOGE(TAG, "Failed to allocate memory for asr_content");
-        cJSON_Delete(json);
-        return ESP_FAIL;
-    }
-    strcpy(receive_buf->asr_content, asr_content->valuestring);
-
     receive_buf->llm_response = (char *)audio_malloc(strlen(llm_response->valuestring) + 1);
     if (receive_buf->llm_response == NULL) {
         ESP_LOGE(TAG, "Failed to allocate memory for llm_response");
         cJSON_Delete(json);
-        audio_free(receive_buf->asr_content);
         return ESP_FAIL;
     }
     strcpy(receive_buf->llm_response, llm_response->valuestring);
@@ -386,7 +739,6 @@ esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf) {
     if (receive_buf->emotion_value == NULL) {
         ESP_LOGE(TAG, "Failed to allocate memory for emotion_value");
         cJSON_Delete(json);
-        audio_free(receive_buf->asr_content);
         audio_free(receive_buf->llm_response);
         return ESP_FAIL;
     }
@@ -396,7 +748,6 @@ esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf) {
     if (receive_buf->tts_audio == NULL) {
         ESP_LOGE(TAG, "Failed to allocate memory for tts_audio");
         cJSON_Delete(json);
-        audio_free(receive_buf->asr_content);
         audio_free(receive_buf->llm_response);
         audio_free(receive_buf->emotion_value);
         return ESP_FAIL;
@@ -411,7 +762,6 @@ esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf) {
         receive_buf->audio_seconds = 0.0f;  // 设为默认值
     }
 
-    ESP_LOGI(TAG, "------------------receive_buf->asr_content: %s\n", receive_buf->asr_content);
     ESP_LOGI(TAG, "------------------receive_buf->llm_response: %s\n", receive_buf->llm_response);
     ESP_LOGI(TAG, "------------------receive_buf->emotion_value: %s\n", receive_buf->emotion_value);
     ESP_LOGI(TAG, "------------------receive_buf->tts_audio: %s\n", receive_buf->tts_audio);
@@ -420,4 +770,4 @@ esp_err_t resolve_answer_json(char *jbuf, ReceivedAnswerData* receive_buf) {
     cJSON_Delete(json);
     return ESP_OK;  // 返回成功
 }
-
+#endif //USE_HTTP_STREAM

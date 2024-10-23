@@ -93,7 +93,7 @@ audio_err_t gt_audio_player_vol_set(int vol);
  */
 audio_err_t gt_audio_player_vol_get(int* vol);
 
-
+audio_err_t gt_audio_player_stop_and_prepare_next(void);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

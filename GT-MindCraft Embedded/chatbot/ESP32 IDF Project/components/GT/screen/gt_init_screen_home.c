@@ -111,6 +111,7 @@ void wifi_connected_fail_ui() {
     set_emojis_in_player(player_emojis, AI_EMOJIS_SYMPATHY);
 
     gt_obj_remove_all_event_cb(imgbtn1);
+    gt_disp_invalid_area(screen_home);
     ESP_LOGI(TAG, "-----------------------wifi链接失败时的ui\n");
 
 }
@@ -126,9 +127,16 @@ static void recording_cb(gt_event_st * e) {
 
     // 停止播放器
     gt_audio_player_stop();
+
     //step2:开始录音
+#if USE_HTTP_STREAM
+    get_pipe_send_api_key();
+    gt_pipe_send_start();
+#else //!USE_HTTP_STREAM
     gt_recording_path_set("/sdcard/rec.wav");
     gt_recording_start();
+#endif //!USE_HTTP_STREAM
+
     ESP_LOGI(TAG, "-----------------------按下执行结束\n");
 }
 //抬起
@@ -137,8 +145,14 @@ static void send_information_cb(gt_event_st * e) {
     waiting_answer_ui();
 
     //step2:结束录音
+#if USE_HTTP_STREAM
+    gt_pipe_send_stop();
+    set_ringbuf_done();
+#else //!USE_HTTP_STREAM
     gt_recording_stop();
+#endif //!USE_HTTP_STREAM
 
+    print_memory_info();
     //step3:获取设置界面的参数以及语音数据，并发送请求到服务器
     //这里采用消息队列mYxQueue向http_test_task任务发送消息
     int msg = 1; // 发送一个整数作为信号
@@ -153,11 +167,16 @@ static void cancel_recording_cb(gt_event_st * e) {
     //step1:切换等待录音时的ui
     waiting_rec_ui();
 
+#if USE_HTTP_STREAM
+    gt_pipe_send_stop();
+    set_ringbuf_done();
+#else //!USE_HTTP_STREAM
     //step2:结束录音，并删除SD卡中的录音文件
     gt_recording_stop();
 
     //删除SD卡中录音文件
     f_unlink("0:rec.wav");
+#endif //!USE_HTTP_STREAM
 
 
     ESP_LOGI(TAG, "-----------------------焦点移开当前控件\n");

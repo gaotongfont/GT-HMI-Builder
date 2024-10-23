@@ -4,6 +4,11 @@ static const char *TAG = "SCREEN_SUBTITLE";
 
 extern audio_board_handle_t gt_board_handle;
 
+#if USE_HTTP_STREAM
+extern QueueHandle_t mYxQueue4;
+extern QueueHandle_t audio_uri_queue;
+#endif //!USE_HTTP_STREAM
+
 /** screen_subtitle */
 gt_obj_st * screen_subtitle = NULL;
 static gt_obj_st * img2 = NULL;
@@ -12,10 +17,96 @@ static gt_obj_st * img1 = NULL;
 static gt_obj_st * imgbtn1 = NULL;
 static gt_obj_st * player1 = NULL;
 
+void set_emojis() {
+    if (cb_data.answer->emotion_value == NULL) {
+        set_emojis_in_player(player1, AI_EMOJIS_WAITING);
+        return;
+    }
+    //根据返回的情绪值设置不同的表情
+    if (strcmp(cb_data.answer->emotion_value, "开心") == 0) {
+        set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
+    } else if (strcmp(cb_data.answer->emotion_value, "同情") == 0) {
+        set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
+    } else if (strcmp(cb_data.answer->emotion_value, "鼓励") == 0) {
+        set_emojis_in_player(player1, AI_EMOJIS_ENCOURAGE);
+    } else {
+        set_emojis_in_player(player1, AI_EMOJIS_WAITING);
+        // set_emojis_in_player(player1, AI_EMOJIS_SPEAKING);
+    }
+}
+
+#if USE_HTTP_STREAM
+void update_subtitles(ReceivedAnswerData* receive_data) {
+    if (cb_data.answer == NULL) {
+        ESP_LOGE(TAG, "cb_data.answer is NULL");
+        return;
+    }
+    // 分配内存并检查 receive_data->emotion_value 是否不为 NULL
+    if (receive_data->emotion_value != NULL) {
+        cb_data.answer->emotion_value = NULL;
+        audio_free(cb_data.answer->emotion_value);
+        cb_data.answer->emotion_value = (char *)audio_malloc(strlen(receive_data->emotion_value) + 1);
+        if (cb_data.answer->emotion_value == NULL) {
+            ESP_LOGE(TAG, "Failed to allocate memory for emotion_value");
+            return;
+        }
+        strcpy(cb_data.answer->emotion_value, receive_data->emotion_value);
+    }
+    // 分配内存并检查 receive_data->llm_response 是否不为 NULL
+    if (receive_data->llm_response != NULL) {
+        cb_data.answer->llm_response = NULL;
+        audio_free(cb_data.answer->llm_response);
+        cb_data.answer->llm_response = (char *)audio_malloc(strlen(receive_data->llm_response) + 1);
+        if (cb_data.answer->llm_response == NULL) {
+            ESP_LOGE(TAG, "Failed to allocate memory for llm_response");
+            return;
+        }
+        strcpy(cb_data.answer->llm_response, receive_data->llm_response);
+    }
+
+    cb_data.answer->audio_seconds = receive_data->audio_seconds;
+    if (cb_data.answer->audio_seconds < 1)
+    {
+        cb_data.answer->audio_seconds = 1;
+    }
+
+    ESP_LOGI(TAG, "<<------------------cb_data.answer->emotion_value: %s\n", cb_data.answer->emotion_value);
+    ESP_LOGI(TAG, "<<------------------cb_data.answer->llm_response: %s\n", cb_data.answer->llm_response);
+    ESP_LOGI(TAG, "<<------------------cb_data.answer->audio_seconds: %f\n", cb_data.answer->audio_seconds);
+    gt_label_set_auto_scroll_single_line(lab2, true);
+    gt_label_set_text(lab2, cb_data.answer->llm_response);
+    gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
+    set_emojis();
+}
+#endif //!USE_HTTP_STREAM
+
 //手势左滑返回到上一个界面
 static void screen_subtitle_0_cb(gt_event_st * e) {
+#if USE_HTTP_STREAM
+    int send_num = -1;
+    if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
+    {
+        gt_audio_player_stop_and_prepare_next();
+    }
+    xQueueReset(audio_uri_queue);
+    int num = uxQueueMessagesWaiting(audio_uri_queue);
+    ESP_LOGI(TAG, "Stopping HTTP connection from callback...      audio_uri_queue======  %d\n",num);
+    xQueueSend(mYxQueue4, &send_num, portMAX_DELAY);
+    if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
+    {
+        gt_audio_player_stop_and_prepare_next();
+    }
+    
+    gt_disp_stack_go_back(1);
+    audio_free(cb_data.answer->emotion_value);
+    cb_data.answer->emotion_value = NULL;
+    audio_free(cb_data.answer->llm_response);
+    cb_data.answer->llm_response = NULL;
+    cb_data.answer->audio_seconds = 0.0f;
+#else //!USE_HTTP_STREAM
 	gt_audio_player_pause();
 	gt_disp_stack_go_back(1);
+#endif //!USE_HTTP_STREAM
 }
 
 //跳转到设置界面
@@ -25,8 +116,33 @@ static void img1_0_cb(gt_event_st * e) {
 
 //跳转到主界面
 static void imgbtn1_0_cb(gt_event_st * e) {
+#if USE_HTTP_STREAM
+    int send_num = -1;
+    if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
+    {
+        gt_audio_player_stop_and_prepare_next();
+    }
+    xQueueReset(audio_uri_queue);
+    int num = uxQueueMessagesWaiting(audio_uri_queue);
+    ESP_LOGI(TAG, "Stopping HTTP connection from callback...      audio_uri_queue======  %d\n",num);
+    xQueueSend(mYxQueue4, &send_num, portMAX_DELAY);
+    // if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
+    // {
+    //     gt_audio_player_stop_and_prepare_next();
+    // }
+
+    gt_disp_stack_load_scr_anim(GT_ID_SCREEN_HOME, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
+    audio_free(cb_data.answer->tts_audio);
+    cb_data.answer->tts_audio = NULL;
+    audio_free(cb_data.answer->emotion_value);
+    cb_data.answer->emotion_value = NULL;
+    audio_free(cb_data.answer->llm_response);
+    cb_data.answer->llm_response = NULL;
+    cb_data.answer->audio_seconds = 0.0f;
+#else //!USE_HTTP_STREAM
 	gt_audio_player_pause();
 	gt_disp_stack_load_scr_anim(GT_ID_SCREEN_HOME, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
+#endif //!USE_HTTP_STREAM
 }
 
 
@@ -53,8 +169,16 @@ gt_obj_st * gt_init_screen_subtitle(void)
 	gt_label_set_font_family(lab2, 1);
 	gt_label_set_font_cjk(lab2, 0);
 	gt_label_set_font_align(lab2, GT_ALIGN_CENTER_MID);
-	gt_label_set_text(lab2, cb_data.answer->llm_response);
-    gt_label_set_auto_scroll_single_line(lab2, true);
+	gt_label_set_auto_scroll_single_line(lab2, true);
+    if (cb_data.answer->llm_response != NULL) {
+        gt_label_set_text(lab2, cb_data.answer->llm_response);
+    } else {
+        gt_label_set_text(lab2, "");
+    }
+    if (cb_data.answer->audio_seconds < 1)
+    {
+        cb_data.answer->audio_seconds = 1;
+    }
     gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
 
 	/** rect1 */
@@ -93,23 +217,7 @@ gt_obj_st * gt_init_screen_subtitle(void)
 	gt_player_set_mode(player1, GT_PLAYER_MODE_LOOP);
 	gt_player_set_auto_play_period(player1, 35);
     //根据返回的情绪值设置不同的表情
-    if (strcmp(cb_data.answer->emotion_value, "开心") == 0) {
-        set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
-    } else if (strcmp(cb_data.answer->emotion_value, "同情") == 0) {
-	    set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
-    } else if (strcmp(cb_data.answer->emotion_value, "鼓励") == 0) {
-	    set_emojis_in_player(player1, AI_EMOJIS_ENCOURAGE);
-    } else {
-        // set_emojis_in_player(player1, AI_EMOJIS_WAITING);
-	    set_emojis_in_player(player1, AI_EMOJIS_SPEAKING);
-    }
-
-    ESP_LOGI(TAG, "--------------start play wav");
-    ESP_LOGI(TAG, "------------------cb_data.answer->asr_content: %s\n", cb_data.answer->asr_content);
-    ESP_LOGI(TAG, "------------------cb_data.answer->llm_response: %s\n", cb_data.answer->llm_response);
-    ESP_LOGI(TAG, "------------------cb_data.answer->tts_audio: %s\n", cb_data.answer->tts_audio);
-    ESP_LOGI(TAG, "------------------cb_data.answer->emotion_value: %s\n", cb_data.answer->emotion_value);
-    ESP_LOGI(TAG, "------------------cb_data.answer->audio_seconds: %f\n", cb_data.answer->audio_seconds);
+    set_emojis();
 
 	return screen_subtitle;
 }

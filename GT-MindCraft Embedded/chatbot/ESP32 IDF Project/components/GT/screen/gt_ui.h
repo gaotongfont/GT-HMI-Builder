@@ -6,9 +6,11 @@
 #include "gt_recording.h"
 #include "gt_audio_play.h"
 #include "http_send.h"
+#include "gt_pipe_send.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "gt_font_config.h"
+#include "audio_mem.h"
 
 extern QueueHandle_t mYxQueue;
 extern QueueHandle_t mYxQueue2;
@@ -19,6 +21,7 @@ extern gt_obj_st * screen_subtitle;
 
 extern ChatbotData cb_data;
 
+extern void print_memory_info(void);
 
 void gt_ui_init(void);
 
@@ -65,5 +68,8 @@ void identification_failed_ui();
 void wifi_connecting_ui();
 void waiting_rec_ui();
 void wifi_connected_fail_ui();
+#if USE_HTTP_STREAM
+void update_subtitles(ReceivedAnswerData* receive_data);
+#endif //!USE_HTTP_STREAM
 #endif
 

@@ -97,11 +97,13 @@
     "wifi_config.h": "c",
     "gt_ui.h": "c",
     "gt_audio_play.h": "c",
-    "complex": "c"
+    "complex": "c",
+    "chrono": "c",
+    "input_key_service.h": "c"
 },
 "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
 ],
 "idf.flashType": "UART",
-"idf.portWin": "COM25"
+"idf.portWin": "COM9"
 }
