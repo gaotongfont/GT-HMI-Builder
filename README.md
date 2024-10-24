@@ -316,6 +316,12 @@
 <li style="margin-bottom: 4px;"><a href="https://www.bilibili.com/video/BV1Ds4y1B7iW/?spm_id_from=333.999.0.0&vd_source=8ecf13d60f5e8ce6a592b252d351e954">第五章 事件交互介绍</a></li>
 </ul>
 
+**高通GT-HMI零基础详细教程合集(最新)(推荐)**
+
+<ul>
+<li style="margin-bottom: 4px;"><a href="https://space.bilibili.com/3493293474188211/channel/collectiondetail?sid=3764678">高通GT-HMI零基础详细教程</a></li>
+</ul>
+
 <br/>
 
 **Engine功能特点**
