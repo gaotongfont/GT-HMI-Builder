@@ -49,6 +49,7 @@
 <li>GT-HMI Engine移植：请参考视频<a href="https://www.bilibili.com/video/BV1dBsVeDEMR/?share_source=copy_web&vd_source=51817f89c7e6ffe331e366d0963376b5" target="_blank">【在ESP32上移植GT-HMI Engine详细教程】</a> (或复制https://www.bilibili.com/video/BV1dBsVeDEMR/?share_source=copy_web&vd_source=51817f89c7e6ffe331e366d0963376b5)</li>
 <li>ESP32外设移植：ESP32部分的外设在ADF框架下移植请参考乐鑫官方文档及示例,本开发板除电源、USB转TTL、扩展IO、 GUI-LCD接口和乐鑫官方推出的korvo2_v3开发板不同外，其余均大致相同，相同部分的外设及例程可参考乐鑫官方的korvo2_v3的例程进行开发。</li></ul></li>
 <li style="margin-bottom: 4px;">WIFI参数及API KEY修改：<ul>
+<li>流式和非流式模式：找到components\GT\GT_DRV\http_send.h文件，在文件中找到如下字段"#define USE_HTTP_STREAM 1 //使用流式代码宏,1:流式，0:非流式" 字段，设置成1则是流式模式，设置成0则为非流式模式。 推荐使用流式模式，上传数据和下发数据均较快速。</li>
 <li>修改WIFI 名称及密码：找到components\GT\GT_DRV\wifi_config.c文件，在文件中找到如下字段#define DEFAULT SSID #define DEFAULT PWD字段，分别是WIFI名称和密码，修改成您使用的WIFI名称及密码。 </li>
 <li>获取API KEY及修改API KEY：申请API KEY参考如下链接<a href="https://apifox.com/apidoc/shared-0fd7ea54-919e-4c93-b673-c60219bc82e0/doc-4739665" target="_blank">API KEY链接</a>(或复制 https://apifox.com/apidoc/shared-0fd7ea54-919e-4c93-b673-c60219bc82e0/doc-4739665)，然后找到components\GT\GT_DRV\Chttp_send.c 中的esp_http_client_set_header(client."Authorization","API keys");字段，将申请到的API KEY填入到API keys的位置</li>
 </ul></li>
