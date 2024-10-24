@@ -66,6 +66,9 @@
 **视频教程，陆续发布，敬请期待**
 <ul>
 <li style="margin-bottom: 4px;"><a href="https://www.bilibili.com/video/BV1qP22YSEQW/?spm_id_from=333.337.search-card.all.click&vd_source=0d93f7ed5a2d40d6e2d321f392d5e6f3">高通智匠AI开发板：整体框架的环境搭建</a></li>
+<li style="margin-bottom: 4px;"><a href="https://www.bilibili.com/video/BV1TGmGYgEAS/?spm_id_from=333.999.0.0&vd_source=0d93f7ed5a2d40d6e2d321f392d5e6f3">高通智匠AI开发板：GUI界面的设计流程</a></li>
+<li style="margin-bottom: 4px;"><a href="https://www.bilibili.com/video/BV15jyPY9EfS/?spm_id_from=333.999.0.0&vd_source=0d93f7ed5a2d40d6e2d321f392d5e6f3">高通智匠AI开发板：链接AI云服务</a></li>
+<li style="margin-bottom: 4px;"><a href="https://www.bilibili.com/video/BV15JyBYSEpA/?spm_id_from=333.999.0.0&vd_source=0d93f7ed5a2d40d6e2d321f392d5e6f3">高通智匠AI开发板：GUI界面与业务逻辑交互</a></li>
 </ul>
 
 **智匠chatbot API接口文档**
