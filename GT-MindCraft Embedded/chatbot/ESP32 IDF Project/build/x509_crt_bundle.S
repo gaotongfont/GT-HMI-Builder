@@ -1,4 +1,4 @@
-/* * Data converted from C:/Users/26743/Desktop/esp-stream-pipe-finish/amend_wifi/mindcraft-ai-development-board/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from C:/Users/26743/Desktop/esp32-git_temp/mindcraft-ai-development-board/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 .section .rodata.embedded

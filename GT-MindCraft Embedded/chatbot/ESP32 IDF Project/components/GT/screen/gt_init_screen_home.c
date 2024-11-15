@@ -189,10 +189,15 @@ static void add_event_cb_for_imgbtn() {
     gt_obj_add_event_cb(imgbtn1, cancel_recording_cb, GT_EVENT_TYPE_INPUT_PRESS_LOST, NULL);
 }
 
+static void screen_home_0_cb(gt_event_st * e) {
+	gt_disp_stack_go_back(1);
+    update_wifi_icon();
+}
+
 gt_obj_st * gt_init_screen_home(void)
 {
     screen_home = gt_obj_create(NULL);
-
+	gt_obj_add_event_cb(screen_home, screen_home_0_cb, GT_EVENT_TYPE_INPUT_HOME_GESTURE_LEFT, NULL);
     gt_screen_set_bgcolor(screen_home, gt_color_hex(0x000000));
 
 

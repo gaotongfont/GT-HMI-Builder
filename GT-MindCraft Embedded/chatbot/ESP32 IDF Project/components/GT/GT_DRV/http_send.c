@@ -187,16 +187,19 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
     if(mYxQueue4 == NULL)
     {
         mYxQueue4 = xQueueCreate(5, sizeof(int));
-        if (mYxQueue4 == NULL) {// 队列创建失败处理
-            ESP_LOGE(TAG, "Failed to create mYxQueue4"); 
+        if (mYxQueue4 == NULL) {
+            // 队列创建失败处理
+            ESP_LOGE(TAG, "Failed to create mYxQueue4");
         }
     }
-    if (uxQueueMessagesWaiting(mYxQueue4) > 0) {   // 队列中有数据
+    if (uxQueueMessagesWaiting(mYxQueue4) > 0) {
+        // 队列中有数据
         xQueueReset(mYxQueue4);
         int num = uxQueueMessagesWaiting(mYxQueue4);
         ESP_LOGI(TAG, "uxQueueMessagesWaiting(mYxQueue4) > 0 ==============> uxQueueMessagesWaiting = %d\n",num);
     }
-
+    int num2 = uxQueueMessagesWaiting(mYxQueue4);
+    ESP_LOGI(TAG, "uxQueueMessagesWaiting(mYxQueue4) > 0 ==============> uxQueueMessagesWaiting = %d\n",num2);
     // POST请求
     //要发送给服务器的参数
     uuidStr = get_uuid();
@@ -241,7 +244,7 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
         "%s"
         "\r\n--%s\r\n",
         boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_age,boundary,send_data->bot_name,
-        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary, uuidStr, boundary,"true",boundary,"customize",boundary,"speech-01-turbo-240228",boundary,"100",boundary);
+        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary, uuidStr, boundary,"true",boundary,"customize",boundary,"speech-01-turbo-240228",boundary,"200",boundary);
     size_t extra_pram_len = strlen(extra_param);
     uuidStr = NULL;
 
@@ -509,7 +512,7 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
     snprintf(content_type_header, sizeof(content_type_header), "multipart/form-data; boundary=%s", boundary);
     esp_http_client_set_method(client, HTTP_METHOD_POST);//设置 HTTP 请求的方法
     esp_http_client_set_header(client, "Content-Type",content_type_header);//设置 HTTP 请求头
-    esp_http_client_set_header(client, "Authorization", "MC-4E98B66CC08B49A68B983C83AF2740E7");//设置请求头的时候要加上API keys
+    esp_http_client_set_header(client, "Authorization", "API keys");//设置请求头的时候要加上API keys
     size_t end_boundary_len = strlen(boundary) + 6;
     size_t total_data_len =  wav_size + multipart_data_len + extra_pram_len + end_boundary_len;
 

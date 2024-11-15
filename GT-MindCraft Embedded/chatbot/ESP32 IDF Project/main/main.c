@@ -51,7 +51,7 @@
 #include "gt_ui.h"
 #include "http_send.h"
 #include "gt_pipe_send.h"
-#include "wifi_config.h"
+#include "wifi.h"
 #include "freertos/queue.h"
 #include "audio_thread.h"
 /* ------------------------------------------------------------------------ */
@@ -64,6 +64,7 @@ static tp_dev_t* gt_tp_dev = NULL;
 static portMUX_TYPE my_spinlock = portMUX_INITIALIZER_UNLOCKED;
 
 ChatbotData cb_data;
+bool is_auto_connected_end = false;
 
 QueueHandle_t mYxQueue;
 QueueHandle_t mYxQueue2;
@@ -327,6 +328,7 @@ void app_main(void)
     }
 #if (ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 1, 0))
     ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
 #else
     tcpip_adapter_init();
 #endif
@@ -376,6 +378,9 @@ void app_main(void)
 
     LCD_PWR(1);
 
+    wifi_init();
+    wifi_event_init();
+
     /* 设置界面参数 */
     cb_data.settings = (SendSettingsData*)audio_malloc(sizeof(SendSettingsData));
     memset(cb_data.settings, 0, sizeof(SendSettingsData));
@@ -393,7 +398,7 @@ void app_main(void)
 
     taskENTER_CRITICAL(&my_spinlock);
 
-    xTaskCreate(gt_gui_task, "gt_gui_task", 3*1024, NULL, 3, NULL);
+    xTaskCreate(gt_gui_task, "gt_gui_task", 4*1024, NULL, 3, NULL);
     xTaskCreate(&http_test_task, "http_test_task", 8*1024, &cb_data, 3, NULL);
 #if USE_HTTP_STREAM
     xTaskCreate(gt_streamAudio_task, "gt_streamAudio_task", 3*1024, NULL, 2, NULL);
@@ -402,6 +407,16 @@ void app_main(void)
     taskEXIT_CRITICAL(&my_spinlock);
     print_memory_info();
 
-    wifi_sta_init();                    /* 网络配置 */
+
+    //自动连接上一次的wifi
+    wifi_config_t last_wifi_config = get_current_wifi_config();
+    is_auto_connected_end = false;
+    wifi_sta_connect((char *)last_wifi_config.sta.ssid, (char *)last_wifi_config.sta.password);
+    gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+    if (is_auto_connected_end && screen_id == GT_ID_MAIN_INTERFACE)
+    {
+        update_wifi_icon();
+    }
+
 
 }

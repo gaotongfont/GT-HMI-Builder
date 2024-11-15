@@ -68,9 +68,9 @@ extern "C" {
 
 /* user: Timer task handler timer [ms] */
 #define GT_TASK_PERIOD_TIME_INDEV   10
-#define GT_TASK_PERIOD_TIME_EVENT   10
+#define GT_TASK_PERIOD_TIME_EVENT   2
 #define GT_TASK_PERIOD_TIME_ANIM    10
-#define GT_TASK_PERIOD_TIME_REFR    10
+#define GT_TASK_PERIOD_TIME_REFR    2
 #define GT_TASK_PERIOD_TIME_SERIAL  20
 
 /** Free object memory after N ms timer */

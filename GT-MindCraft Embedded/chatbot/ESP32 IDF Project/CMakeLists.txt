@@ -13,5 +13,4 @@ include_directories($ENV{IDF_PATH}/components/esp_http_client/include)
 include_directories($ENV{ADF_PATH}/components/input_key_service/include)
 include_directories($ENV{ADF_PATH}/components/esp-adf-libs/esp_codec/include)
 
-
 project(31_recoding)

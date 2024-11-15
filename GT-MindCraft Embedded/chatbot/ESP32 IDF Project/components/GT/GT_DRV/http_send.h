@@ -24,7 +24,7 @@
 
 #include "gt_pipe_send.h"
 
-#define USE_HTTP_STREAM 1 //使用流式代码宏,1:流式，0:非流式
+#define USE_HTTP_STREAM 01 //使用流式代码宏,1:流式，0:非流式
 
 typedef struct{
     char emotion_output[15];

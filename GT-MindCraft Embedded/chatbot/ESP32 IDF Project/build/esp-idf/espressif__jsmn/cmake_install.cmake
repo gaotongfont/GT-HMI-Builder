@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/26743/Desktop/esp-stream-pipe-finish/amend_wifi/mindcraft-ai-development-board/managed_components/espressif__jsmn
+# Install script for directory: C:/Users/26743/Desktop/esp32-git_temp/mindcraft-ai-development-board/managed_components/espressif__jsmn
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

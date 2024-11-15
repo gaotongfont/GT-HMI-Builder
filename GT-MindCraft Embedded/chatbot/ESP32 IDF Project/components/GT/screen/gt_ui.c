@@ -4,7 +4,13 @@ static const gt_scr_list_st gt_scr_list[] = {
     {GT_ID_SCREEN_HOME, gt_init_screen_home},
     {GT_ID_SCREEN_SETUP, gt_init_screen_setup},
     {GT_ID_SCREEN_SUBTITLE, gt_init_screen_subtitle},
-
+	{GT_ID_MAIN_INTERFACE, gt_init_main_interface},
+	{GT_ID_SETTING_LIST, gt_init_setting_list},
+	{GT_ID_VOLUME_AND_BRIGHTNESS, gt_init_volume_and_brightness},
+	{GT_ID_KEYBOARD, gt_init_keyboard},
+	{GT_ID_FORGET_PASSWORD, gt_init_forget_password},
+	{GT_ID_CONNECTION_FAILED, gt_init_connection_failed},
+	{GT_ID_WIFI_LIST, gt_init_wifi_list},
 };
 
 static const char* age_items[] = {
@@ -20,8 +26,8 @@ void gt_ui_init(void) {
 
 
     gt_scr_stack_register_id_list(gt_scr_list, sizeof(gt_scr_list) / sizeof(gt_scr_list[0]), 20);
-    gt_scr_stack_set_home_scr_id(GT_ID_SCREEN_HOME, false);
-    gt_disp_stack_load_scr(GT_ID_SCREEN_HOME);
+	gt_scr_stack_set_home_scr_id(GT_ID_MAIN_INTERFACE, false);
+	gt_disp_stack_load_scr(GT_ID_MAIN_INTERFACE);
 }
 
 static void set_player_many_times(gt_obj_st * obj, void * item, uint16_t item_byte_size, uint16_t times) {

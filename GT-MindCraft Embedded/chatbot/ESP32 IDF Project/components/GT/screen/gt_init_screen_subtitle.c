@@ -84,19 +84,17 @@ void update_subtitles(ReceivedAnswerData* receive_data) {
 static void screen_subtitle_0_cb(gt_event_st * e) {
 #if USE_HTTP_STREAM
     int send_num = -1;
-    if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
-    {
-        gt_audio_player_stop_and_prepare_next();
-    }
     xQueueReset(audio_uri_queue);
     int num = uxQueueMessagesWaiting(audio_uri_queue);
     ESP_LOGI(TAG, "Stopping HTTP connection from callback...      audio_uri_queue======  %d\n",num);
+
     xQueueSend(mYxQueue4, &send_num, portMAX_DELAY);
+
     if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
     {
         gt_audio_player_stop_and_prepare_next();
     }
-    
+
     gt_disp_stack_go_back(1);
     audio_free(cb_data.answer->emotion_value);
     cb_data.answer->emotion_value = NULL;
@@ -118,18 +116,15 @@ static void img1_0_cb(gt_event_st * e) {
 static void imgbtn1_0_cb(gt_event_st * e) {
 #if USE_HTTP_STREAM
     int send_num = -1;
+    xQueueReset(audio_uri_queue);
+    int num = uxQueueMessagesWaiting(audio_uri_queue);
+    ESP_LOGI(TAG, "Stopping HTTP connection from callback...      audio_uri_queue======  %d\n",num);
+
+    xQueueSend(mYxQueue4, &send_num, portMAX_DELAY);
     if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
     {
         gt_audio_player_stop_and_prepare_next();
     }
-    xQueueReset(audio_uri_queue);
-    int num = uxQueueMessagesWaiting(audio_uri_queue);
-    ESP_LOGI(TAG, "Stopping HTTP connection from callback...      audio_uri_queue======  %d\n",num);
-    xQueueSend(mYxQueue4, &send_num, portMAX_DELAY);
-    // if(gt_audio_player_state_get() == AUDIO_STATUS_RUNNING)
-    // {
-    //     gt_audio_player_stop_and_prepare_next();
-    // }
 
     gt_disp_stack_load_scr_anim(GT_ID_SCREEN_HOME, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
     audio_free(cb_data.answer->tts_audio);

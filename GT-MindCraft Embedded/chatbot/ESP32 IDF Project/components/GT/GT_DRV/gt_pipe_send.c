@@ -85,6 +85,7 @@ esp_err_t _http_stream_event_handle(http_stream_event_msg_t *msg)
         esp_http_client_delete_header(http, "Transfer-Encoding");
         // esp_http_client_delete_header(http, "Content-Type");
         // esp_http_client_set_header(http, "Content-Type","text/html; charset=utf-8");//设置 HTTP 请求头
+        
         esp_http_client_set_post_field(http, msg->buffer, msg->buffer_len);
         esp_err_t rret = esp_http_client_open(http, msg->buffer_len);
         if (esp_http_client_write(http, msg->buffer, msg->buffer_len) <= 0) {
@@ -347,7 +348,6 @@ void get_pipe_send_api_key(void)
                 ESP_LOGI(TAG, "Received JSON response: %s", local_response_buffer);
                 err = resolve_answer_json(local_response_buffer, api_key_data);
                 printf("api_key_data: %s\r\n", api_key_data->update_uuid);
-                goto FREE_LABEL;
             }else{
                 ESP_LOGE(TAG, "Failed to read response");
                 err = ESP_FAIL;

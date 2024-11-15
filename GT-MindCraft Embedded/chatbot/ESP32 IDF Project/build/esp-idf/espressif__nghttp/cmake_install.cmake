@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/26743/Desktop/esp-stream-pipe-finish/amend_wifi/mindcraft-ai-development-board/managed_components/espressif__nghttp
+# Install script for directory: C:/Users/26743/Desktop/esp32-git_temp/mindcraft-ai-development-board/managed_components/espressif__nghttp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
