@@ -9,15 +9,14 @@
 <div align="center">  <a><b>致力于低代码开发，多功能，易用的免费嵌入式图形库</b></a></div>
 
 <br/>
-<div align="center"
->
-    <a href="https://www.hmi.gaotongfont.cn/kfgj"
+<div align="center">
+    <a href="https://www.hmi.gaotongfont.cn"
     > 公司官网 </a> |
-    <a href="https://space.bilibili.com/3493293474188211/video"
+    <a href="https://space.bilibili.com/3493293474188211/channel/collectiondetail?sid=3764678"
     > B 站教程 </a> |
-    <a href="https://www.hmi.gaotongfont.cn/kfgj#/#hmiEngine"
+    <a href="https://www.hmi.gaotongfont.cn/gthmiengineyhsc"
     > Engine 使用手册 </a> |
-    <a href="https://www.hmi.gaotongfont.cn/kfgj#/#hmidesigner"
+    <a href="https://www.hmi.gaotongfont.cn/gthmidesigneryhsc"
     > Designer 使用手册 </a> |
     <a href="http://isite.baidu.com/site/wjz7qkrv/406a2b0c-f9c7-4a08-a47a-662e862b2af4?ch=48&wid=498ccd5c05334f21a2142ba3cf628964_0_0&field=&orderBy=&categoryId=undefined&title=%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC"
     > 联系方式 </a> |
