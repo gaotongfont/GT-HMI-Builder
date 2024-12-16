@@ -63,7 +63,7 @@ typedef struct _gt_dialog_s {
 static void _init_cb(gt_obj_st * obj);
 static void _event_cb(struct gt_obj_s * obj, gt_event_st * e);
 
-static const gt_obj_class_st gt_dialog_class = {
+static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_dialog_class = {
     ._init_cb      = _init_cb,
     ._deinit_cb    = (_gt_deinit_cb_t)NULL,
     ._event_cb     = _event_cb,
@@ -386,6 +386,7 @@ gt_obj_st * gt_dialog_create(bool show_close_btn)
     _gt_dialog_st * style = (_gt_dialog_st * )obj;
 
     obj->visible = GT_INVISIBLE;
+    obj->focus_dis = GT_DISABLED;
     obj->opa = GT_OPA_0;
 
     style->outside_auto_hide = true;

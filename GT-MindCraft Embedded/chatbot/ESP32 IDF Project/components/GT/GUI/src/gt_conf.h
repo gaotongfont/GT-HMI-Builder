@@ -116,6 +116,13 @@ extern "C" {
     #define GT_ATTRIBUTE_LARGE_RAM_ARRAY
 #endif
 
+#ifndef GT_ATTRIBUTE_RAM_DATA
+    #define GT_ATTRIBUTE_RAM_DATA   GT_ATTRIBUTE_LARGE_RAM_ARRAY
+#endif
+
+#ifndef GT_ATTRIBUTE_RAM_TEXT
+    #define GT_ATTRIBUTE_RAM_TEXT
+#endif
 
 /* ui default style */
 #define GT_STYLE_UI_SIMPLE     0
@@ -160,6 +167,15 @@ extern "C" {
      * @see ./src/extra/gt_extra.c -> gt_gc_set_full_img_buffer()
      */
     #define GT_USE_EXTRA_FULL_IMG_BUFFER    0
+#endif
+
+#ifndef GT_USE_IMG_CACHE
+    /**
+     * @brief Enabled use a separate image cache to store meta data,
+     *      @ref gt_img_cache.h, get raw object to set widget image data.
+     *      [default: 0]
+     */
+    #define GT_USE_IMG_CACHE            0
 #endif
 
 #ifndef GT_USE_WIDGET_LAYOUT
@@ -229,6 +245,14 @@ extern "C" {
          */
         #define GT_USE_DIRECT_ADDR      0
     #endif
+    #ifndef GT_USE_DIRECT_ADDR_CUSTOM_SIZE
+        /**
+         * @brief Enabled direct address custom size function, such as:
+         *      { addr, w, h, is_alpha }
+         * [Default: 0]
+         */
+        #define GT_USE_DIRECT_ADDR_CUSTOM_SIZE   0
+    #endif
 #endif
 
 #ifndef GT_USE_FOLDER_SYSTEM
@@ -280,9 +304,9 @@ extern "C" {
          * @brief Use client recv timer to unpack serial data, timer period
          *      @ref GT_TASK_PERIOD_TIME_SERIAL, callback function @ref
          *      _serial_client_recv_timer_handler_cb().
-         *      [default: 0]
+         *      [default: 1]
          */
-        #define GT_SERIAL_USE_TIMER_RECV_UNPACK 0
+        #define GT_SERIAL_USE_TIMER_RECV_UNPACK 1
     #endif
 
     #ifndef GT_SERIAL_MASTER_CACHE_SIZE
@@ -297,6 +321,13 @@ extern "C" {
          * @brief The size of the recv cache cycle buffer
          */
         #define GT_SERIAL_CLIENT_CACHE_SIZE     512
+    #endif
+
+    #ifndef GT_SERIAL_PACK_CACHE_SIZE
+        /**
+         * @brief The size of the pack data cache for each time
+         */
+        #define GT_SERIAL_PACK_CACHE_SIZE       512
     #endif
 
     #ifndef GT_SERIAL_UNPACK_CACHE_SIZE
@@ -362,6 +393,24 @@ extern "C" {
      *      Must be used with GT_USE_SERIAL.
      */
     #define GT_USE_BIN_CONVERT  1
+
+    #undef GT_INDEV_SIMULATE_POINTER
+    /**
+     * @brief [Warn] Force enabled simulate pointer input device
+     */
+    #define GT_INDEV_SIMULATE_POINTER       1
+
+    #undef GT_USE_FILE_HEADER
+    /**
+     * @brief [Warn] Force enabled img file header function @ref gt_file_header_st
+     */
+    #define GT_USE_FILE_HEADER              1
+
+    #undef GT_FONT_FAMILY_OLD_ENABLE
+    /**
+     * @brief [Warn] Force use new font family
+     */
+    #define GT_FONT_FAMILY_OLD_ENABLE       0
 #endif  /** GT_USE_SERIAL */
 
 #ifndef GT_USE_BIN_CONVERT
@@ -417,6 +466,28 @@ extern "C" {
      */
     #define _GT_USE_TEST       0
 #endif
+
+#ifndef GT_USE_UD_LR_TO_CONTROL_FOCUS_EN
+    /**
+     * @brief Use up and down left to control focus
+     *      [default: 0] using next or prev logical
+     */
+    #define GT_USE_UD_LR_TO_CONTROL_FOCUS_EN     0
+#endif
+
+
+/**
+ * @brief Set the focus color
+ *
+ */
+#ifndef GT_FOCUS_COLOR_SELECT
+    #define GT_FOCUS_COLOR_SELECT   0x0078D7
+#endif
+
+#ifndef GT_FOCUS_COLOR_LOCK
+    #define GT_FOCUS_COLOR_LOCK     0xFF0000
+#endif
+
 /* typedef --------------------------------------------------------------*/
 
 

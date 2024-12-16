@@ -20,9 +20,6 @@
 #include "./jpeg/gt_sjpg.h"
 #endif
 
-#if GT_USE_SERIAL
-#include "./serial/gt_serial_cfg.h"
-#endif
 
 /* private define -------------------------------------------------------*/
 
@@ -67,9 +64,6 @@ void _gt_extra_init(void)
     gt_sjpg_init();
 #endif
 
-#if GT_USE_SERIAL && GT_USE_SERIAL_CFG && GT_USE_BIN_CONVERT
-    gt_serial_cfg_init();
-#endif
 }
 
 

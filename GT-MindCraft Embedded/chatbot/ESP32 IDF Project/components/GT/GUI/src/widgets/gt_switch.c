@@ -43,7 +43,7 @@ typedef struct _gt_switcher_s {
 static void _init_cb(gt_obj_st * obj);
 static void _event_cb(struct gt_obj_s * obj, gt_event_st * e);
 
-static const gt_obj_class_st gt_switcher_class = {
+static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_switcher_class = {
     ._init_cb      = _init_cb,
     ._deinit_cb    = (_gt_deinit_cb_t)NULL,
     ._event_cb     = _event_cb,
@@ -154,6 +154,7 @@ static void _event_cb(struct gt_obj_s * obj, gt_event_st * e) {
             gt_obj_set_state(obj, GT_STATE_PRESSED);
         }
         gt_event_send(obj, GT_EVENT_TYPE_DRAW_START, NULL);
+        gt_event_send(obj, GT_EVENT_TYPE_UPDATE_VALUE, NULL);
     }
 }
 

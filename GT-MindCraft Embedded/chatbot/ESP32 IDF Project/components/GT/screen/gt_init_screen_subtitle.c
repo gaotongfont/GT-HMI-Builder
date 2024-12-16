@@ -13,25 +13,40 @@ extern QueueHandle_t audio_uri_queue;
 gt_obj_st * screen_subtitle = NULL;
 static gt_obj_st * img2 = NULL;
 static gt_obj_st * lab2 = NULL;
-static gt_obj_st * img1 = NULL;
+static gt_obj_st * stupbt = NULL;
 static gt_obj_st * imgbtn1 = NULL;
 static gt_obj_st * player1 = NULL;
+static gt_obj_st * Historybt = NULL;
+static gt_obj_st * emptybt = NULL;
+static gt_obj_st * Voicebutton3 = NULL;
 
 void set_emojis() {
     if (cb_data.answer->emotion_value == NULL) {
-        set_emojis_in_player(player1, AI_EMOJIS_WAITING);
+        ESP_LOGE(TAG, "1111111111111111111111111111111\n");
         return;
     }
-    //根据返回的情绪值设置不同的表情
-    if (strcmp(cb_data.answer->emotion_value, "开心") == 0) {
-        set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
-    } else if (strcmp(cb_data.answer->emotion_value, "同情") == 0) {
-        set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
-    } else if (strcmp(cb_data.answer->emotion_value, "鼓励") == 0) {
-        set_emojis_in_player(player1, AI_EMOJIS_ENCOURAGE);
+    if (strcmp(cb_data.settings->bot_name, "蔡机") == 0){
+        set_emojis_in_player(player1, AI_EMOJIS_CJ);
+        gt_obj_set_pos(player1, 4, 47);
+	    gt_obj_set_size(player1, 228, 184);
+        gt_player_set_auto_play_period(player1, 20);
+        ESP_LOGE(TAG, "2222222222222222222222222222222222\n");
+
     } else {
-        set_emojis_in_player(player1, AI_EMOJIS_WAITING);
-        // set_emojis_in_player(player1, AI_EMOJIS_SPEAKING);
+        if (strcmp(cb_data.answer->emotion_value, "开心") == 0) {
+            set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
+        } else if (strcmp(cb_data.answer->emotion_value, "同情") == 0) {
+            set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
+        } else if (strcmp(cb_data.answer->emotion_value, "鼓励") == 0) {
+            set_emojis_in_player(player1, AI_EMOJIS_ENCOURAGE);
+        } else {
+            set_emojis_in_player(player1, AI_EMOJIS_WAITING);
+        }
+        gt_obj_set_pos(player1, 4, 78);
+	    gt_obj_set_size(player1, 228, 116);
+        gt_player_set_auto_play_period(player1, 35);
+        ESP_LOGE(TAG, "333333333333333333333333333333\n");
+
     }
 }
 
@@ -75,7 +90,10 @@ void update_subtitles(ReceivedAnswerData* receive_data) {
     ESP_LOGI(TAG, "<<------------------cb_data.answer->audio_seconds: %f\n", cb_data.answer->audio_seconds);
     gt_label_set_auto_scroll_single_line(lab2, true);
     gt_label_set_text(lab2, cb_data.answer->llm_response);
-    gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
+    // gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
+    int total_time_ms = (int)(cb_data.answer->audio_seconds * 1000);
+    ESP_LOGI(TAG, "------------------------total_time_ms = %d", total_time_ms);
+    gt_label_set_auto_scroll_total_time(lab2, total_time_ms);
     set_emojis();
 }
 #endif //!USE_HTTP_STREAM
@@ -108,7 +126,7 @@ static void screen_subtitle_0_cb(gt_event_st * e) {
 }
 
 //跳转到设置界面
-static void img1_0_cb(gt_event_st * e) {
+static void stupbt_0_cb(gt_event_st * e) {
 	gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SETUP, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
 }
 
@@ -140,6 +158,37 @@ static void imgbtn1_0_cb(gt_event_st * e) {
 #endif //!USE_HTTP_STREAM
 }
 
+static void Historybt_0_cb(gt_event_st * e) {
+    set_history_in_chat();
+}
+
+static void emptybt_0_cb(gt_event_st * e) {
+    // clear_chat_history();
+    _Clear_page_dialog1_init();
+}
+
+static void speaking_ui_in_subtitle(void) {
+    gt_label_set_text(lab2, "正在说话...");
+    set_emojis_in_player(player1, AI_EMOJIS_RECORDING);
+}
+static void identifying_ui_in_subtitle(void) {
+    gt_label_set_text(lab2, "正在识别...");
+    set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
+}
+void identifying_failed_ui_in_subtitle(void) {
+    gt_label_set_text(lab2, "识别失败，请重试");
+    set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
+}
+
+static void voice_btn_recording_cb(gt_event_st * e) {
+    speaking_ui_in_subtitle();
+    recording_exe_func();
+}
+
+static void voice_btn_send_information_cb(gt_event_st * e) {
+    identifying_ui_in_subtitle();
+    send_information_exe_func();
+}
 
 gt_obj_st * gt_init_screen_subtitle(void)
 {
@@ -149,19 +198,18 @@ gt_obj_st * gt_init_screen_subtitle(void)
 
 	/** img2 */
 	img2 = gt_img_create(screen_subtitle);
-	gt_obj_set_pos(img2, 3, 220);
-	gt_obj_set_size(img2, 230, 97);
+	gt_obj_set_pos(img2, 2, 217);
+	gt_obj_set_size(img2, 233, 102);
 	gt_obj_set_opa(img2, GT_OPA_65);
-	gt_img_set_src(img2, "f:img_10_230x97.png");
-
+	gt_img_set_src(img2, "f:img_u10_233x102.png");
 
 
 	/** lab2 */
 	lab2 = gt_label_create(screen_subtitle);
-	gt_obj_set_pos(lab2, 26, 265);
-	gt_obj_set_size(lab2, 192, 30);
+	gt_obj_set_pos(lab2, 30, 245);
+	gt_obj_set_size(lab2, 187, 30);
 	gt_label_set_font_color(lab2, gt_color_hex(0xffffff));
-	gt_label_set_font_family(lab2, 1);
+	gt_label_set_font_family(lab2, gray_black_20);
 	gt_label_set_font_cjk(lab2, 0);
 	gt_label_set_font_align(lab2, GT_ALIGN_CENTER_MID);
 	gt_label_set_auto_scroll_single_line(lab2, true);
@@ -174,20 +222,43 @@ gt_obj_st * gt_init_screen_subtitle(void)
     {
         cb_data.answer->audio_seconds = 1;
     }
-    gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
+    // gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
+    int total_time_ms = (int)(cb_data.answer->audio_seconds * 1000);
+    ESP_LOGI(TAG, "------------------------total_time_ms = %d", total_time_ms);
+    gt_label_set_auto_scroll_total_time(lab2, total_time_ms);
 
 	/** rect1 */
 	gt_obj_st* rect1 = gt_rect_create(screen_subtitle);
-	gt_obj_set_pos(rect1, 200, 0);
-	gt_obj_set_size(rect1, 40, 40);
+	gt_obj_set_pos(rect1, 180, 0);
+	gt_obj_set_size(rect1, 60, 40);
 	gt_obj_set_opa(rect1, GT_OPA_TRANSP);
-	gt_obj_add_event_cb(rect1, img1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
-	/** img1 */
-	img1 = gt_img_create(rect1);
-	gt_obj_set_pos(img1, 206, 7);
-	gt_obj_set_size(img1, 26, 26);
-	gt_img_set_src(img1, "f:img_1723686274619_26x26.png");
-	gt_obj_set_touch_parent(img1, true);
+	gt_obj_add_event_cb(rect1, stupbt_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+
+	/** stupbt */
+	/** 设置 */
+	stupbt = gt_img_create(rect1);
+	gt_obj_set_pos(stupbt, 189, 7);
+	gt_obj_set_size(stupbt, 24, 24);
+	gt_img_set_src(stupbt, "f:img_Set_up_24x24.png");
+    gt_obj_set_touch_parent(stupbt, true);
+	/** Historybt */
+	/** 历史记录 */
+	Historybt = gt_imgbtn_create(screen_subtitle);
+	gt_obj_set_pos(Historybt, 64, 8);
+	gt_obj_set_size(Historybt, 22, 19);
+	gt_imgbtn_set_src(Historybt, "f:img_History_22x19.png");
+	gt_imgbtn_set_src_press(Historybt, "f:img_History2_22x19.png");
+	gt_obj_add_event_cb(Historybt, Historybt_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+
+
+	/** emptybt */
+	/** 清空 */
+	emptybt = gt_imgbtn_create(screen_subtitle);
+	gt_obj_set_pos(emptybt, 129, 9);
+	gt_obj_set_size(emptybt, 18, 18);
+	gt_imgbtn_set_src(emptybt, "f:img_empty_18x18.png");
+	gt_imgbtn_set_src_press(emptybt, "f:img_empty2_18x18.png");
+	gt_obj_add_event_cb(emptybt, emptybt_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
 
 	/** rect2 */
 	gt_obj_st* rect2 = gt_rect_create(screen_subtitle);
@@ -206,13 +277,37 @@ gt_obj_st * gt_init_screen_subtitle(void)
 	/** player1 */
 	/** 说话 */
 	player1 = gt_player_create(screen_subtitle);
-	gt_obj_set_pos(player1, 4, 84);
-	gt_obj_set_size(player1, 228, 116);
 	gt_player_set_type(player1, GT_PLAYER_TYPE_IMG);
 	gt_player_set_mode(player1, GT_PLAYER_MODE_LOOP);
 	gt_player_set_auto_play_period(player1, 35);
     //根据返回的情绪值设置不同的表情
     set_emojis();
+
+
+	/** rect1 */
+	rect1 = gt_rect_create(screen_subtitle);
+	gt_obj_set_pos(rect1, 31, 264);
+	gt_obj_set_size(rect1, 176, 49);
+	gt_obj_set_opa(rect1, GT_OPA_0);
+	gt_rect_set_radius(rect1, 0);
+	gt_rect_set_bg_color(rect1, gt_color_hex(0xffffff));
+	gt_rect_set_color_border(rect1, gt_color_hex(0xffffff));
+	gt_rect_set_fill(rect1, 1);
+	gt_rect_set_border(rect1, 0);
+    gt_obj_set_fixed(rect1, false);
+    gt_obj_add_event_cb(rect1, voice_btn_recording_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+    gt_obj_add_event_cb(rect1, voice_btn_send_information_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    gt_obj_add_event_cb(rect1, voice_btn_send_information_cb, GT_EVENT_TYPE_INPUT_SCROLL_END, NULL);
+    // gt_obj_add_event_cb(rect1, voice_btn_cancel_recording_cb, GT_EVENT_TYPE_INPUT_PRESS_LOST, NULL);
+
+	/** Voicebutton3 */
+	/** 语音键 */
+	Voicebutton3 = gt_imgbtn_create(rect1);
+	gt_obj_set_pos(Voicebutton3, 107, 283);
+	gt_obj_set_size(Voicebutton3, 21, 30);
+	gt_imgbtn_set_src(Voicebutton3, "f:img_Voicebutton_21x30.png");
+    gt_obj_set_touch_parent(Voicebutton3, true);
+
 
 	return screen_subtitle;
 }

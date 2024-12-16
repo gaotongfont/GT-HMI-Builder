@@ -1,6 +1,6 @@
 /**
  * @file gt_serial_show.h
- * @author Yang (your@email.com)
+ * @author Yang
  * @brief
  * @version 0.1
  * @date 2024-09-20 17:22:31
@@ -16,6 +16,7 @@ extern "C" {
 /* include --------------------------------------------------------------*/
 #include "../../gt_conf.h"
 #include "../../others/gt_types.h"
+#include "../../widgets/gt_obj.h"
 
 #if GT_USE_SERIAL
 
@@ -34,7 +35,53 @@ extern "C" {
 
 #if GT_USE_SERIAL_SHOW && GT_USE_BIN_CONVERT
 
+// show file
+#ifndef GT_SERIAL_SHOW_FILE_HEAD_SIZE
+    /* show file head info size */
+    #define GT_SERIAL_SHOW_FILE_HEAD_SIZE   (16)
+#endif
 
+#ifndef GT_SERIAL_SHOW_FILE_PAGE_INFO_SIZ
+    /* show file page info size */
+    #define GT_SERIAL_SHOW_FILE_PAGE_INFO_SIZ    (4)
+#endif
+
+#ifndef GT_SERIAL_UI_PAGE_STACK_DEPTH
+    /* show file page stack depth */
+    #define GT_SERIAL_UI_PAGE_STACK_DEPTH   (20)
+#endif
+
+#ifndef GT_SERIAL_UI_HOME_PAGE_INDEX
+    /* show file home page index */
+    #define GT_SERIAL_UI_HOME_PAGE_INDEX    (0)
+#endif
+
+#ifndef GT_SERIAL_UI_PAGE_CONTROL_SIZE
+    #define GT_SERIAL_UI_PAGE_CONTROL_SIZE      (32)
+#endif
+
+#ifndef GT_SERIAL_UI_PAGE_CONTROL_MAX_NUMB
+    #define GT_SERIAL_UI_PAGE_CONTROL_MAX_NUMB  (256)
+#endif
+
+// font and img
+#ifndef GT_SERIAL_RESOURCE_FILE_HEAD_SIZE
+    #define GT_SERIAL_RESOURCE_FILE_HEAD_SIZE   (10)
+#endif
+
+#ifndef GT_SERIAL_ZK_FILE_INFO_SIZE
+    #define GT_SERIAL_ZK_FILE_INFO_SIZE     (6)
+#endif
+
+#ifndef GT_SERIAL_IMG_FILE_INFO_SIZE
+    #define GT_SERIAL_IMG_FILE_INFO_SIZE    (9)
+#endif
+
+#ifndef GT_SERIAL_FONT_CONFIG_HEAD_SIZE
+    #define GT_SERIAL_FONT_CONFIG_HEAD_SIZE  (6)
+#endif
+
+#define GT_SERIAL_FONT_CONFIG_INFO_SIZE      ((FONT_LAN_MAX_COUNT * 2) + 1)
 /* typedef --------------------------------------------------------------*/
 
 
@@ -69,68 +116,48 @@ uint16_t gt_serial_page_index_get(void);
  *
  * @param index
  */
-void gt_serial_load_page(uint16_t index);
+void gt_serial_load_page(gt_scr_id_t index);
+
+/**
+ * @brief
+ *
+ * @param scr_id
+ * @param type
+ * @param time
+ * @param delay
+ * @param del_prev_scr
+ */
+void gt_serial_load_page_anim(gt_scr_id_t scr_id, gt_scr_anim_type_et type, uint32_t time, uint32_t delay, bool del_prev_scr);
 
 /**
  * @brief Go back to previous page
  *
  * @param step
- * @return int16_t
+ * @return gt_scr_id_t
  */
-int16_t gt_serial_go_back(int16_t step);
+gt_scr_id_t gt_serial_go_back(int16_t step);
+
+const uint8_t* gt_serial_get_info_by_obj(gt_obj_st* obj);
 
 /**
- * @brief Set the value using vp
+ * @brief
  *
- * @param vp
- * @param value
- * @param len
- * @return int  0: success, -1: fail
+ * @param value 0x0000(vp / sp) + (0x00 ...)data
+ * @param len byte length
  */
-int gt_serial_control_value_set(uint16_t vp, uint8_t* value, uint16_t len);
+void gt_serial_set_value(uint8_t *value, uint16_t len);
 
+uint16_t gt_serial_get_value(uint8_t * res_buffer, uint8_t * value, uint16_t len);
 
 /**
- * @brief Set the param using sp
+ * @brief get value by addr
  *
- * @param sp
- * @param param
- * @param len
- * @return int  0: success, -1: fail
+ * @param res_buffer read data in to res_buffer
+ * @param addr 0x0000
+ * @param short_len the short or word length
+ * @return uint16_t
  */
-int gt_serial_control_param_set(uint16_t sp, uint8_t* param, uint16_t len);
-
-/**
- * @brief Set the control using reg , reg is vp or sp
- *
- * @param reg vp or sp
- * @param param
- * @param len
- * @return int  0: success, -1: fail
- */
-int gt_serial_control_set(uint16_t reg, uint8_t* param, uint16_t len);
-
-/**
- * @brief get value using reg , reg is vp or sp
- *
- * @param reg
- * @param data
- * @param len
- * @return int
- */
-int gt_serial_val_get(uint16_t reg, uint8_t* data, uint16_t len);
-
-/**
- * @brief set value using reg , reg is vp or sp
- *
- * @param reg vp or sp
- * @param data
- * @param len
- * @return int
- */
-int gt_serial_val_set(uint16_t reg, uint8_t* data, uint16_t len);
-
-
+uint16_t gt_serial_get_value_by_addr(uint8_t * res_buffer, uint16_t addr, uint8_t short_len);
 
 #endif /* GT_USE_SERIAL_CFG && GT_USE_BIN_CONVERT */
 //

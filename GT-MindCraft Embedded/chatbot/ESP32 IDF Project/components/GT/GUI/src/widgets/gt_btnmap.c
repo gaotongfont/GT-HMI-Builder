@@ -35,7 +35,7 @@ typedef struct _btnmap_btn_param_s {
 
 typedef struct _gt_btnmap_s {
     gt_obj_st obj;
-    gt_obj_st* _input;
+    gt_obj_st* input_ptr;
     gt_map_st* map;
     gt_py_input_method_st* py_input_method;
     char* press_btn;
@@ -78,7 +78,7 @@ static void _gt_clean_press_btn(gt_obj_st* obj);
 static void _gt_push_btn_kv(gt_obj_st* obj);
 
 /* static variables -----------------------------------------------------*/
-static const gt_obj_class_st gt_btnmap_class = {
+static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_btnmap_class = {
     ._init_cb      = _init_cb,
     ._deinit_cb    = _deinit_cb,
     ._event_cb     = _event_cb,
@@ -404,11 +404,11 @@ static void _gt_push_btn_kv(gt_obj_st* obj) {
     if(!style->press_btn) return ;
 
     if(style->_push_btn_kv_cb){
-        style->_push_btn_kv_cb( obj, style->_input, style->press_btn);
+        style->_push_btn_kv_cb( obj, style->input_ptr, style->press_btn);
     }
 #if GT_CFG_ENABLE_INPUT
-    else if(style->_input){
-        gt_input_append_value(style->_input, style->press_btn);
+    else if (style->input_ptr) {
+        gt_input_append_value(style->input_ptr, style->press_btn);
     }
 #endif
 }
@@ -467,7 +467,16 @@ void gt_btnmap_set_input(gt_obj_st * btnmap, gt_obj_st * input)
         return;
     }
     _gt_btnmap_st * style = (_gt_btnmap_st * )btnmap;
-    style->_input = input;
+    style->input_ptr = input;
+}
+
+gt_obj_st * gt_btnmap_get_input(gt_obj_st * btnmap)
+{
+    if (false == gt_obj_is_type(btnmap, OBJ_TYPE)) {
+        return NULL;
+    }
+    _gt_btnmap_st * style = (_gt_btnmap_st * )btnmap;
+    return style->input_ptr;
 }
 
 void gt_btnmap_set_radius(gt_obj_st* btnmap, uint8_t radius)

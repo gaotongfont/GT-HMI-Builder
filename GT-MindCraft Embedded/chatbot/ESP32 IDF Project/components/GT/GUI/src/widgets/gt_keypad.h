@@ -82,9 +82,33 @@ gt_obj_st * gt_keypad_create(gt_obj_st * parent);
  */
 void gt_keypad_set_default_style(gt_obj_st * keypad, gt_keypad_default_style_st def_style);
 void gt_keypad_set_type(gt_obj_st * keypad, gt_keypad_type_te type);
+
+/**
+ * @brief When the auto hide flag is set, the keypad will be hidden automatically
+ *      when focus is on screen objects
+ *
+ * @param keypad
+ * @param auto_hide [default: false]
+ */
+void gt_keypad_set_auto_hide(gt_obj_st * keypad, bool auto_hide);
+bool gt_keypad_get_auto_hide(gt_obj_st * keypad);
+
+/**
+ * @brief hide keypad by auto hide flag status
+ *
+ * @param keypad
+ */
+void gt_keypad_hide(gt_obj_st * keypad);
 void gt_keypad_set_map_list(gt_obj_st * keypad, gt_keypad_map_st* map_list, uint8_t map_num);
 
-void gt_keypad_set_target(gt_obj_st * keypad, gt_obj_st * ta);
+/**
+ * @brief
+ *
+ * @param keypad
+ * @param tar_input need to set the target input box
+ */
+void gt_keypad_set_target(gt_obj_st * keypad, gt_obj_st * tar_input);
+gt_obj_st * gt_keypad_get_target(gt_obj_st * keypad);
 void gt_keypad_set_color_background(gt_obj_st * keypad, gt_color_t color);
 void gt_keypad_set_border_width_and_color(gt_obj_st * keypad, gt_size_t width, gt_color_t color);
 void gt_keypad_set_color_ctrl_key(gt_obj_st * keypad, gt_color_t color);
@@ -100,7 +124,6 @@ void gt_keypad_set_key_xy_space(gt_obj_st* keypad, uint8_t x_space, uint8_t y_sp
 void gt_keypad_set_font_color(gt_obj_st * keypad, gt_color_t color);
 void gt_keypad_set_font_size(gt_obj_st * keypad, uint8_t size);
 void gt_keypad_set_font_gray(gt_obj_st * keypad, uint8_t gray);
-void gt_keypad_set_font_align(gt_obj_st * keypad, uint8_t align);
 #if (defined(GT_FONT_FAMILY_OLD_ENABLE) && (GT_FONT_FAMILY_OLD_ENABLE == 1))
 void gt_keypad_set_font_family_cn(gt_obj_st * keypad, gt_family_t family);
 void gt_keypad_set_font_family_en(gt_obj_st * keypad, gt_family_t family);
@@ -118,6 +141,7 @@ void gt_keypad_set_ctrl_key_border_width_and_color(gt_obj_st * keypad, gt_size_t
 void gt_keypad_set_ctrl_key_font_color(gt_obj_st * keypad, gt_color_t color);
 
 void gt_keypad_set_py_input_method(gt_obj_st * keypad, gt_py_input_method_st* py_input_method);
+gt_py_input_method_st* gt_keypad_get_py_input_method(gt_obj_st * keypad);
 
 #ifdef __cplusplus
 } /*extern "C"*/

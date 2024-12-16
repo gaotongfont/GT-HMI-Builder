@@ -43,6 +43,19 @@ void update_wifi_icon() {
 
 static void AIRobots_0_cb(gt_event_st * e) {
 	gt_disp_stack_load_scr_anim(GT_ID_SCREEN_HOME, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
+
+    char room_id[40];
+#if 0
+    erase_data_from_nvs("room_id");
+    store_data_in_nvs("room_id", "eeed2c61-65ad-4811-910b-a5072bac257f");
+#endif
+    read_data_from_nvs("room_id", room_id, 40);
+    if (strcmp(room_id, "") == 0) {
+        create_room_http();
+    } else {
+        ESP_LOGI(TAG, "---------room_id: %s\r\n", room_id);
+        set_session_token(room_id);
+    }
 }
 
 static void setup_0_cb(gt_event_st * e) {

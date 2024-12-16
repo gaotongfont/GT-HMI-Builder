@@ -19,7 +19,6 @@
 #include "../others/gt_assert.h"
 #include "../core/gt_draw.h"
 #include "../core/gt_disp.h"
-#include "../font/gt_font.h"
 #include "../others/gt_anim.h"
 
 /* private define -------------------------------------------------------*/
@@ -42,6 +41,7 @@ typedef struct _gt_label_s {
     gt_color_t  font_color;
     gt_font_info_st font_info;
 
+    uint16_t indent;
     uint8_t font_align;     //@ref gt_align_et
     uint8_t space_x;
     uint8_t space_y;
@@ -54,7 +54,7 @@ static void _init_cb(gt_obj_st * obj);
 static void _deinit_cb(gt_obj_st * obj);
 static void _event_cb(struct gt_obj_s * obj, gt_event_st * e);
 
-static const gt_obj_class_st gt_label_class = {
+static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_label_class = {
     ._init_cb      = _init_cb,
     ._deinit_cb    = _deinit_cb,
     ._event_cb     = _event_cb,
@@ -83,9 +83,7 @@ static void _init_cb(gt_obj_st * obj) {
         .utf8       = (char * )style->text,
         .len        = len,
     };
-
-    font.info.thick_en = style->font_info.thick_en == 0 ? style->font_info.size + 6: style->font_info.thick_en;
-    font.info.thick_cn = style->font_info.thick_cn == 0 ? style->font_info.size + 6: style->font_info.thick_cn;
+    gt_font_info_update_font_thick(&font.info);
 
     gt_area_st box_area = gt_area_reduce(obj->area, gt_obj_get_reduce(obj));
     /*draw font*/
@@ -98,6 +96,7 @@ static void _init_cb(gt_obj_st * obj) {
         .opa        = obj->opa,
         .reg        = style->text_style,
         .logical_area = box_area,
+        .indent     = style->indent,
     };
     if (style->text_style.single_line && style->auto_scroll) {
         font_attr.logical_area = style->auto_scroll->area;
@@ -395,6 +394,15 @@ void gt_label_set_font_color(gt_obj_st * label, gt_color_t color)
     gt_event_send(label, GT_EVENT_TYPE_DRAW_START, NULL);
 }
 
+gt_color_t gt_label_get_font_color(gt_obj_st * label)
+{
+    if (false == gt_obj_is_type(label, OBJ_TYPE)) {
+        return gt_color_black();
+    }
+    _gt_label_st * style = (_gt_label_st * )label;
+    return style->font_color;
+}
+
 void gt_label_set_font_size(gt_obj_st * label, uint8_t size)
 {
     if (false == gt_obj_is_type(label, OBJ_TYPE)) {
@@ -412,6 +420,15 @@ void gt_label_set_font_gray(gt_obj_st * label, uint8_t gray)
     }
     _gt_label_st * style = (_gt_label_st * )label;
     style->font_info.gray = gray;
+}
+
+void gt_label_set_indent(gt_obj_st * label, uint16_t indent)
+{
+    if (false == gt_obj_is_type(label, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_label_st * style = (_gt_label_st * )label;
+    style->indent = indent;
 }
 
 void gt_label_set_font_align(gt_obj_st * label, gt_align_et align)
@@ -539,6 +556,15 @@ uint8_t gt_label_get_space_y(gt_obj_st * label)
     }
     _gt_label_st * style = (_gt_label_st * )label;
     return style->space_y;
+}
+
+gt_font_info_st * gt_label_get_font_info(gt_obj_st * label)
+{
+    if (false == gt_obj_is_type(label, OBJ_TYPE)) {
+        return 0;
+    }
+    _gt_label_st * style = (_gt_label_st * )label;
+    return &style->font_info;
 }
 
 uint16_t gt_label_get_longest_line_substring_width(gt_obj_st * label)
@@ -675,5 +701,53 @@ bool gt_label_is_auto_scroll_single_line(gt_obj_st * label)
     return true;
 }
 
+void gt_label_add_text(gt_obj_st * label, const char * fmt, ...)
+{
+    char buffer[8] = {0};
+    va_list args;
+    va_list args2;
+
+    if (false == gt_obj_is_type(label, OBJ_TYPE)) {
+        return;
+    }
+    if (NULL == fmt) {
+        return;
+    }
+
+    _gt_label_st * style = (_gt_label_st * )label;
+    _reset_auto_scroll_st(style->auto_scroll);
+    va_start(args, fmt);
+    va_copy(args2, args);
+    uint16_t size = (NULL == fmt) ? 0 : (vsnprintf(buffer, sizeof(buffer), fmt, args) + 1);
+    va_end(args);
+    if (!size) {
+        goto free_lb;
+    }
+
+    uint16_t len = 0;
+
+    if (NULL == style->text) {
+        style->text = gt_mem_malloc(size);
+    } else {
+        len = strlen(style->text);
+        style->text = gt_mem_realloc(style->text, size + len);
+    }
+    if (NULL == style->text) {
+        goto free_lb;
+    }
+
+    gt_memset(&style->text[len], 0, size);
+    va_start(args2, fmt);
+    vsnprintf(&style->text[len], size, fmt, args2);
+    va_end(args2);
+
+    _update_label_size(label, size + len);
+    gt_event_send(label, GT_EVENT_TYPE_UPDATE_VALUE, NULL);
+
+    return;
+
+free_lb:
+    va_end(args2);
+}
 #endif  /** GT_CFG_ENABLE_LABEL */
 /* end ------------------------------------------------------------------*/

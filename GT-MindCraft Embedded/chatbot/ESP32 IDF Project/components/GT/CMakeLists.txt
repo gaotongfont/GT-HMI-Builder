@@ -1,4 +1,6 @@
 set(src_dirs
+            inc
+            app
             GT_DRV
             GT_TOUCH
             SPI
@@ -25,6 +27,8 @@ set(src_dirs
             GUI/src/widgets)
 
 set(include_dirs
+            inc
+            app
             GT_DRV
             GT_TOUCH
             SPI

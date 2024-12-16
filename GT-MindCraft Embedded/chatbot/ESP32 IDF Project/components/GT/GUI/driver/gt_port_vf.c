@@ -222,43 +222,56 @@
 #define IMG_10_20_228X184_JPG		0xc2870c
 #define IMG_10_21_228X184_JPG		0xc3cecc
 #define IMG_10_22_228X184_JPG		0xc5168c
-#define IMG_10_230X97_PNG		0xc65e4c
-#define IMG_10_23_228X184_JPG		0xc763be
-#define IMG_10_24_228X184_JPG		0xc8ab7e
-#define IMG_10_25_228X184_JPG		0xc9f33e
-#define IMG_1723686274619_24X24_PNG		0xcb3afe
-#define IMG_1723686274619_26X26_PNG		0xcb41be
-#define IMG_3096_101X124_PNG		0xcb49aa
-#define IMG_3097_105X124_PNG		0xcbdc6e
-#define IMG_3106_82X82_PNG		0xcc7502
-#define IMG_3107_82X82_PNG		0xccc3ce
-#define IMG_3109_44X44_PNG		0xcd129a
-#define IMG_3110_44X44_PNG		0xcd294a
-#define IMG_3111_44X44_PNG		0xcd3ffa
-#define IMG_3112_44X44_PNG		0xcd56aa
-#define IMG_3113_44X44_PNG		0xcd6d5a
-#define IMG_3114_44X44_PNG		0xcd840a
-#define IMG_3115_44X44_PNG		0xcd9aba
-#define IMG_3117_44X44_PNG		0xcdb16a
-#define IMG_3118_44X44_PNG		0xcdc81a
-#define IMG_BATTERY_22X12_PNG		0xcddeca
-#define IMG_BRIGHTNESSPLUS_24X24_PNG		0xcde1e2
-#define IMG_BRIGHTNESSREDUCTION_24X24_PNG		0xcde8a2
-#define IMG_CONNECTED_220X278_PNG		0xcdef62
-#define IMG_LOCK_220X278_PNG		0xcdf280
-#define IMG_VOLUMEBRIGHTNESS_36X36_PNG		0xcdf4c9
-#define IMG_VOLUMEDOWN_24X24_PNG		0xce03f9
-#define IMG_VOLUMEUP_24X24_PNG		0xce0ab9
-#define IMG_WIFISIGNAL1_16X12_PNG		0xce1179
-#define IMG_WIFISIGNAL2_16X12_PNG		0xce13b9
-#define IMG_WIFISIGNAL3_16X12_PNG		0xce15f9
-#define IMG_WIFISIGNAL4_16X12_PNG		0xce1839
-#define IMG_WIFISIGNAL5_16X12_PNG		0xce1a79
-#define IMG_WI_FISETTINGS_36X36_PNG		0xce1cb9
-#define IMG_AJ_170X44_PNG		0xce2be9
-#define IMG_DOWN1_27X20_PNG		0xce8391
-#define IMG_FH_16X16_PNG		0xce89e5
-#define IMG_UP1_27X20_PNG		0xce8ce5
+#define IMG_10_23_228X184_JPG		0xc65e4c
+#define IMG_10_24_228X184_JPG		0xc7a60c
+#define IMG_10_25_228X184_JPG		0xc8edcc
+#define IMG_1723686274619_24X24_PNG		0xca358c
+#define IMG_1723686274619_26X26_PNG		0xca3c4c
+#define IMG_1AI_SETTINGS_N_109X39_PNG		0xca4438
+#define IMG_1AI_SETTINGS_P_109X39_PNG		0xca7609
+#define IMG_1FUNCTION_SETTINGS_N_109X39_PNG		0xcaa7da
+#define IMG_1FUNCTION_SETTINGS_P_109X39_PNG		0xcad9ab
+#define IMG_3096_101X124_PNG		0xcb0b7c
+#define IMG_3097_105X124_PNG		0xcb9e40
+#define IMG_3106_82X82_PNG		0xcc36d4
+#define IMG_3107_82X82_PNG		0xcc85a0
+#define IMG_3109_44X44_PNG		0xccd46c
+#define IMG_3110_44X44_PNG		0xcceb1c
+#define IMG_3111_44X44_PNG		0xcd01cc
+#define IMG_3112_44X44_PNG		0xcd187c
+#define IMG_3113_44X44_PNG		0xcd2f2c
+#define IMG_3114_44X44_PNG		0xcd45dc
+#define IMG_3115_44X44_PNG		0xcd5c8c
+#define IMG_3116_44X44_PNG		0xcd733c
+#define IMG_3117_44X44_PNG		0xcd89ec
+#define IMG_3118_44X44_PNG		0xcda09c
+#define IMG_BATTERY_22X12_PNG		0xcdb74c
+#define IMG_BRIGHTNESSPLUS_24X24_PNG		0xcdba64
+#define IMG_BRIGHTNESSREDUCTION_24X24_PNG		0xcdc124
+#define IMG_CONNECTED_220X278_PNG		0xcdc7e4
+#define IMG_HISTORY2_22X19_PNG		0xcdcb02
+#define IMG_HISTORY_22X19_PNG		0xcdcfe8
+#define IMG_LOCK_220X278_PNG		0xcdd4ce
+#define IMG_SET_UP_24X24_PNG		0xcdd717
+#define IMG_VOICEBUTTON_21X30_PNG		0xcdddd7
+#define IMG_VOLUMEBRIGHTNESS_36X36_PNG		0xcde539
+#define IMG_VOLUMEDOWN_24X24_PNG		0xcdf469
+#define IMG_VOLUMEUP_24X24_PNG		0xcdfb29
+#define IMG_WIFISIGNAL1_16X12_PNG		0xce01e9
+#define IMG_WIFISIGNAL2_16X12_PNG		0xce0429
+#define IMG_WIFISIGNAL3_16X12_PNG		0xce0669
+#define IMG_WIFISIGNAL4_16X12_PNG		0xce08a9
+#define IMG_WIFISIGNAL5_16X12_PNG		0xce0ae9
+#define IMG_WI_FISETTINGS_36X36_PNG		0xce0d29
+#define IMG_AJ_170X44_PNG		0xce1c59
+#define IMG_DOWN1_27X20_PNG		0xce7401
+#define IMG_DOWN2_27X20_PNG		0xce7a55
+#define IMG_EMPTY2_18X18_PNG		0xce80a9
+#define IMG_EMPTY_18X18_PNG		0xce8475
+#define IMG_FH_16X16_PNG		0xce8841
+#define IMG_U10_233X102_PNG		0xce8b41
+#define IMG_U11_109X84_JPG		0xcfa1c3
+#define IMG_UP1_27X20_PNG		0xcfe94b
 
 
 /* private typedef ------------------------------------------------------*/
@@ -484,12 +497,15 @@ static const gt_vfs_st virt_file_sys[] ={
 	{"f:img_10_20_228x184.jpg", 228, 184, IMG_10_20_228X184_JPG, 83904, 0},
 	{"f:img_10_21_228x184.jpg", 228, 184, IMG_10_21_228X184_JPG, 83904, 0},
 	{"f:img_10_22_228x184.jpg", 228, 184, IMG_10_22_228X184_JPG, 83904, 0},
-	{"f:img_10_230x97.png", 230, 97, IMG_10_230X97_PNG, 66930, 1},
 	{"f:img_10_23_228x184.jpg", 228, 184, IMG_10_23_228X184_JPG, 83904, 0},
 	{"f:img_10_24_228x184.jpg", 228, 184, IMG_10_24_228X184_JPG, 83904, 0},
 	{"f:img_10_25_228x184.jpg", 228, 184, IMG_10_25_228X184_JPG, 83904, 0},
 	{"f:img_1723686274619_24x24.png", 24, 24, IMG_1723686274619_24X24_PNG, 1728, 1},
 	{"f:img_1723686274619_26x26.png", 26, 26, IMG_1723686274619_26X26_PNG, 2028, 1},
+	{"f:img_1AI_Settings_n_109x39.png", 109, 39, IMG_1AI_SETTINGS_N_109X39_PNG, 12753, 1},
+	{"f:img_1AI_Settings_p_109x39.png", 109, 39, IMG_1AI_SETTINGS_P_109X39_PNG, 12753, 1},
+	{"f:img_1Function_settings_n_109x39.png", 109, 39, IMG_1FUNCTION_SETTINGS_N_109X39_PNG, 12753, 1},
+	{"f:img_1Function_settings_p_109x39.png", 109, 39, IMG_1FUNCTION_SETTINGS_P_109X39_PNG, 12753, 1},
 	{"f:img_3096_101x124.png", 101, 124, IMG_3096_101X124_PNG, 37572, 1},
 	{"f:img_3097_105x124.png", 105, 124, IMG_3097_105X124_PNG, 39060, 1},
 	{"f:img_3106_82x82.png", 82, 82, IMG_3106_82X82_PNG, 20172, 1},
@@ -501,13 +517,18 @@ static const gt_vfs_st virt_file_sys[] ={
 	{"f:img_3113_44x44.png", 44, 44, IMG_3113_44X44_PNG, 5808, 1},
 	{"f:img_3114_44x44.png", 44, 44, IMG_3114_44X44_PNG, 5808, 1},
 	{"f:img_3115_44x44.png", 44, 44, IMG_3115_44X44_PNG, 5808, 1},
+	{"f:img_3116_44x44.png", 44, 44, IMG_3116_44X44_PNG, 5808, 1},
 	{"f:img_3117_44x44.png", 44, 44, IMG_3117_44X44_PNG, 5808, 1},
 	{"f:img_3118_44x44.png", 44, 44, IMG_3118_44X44_PNG, 5808, 1},
 	{"f:img_Battery_22x12.png", 22, 12, IMG_BATTERY_22X12_PNG, 792, 1},
 	{"f:img_BrightnessPlus_24x24.png", 24, 24, IMG_BRIGHTNESSPLUS_24X24_PNG, 1728, 1},
 	{"f:img_Brightnessreduction_24x24.png", 24, 24, IMG_BRIGHTNESSREDUCTION_24X24_PNG, 1728, 1},
 	{"f:img_Connected_220x278.png", 19, 14, IMG_CONNECTED_220X278_PNG, 798, 1},
+	{"f:img_History2_22x19.png", 22, 19, IMG_HISTORY2_22X19_PNG, 1254, 1},
+	{"f:img_History_22x19.png", 22, 19, IMG_HISTORY_22X19_PNG, 1254, 1},
 	{"f:img_Lock_220x278.png", 13, 15, IMG_LOCK_220X278_PNG, 585, 1},
+	{"f:img_Set_up_24x24.png", 24, 24, IMG_SET_UP_24X24_PNG, 1728, 1},
+	{"f:img_Voicebutton_21x30.png", 21, 30, IMG_VOICEBUTTON_21X30_PNG, 1890, 1},
 	{"f:img_VolumeBrightness_36x36.png", 36, 36, IMG_VOLUMEBRIGHTNESS_36X36_PNG, 3888, 1},
 	{"f:img_VolumeDown_24x24.png", 24, 24, IMG_VOLUMEDOWN_24X24_PNG, 1728, 1},
 	{"f:img_VolumeUp_24x24.png", 24, 24, IMG_VOLUMEUP_24X24_PNG, 1728, 1},
@@ -519,7 +540,12 @@ static const gt_vfs_st virt_file_sys[] ={
 	{"f:img_Wi_Fisettings_36x36.png", 36, 36, IMG_WI_FISETTINGS_36X36_PNG, 3888, 1},
 	{"f:img_aj_170x44.png", 170, 44, IMG_AJ_170X44_PNG, 22440, 1},
 	{"f:img_down1_27x20.png", 27, 20, IMG_DOWN1_27X20_PNG, 1620, 1},
+	{"f:img_down2_27x20.png", 27, 20, IMG_DOWN2_27X20_PNG, 1620, 1},
+	{"f:img_empty2_18x18.png", 18, 18, IMG_EMPTY2_18X18_PNG, 972, 1},
+	{"f:img_empty_18x18.png", 18, 18, IMG_EMPTY_18X18_PNG, 972, 1},
 	{"f:img_fh_16x16.png", 16, 16, IMG_FH_16X16_PNG, 768, 1},
+	{"f:img_u10_233x102.png", 233, 102, IMG_U10_233X102_PNG, 71298, 1},
+	{"f:img_u11_109x84.jpg", 109, 84, IMG_U11_109X84_JPG, 18312, 0},
 	{"f:img_up1_27x20.png", 27, 20, IMG_UP1_27X20_PNG, 1620, 1},
     {NULL,0,0,0,0},
 };

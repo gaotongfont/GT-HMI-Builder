@@ -202,7 +202,7 @@ void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id
         {
             network_connet.connet_state |= 0x02;
             /* 尝试连接 */
-            if (s_retry_num < 1)
+            if (s_retry_num < 5)
             {
                 esp_wifi_connect();
                 s_retry_num ++;

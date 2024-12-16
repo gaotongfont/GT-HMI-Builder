@@ -247,6 +247,13 @@ typedef GT_CONCAT3(gt_color, GT_COLOR_DEPTH, _t) gt_color_t;
 
 typedef uint8_t gt_opa_t;
 
+typedef struct gt_color_img_raw_s {
+    gt_color_t const * buffer;    /** color channel, necessary */
+    gt_opa_t   const * opa;       /** alpha channel, unnecessary */
+    gt_color_t color;
+    uint16_t   width;             /** width of the image */
+    uint16_t   height;            /** height of the image */
+}gt_color_img_raw_st;
 
 /* macros ---------------------------------------------------------------*/
 
@@ -266,10 +273,10 @@ static inline gt_color_t gt_color_hex(uint32_t c) {
 }
 
 /**
- * @brief
+ * @brief Set the color value
  *
  * @param hex_val According to the GT_COLOR_DEPTH width
- * @return gt_color_t
+ * @return gt_color_val_t current color depth
  */
 static inline gt_color_t gt_color_set(gt_color_val_t hex_val) {
     gt_color_t ret = {

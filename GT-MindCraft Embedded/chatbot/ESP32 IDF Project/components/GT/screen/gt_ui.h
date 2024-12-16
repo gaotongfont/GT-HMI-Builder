@@ -12,6 +12,8 @@
 #include "gt_font_config.h"
 #include "audio_mem.h"
 #include "wifi.h"
+#include "gt_record_http.h"
+#include "gt_nvs_store.h"
 
 extern QueueHandle_t mYxQueue;
 extern QueueHandle_t mYxQueue2;
@@ -26,6 +28,8 @@ extern gt_obj_st * keyboard;
 extern gt_obj_st * forget_password;
 extern gt_obj_st * connection_failed;
 extern gt_obj_st * wifi_list;
+extern gt_obj_st * History_page;
+extern gt_obj_st * Function_settings;
 
 extern ChatbotData cb_data;
 
@@ -48,7 +52,8 @@ gt_obj_st * gt_init_keyboard(void);
 gt_obj_st * gt_init_forget_password(void);
 gt_obj_st * gt_init_connection_failed(void);
 gt_obj_st * gt_init_wifi_list(void);
-
+gt_obj_st * gt_init_History_page(void);
+gt_obj_st * gt_init_Function_settings(void);
 typedef enum {
         GT_ID_SCREEN_HOME = 0,
         GT_ID_SCREEN_SETUP,
@@ -60,6 +65,8 @@ typedef enum {
         GT_ID_FORGET_PASSWORD,
         GT_ID_CONNECTION_FAILED,
         GT_ID_WIFI_LIST,
+        GT_ID_HISTORY_PAGE,
+        GT_ID_FUNCTION_SETTINGS
 } gt_scr_id_et;
 
 typedef enum {
@@ -69,6 +76,7 @@ typedef enum {
     AI_EMOJIS_SYMPATHY,
     AI_EMOJIS_ENCOURAGE,
     AI_EMOJIS_HAPPY,
+    AI_EMOJIS_CJ,
     AI_ANIM_AUDIO,
     AI_ANIM_SMILE,
     AI_ANIM_TOTAL,
@@ -83,6 +91,8 @@ typedef enum {
 	AI_SETTING_CHAR,
 	AI_SETTING_TIMBRE,
 	AI_SETTING_AI_NAME,
+    AI_SETTING_MODEL,
+    AI_SETTING_REPLY_STYLE,
 }gt_ai_setting_et;
 
 
@@ -90,10 +100,20 @@ typedef enum {
 void set_items_in_listview(gt_obj_st * listview, gt_ai_setting_et option);
 char* gt_vocie_id_string_get(char *timbre);
 char* gt_timber_string_get(char *voice_id);
+char* gt_bot_description_string_get(char *ai_name);
+char* gt_mode_en_string_get(char *mode);
+char* gt_mode_cn_string_get(char *mode);
+char* gt_reply_style_en_string_get(char *reply_style);
+char* gt_reply_style_cn_string_get(char *reply_style);
+
 void identification_failed_ui();
 void wifi_connecting_ui();
 void waiting_rec_ui();
 void wifi_connected_fail_ui();
+
+void recording_exe_func(void);
+void send_information_exe_func(void);
+void identifying_failed_ui_in_subtitle(void);
 
 void redraw_wifi_list();
 void change_wifi_connect_tip(uint8_t flag);
@@ -112,5 +132,10 @@ typedef enum {
 
 void update_wifi_icon();
 
+gt_obj_st * _Clear_page_dialog1_init();
+void set_history_in_chat();
+void clear_chat_history();
+gt_obj_st * _Unstable_network_dialog1_init();
+void set_wifi_status_icon(gt_wifi_icon_status_et status);
 #endif
 

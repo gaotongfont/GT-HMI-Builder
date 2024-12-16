@@ -162,6 +162,9 @@ typedef struct _gt_attr_font_s {
     gt_size_t start_x;  ///< draw text start x from coords,if not need,must set 0
     gt_size_t start_y;  ///< draw text start y from coords,if not need,must set 0
 
+    ///< over 0: set the text indent words font size, 0: not set
+    uint16_t indent;
+
     uint8_t space_x;    ///< The width of the space between characters
     uint8_t space_y;    ///< The distance between rows
 
@@ -269,6 +272,7 @@ void gt_py_input_method_last_page(gt_py_input_method_st* py_input_method);
 void gt_py_input_method_next_page(gt_py_input_method_st* py_input_method);
 void gt_py_input_method_select_text(gt_py_input_method_st* py_input_method, uint8_t index);
 void gt_py_input_method_clean(gt_py_input_method_st* py_input_method);
+void gt_py_input_method_destroy(gt_py_input_method_st* py_input_method);
 
 
 void gt_font_info_init(gt_font_info_st *font_info);
@@ -388,7 +392,7 @@ uint8_t right_to_left_lan_get(uint16_t style);
 uint8_t right_to_left_lan_get(gt_font_st* font);
 #endif
 
-uint32_t gt_font_split_line_numb(gt_font_info_st* info, const char * text, uint32_t max_w, uint16_t space, uint32_t * ret_max_w);
+uint32_t gt_font_split_line_numb(gt_font_info_st* info, const char * text, uint32_t max_w, uint32_t start_w, uint16_t space, uint32_t * ret_max_w);
 
 
 #if _GT_FONT_GET_WORD_BY_TOUCH_POINT

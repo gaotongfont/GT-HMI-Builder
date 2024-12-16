@@ -14,7 +14,7 @@ QueueHandle_t mYxQueue4 = NULL;
 #define MAX_HTTP_RECV_BUFFER 512
 #define MAX_HTTP_OUTPUT_BUFFER 512//3000//2048
 #define MULTIPART_DATA_SIZE 300//multipart_data
-#define EXTRA_PARAM_SIZE 1536//extra_param
+#define EXTRA_PARAM_SIZE 2000//extra_param
 
 static const char *TAG = "HTTP_CLIENT";
 static bool flag = true;
@@ -170,10 +170,12 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
 
     flag = true;
     char *uuidStr = NULL;
+    char *session_token = NULL;
     const char boundary[] = {"----WebKitFormBoundary7MA4YWxkTrZu0gW"};//分隔符
 
     esp_http_client_config_t config = {
-        .url = "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",
+        // .url = "http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/",
+        .url = "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",//"http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/stream/",//"http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/stream/",//"http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/",
         .event_handler = stream_http_event_handler,
         .user_data = NULL,//local_response_buffer,        // Pass address of local buffer to get response
         .buffer_size = 1024,
@@ -202,7 +204,12 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
     ESP_LOGI(TAG, "uxQueueMessagesWaiting(mYxQueue4) > 0 ==============> uxQueueMessagesWaiting = %d\n",num2);
     // POST请求
     //要发送给服务器的参数
-    uuidStr = get_uuid();
+    // uuidStr = get_uuid();
+    uuidStr = get_user_asr_uuid();
+    ESP_LOGI(TAG, "uuidStr = %s\n", uuidStr);
+    session_token = get_session_token();
+    ESP_LOGI(TAG, "session_token = %s\n", session_token);
+
     char *extra_param = (char *)audio_malloc(EXTRA_PARAM_SIZE);
     memset(extra_param, 0, EXTRA_PARAM_SIZE);
     snprintf(extra_param, EXTRA_PARAM_SIZE,
@@ -231,6 +238,9 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
         "Content-Disposition: form-data; name=\"asr_uuid\"\r\n\r\n"
         "%s"
         "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"bot_description\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
         "Content-Disposition: form-data; name=\"stream\"\r\n\r\n"
         "%s"
         "\r\n--%s\r\n"
@@ -241,10 +251,27 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
         "%s"
         "\r\n--%s\r\n"
         "Content-Disposition: form-data; name=\"max_tokens\"\r\n\r\n"
+        "%d"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"session_token\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"speed\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"bot_response_style\"\r\n\r\n"
         "%s"
         "\r\n--%s\r\n",
         boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_age,boundary,send_data->bot_name,
-        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary, uuidStr, boundary,"true",boundary,"customize",boundary,"speech-01-turbo-240228",boundary,"200",boundary);
+        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary, uuidStr,
+        boundary,send_data->bot_description,
+        boundary,"true",boundary, send_data->mode,boundary,"speech-01-turbo-240228",boundary, send_data->max_output_size, boundary, session_token,
+        boundary,"1.0", boundary, send_data->bot_response_style, boundary);
+
+
+    ESP_LOGE(TAG, "extra_param %s\n", extra_param);
+
+
     size_t extra_pram_len = strlen(extra_param);
     uuidStr = NULL;
 

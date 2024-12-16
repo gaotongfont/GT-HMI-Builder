@@ -6,12 +6,15 @@ static char *blue_tip[5] = {"松手发送，上移取消", "正在思考，请�
 
 /** screen_home */
 gt_obj_st * screen_home = NULL;
-static gt_obj_st * img1 = NULL;
+static gt_obj_st * stupbt = NULL;
 static gt_obj_st * imgbtn1 = NULL;
 static gt_obj_st * lab1 = NULL;
 static gt_obj_st * player_emojis = NULL;
 static gt_obj_st * player_audio = NULL;
 static gt_obj_st * lab2 = NULL;
+static gt_obj_st * Historybt = NULL;
+static gt_obj_st * emptybt = NULL;
+
 
 static void add_event_cb_for_imgbtn();
 
@@ -120,11 +123,7 @@ static void img1_0_cb(gt_event_st * e) {
     gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SETUP, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
 }
 
-//按下
-static void recording_cb(gt_event_st * e) {
-    //step1:切换正在录音时的ui
-    recording_ui();
-
+void recording_exe_func(void) {
     // 停止播放器
     gt_audio_player_stop();
 
@@ -139,11 +138,14 @@ static void recording_cb(gt_event_st * e) {
 
     ESP_LOGI(TAG, "-----------------------按下执行结束\n");
 }
-//抬起
-static void send_information_cb(gt_event_st * e) {
-    //step1:切换等待回复时的ui
-    waiting_answer_ui();
 
+//按下
+static void recording_cb(gt_event_st * e) {
+    //step1:切换正在录音时的ui
+    recording_ui();
+    recording_exe_func();
+}
+void send_information_exe_func(void) {
     //step2:结束录音
 #if USE_HTTP_STREAM
     gt_pipe_send_stop();
@@ -160,6 +162,13 @@ static void send_information_cb(gt_event_st * e) {
     xQueueSendFromISR(mYxQueue, &msg, &xHigherPriorityTaskWoken);
 
     ESP_LOGI(TAG, "-----------------------抬起执行结束\n");
+}
+
+//抬起
+static void send_information_cb(gt_event_st * e) {
+    //step1:切换等待回复时的ui
+    waiting_answer_ui();
+    send_information_exe_func();
 }
 
 //焦点移开当前控件
@@ -194,6 +203,15 @@ static void screen_home_0_cb(gt_event_st * e) {
     update_wifi_icon();
 }
 
+static void Historybt_0_cb(gt_event_st * e) {
+    set_history_in_chat();
+}
+
+static void emptybt_0_cb(gt_event_st * e) {
+    // clear_chat_history();
+    _Clear_page_dialog1_init();
+}
+
 gt_obj_st * gt_init_screen_home(void)
 {
     screen_home = gt_obj_create(NULL);
@@ -203,17 +221,37 @@ gt_obj_st * gt_init_screen_home(void)
 
     /** rect1 */
 	gt_obj_st* rect1 = gt_rect_create(screen_home);
-	gt_obj_set_pos(rect1, 200, 0);
-	gt_obj_set_size(rect1, 40, 40);
+	gt_obj_set_pos(rect1, 180, 0);
+	gt_obj_set_size(rect1, 60, 40);
 	gt_obj_set_opa(rect1, GT_OPA_TRANSP);
 	gt_obj_add_event_cb(rect1, img1_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
 
-    /** img1 */
-    img1 = gt_img_create(rect1);
-	gt_obj_set_pos(img1, 206, 7);
-	gt_obj_set_size(img1, 26, 26);
-	gt_img_set_src(img1, "f:img_1723686274619_26x26.png");
-    gt_obj_set_touch_parent(img1, true);
+	/** stupbt */
+	/** 设置 */
+	stupbt = gt_img_create(rect1);
+	gt_obj_set_pos(stupbt, 183, 16);
+	gt_obj_set_size(stupbt, 24, 24);
+	gt_img_set_src(stupbt, "f:img_Set_up_24x24.png");
+    gt_obj_set_touch_parent(stupbt, true);
+
+	/** Historybt */
+	/** 历史记录 */
+	Historybt = gt_imgbtn_create(screen_home);
+	gt_obj_set_pos(Historybt, 64, 18);
+	gt_obj_set_size(Historybt, 22, 19);
+	gt_imgbtn_set_src(Historybt, "f:img_History_22x19.png");
+    gt_imgbtn_set_src_press(Historybt, "f:img_History2_22x19.png");
+	gt_obj_add_event_cb(Historybt, Historybt_0_cb, GT_EVENT_TYPE_INPUT_PRESSED, NULL);
+
+
+	/** emptybt */
+	/** 清空 */
+	emptybt = gt_imgbtn_create(screen_home);
+	gt_obj_set_pos(emptybt, 125, 19);
+	gt_obj_set_size(emptybt, 18, 18);
+	gt_imgbtn_set_src(emptybt, "f:img_empty_18x18.png");
+	gt_imgbtn_set_src_press(emptybt, "f:img_empty2_18x18.png");
+	gt_obj_add_event_cb(emptybt, emptybt_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
 
     /** imgbtn1 */
     imgbtn1 = gt_imgbtn_create(screen_home);

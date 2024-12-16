@@ -24,7 +24,17 @@
 #include "gt_event.h"
 #include "../extra/gt_extra.h"
 #include "../core/gt_img_decoder.h"
+#if GT_USE_SERIAL
+#include "../extra/serial/gt_serial_resource.h"
 #include "../utils/gt_serial.h"
+#include "../extra/serial/gt_serial_cfg.h"
+#include "../extra/serial/gt_serial_event.h"
+
+#if GT_SERIAL_USE_TIMER_RECV_UNPACK
+    #include "../extra/serial/gt_serial_command.h"
+#endif
+#endif
+
 
 #if _GT_USE_TEST
 #include "../../test/gt_test_rand_widget.h"
@@ -115,6 +125,29 @@ static void _gt_port_init(void) {
     gt_font_config_init();
 }
 
+#if GT_USE_SERIAL
+static void _gt_serial_core_init(void) {
+    if (GT_RES_OK != gt_serial_resource_init()) {
+        return;
+    }
+    gt_serial_init();
+
+#if GT_USE_SERIAL_CFG && GT_USE_BIN_CONVERT
+    gt_serial_cfg_init();
+
+#if GT_SERIAL_USE_TIMER_RECV_UNPACK
+    gt_serial_command_init();
+#endif  /** GT_SERIAL_USE_TIMER_RECV_UNPACK */
+
+#endif  /** GT_USE_SERIAL_CFG && GT_USE_BIN_CONVERT */
+
+#if GT_USE_BIN_CONVERT
+    gt_serial_event_init();
+#endif
+
+}
+#endif  /** GT_USE_SERIAL */
+
 /* global functions / API interface -------------------------------------*/
 
 void gt_init(void)
@@ -142,7 +175,7 @@ void gt_init(void)
     _gt_port_init();
 
 #if GT_USE_SERIAL
-    gt_serial_init();
+    _gt_serial_core_init();
 #endif
 
 #if GT_BOOTING_INFO_MSG

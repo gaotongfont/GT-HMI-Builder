@@ -61,6 +61,7 @@ typedef struct _gt_textarea_s {
 
     gt_font_info_st font_info;
 
+    uint16_t indent;
     uint8_t bg_opa;     /* @ref gt_color.h */
     uint8_t space_x;
     uint8_t space_y;
@@ -84,7 +85,7 @@ static void _textarea_init_cb(gt_obj_st * obj);
 static void _textarea_deinit_cb(gt_obj_st * obj);
 static void _event_cb(struct gt_obj_s * obj, gt_event_st * e);
 
-static const gt_obj_class_st gt_textarea_class = {
+static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_textarea_class = {
     ._init_cb      = _textarea_init_cb,
     ._deinit_cb    = _textarea_deinit_cb,
     ._event_cb     = _event_cb,
@@ -198,6 +199,7 @@ static void _draw_content_or_get_words(gt_obj_st * obj, gt_point_st * touch_poin
         .space_x    = style->space_x,
         .space_y    = style->space_y,
         .align      = style->font_align,
+        .indent     = style->indent,
         .opa        = obj->opa,
         .reg.immediately_return = _is_hold_on_contents_for_scroll(style),
 #if _GT_FONT_GET_WORD_BY_TOUCH_POINT
@@ -439,6 +441,7 @@ static void _event_cb(struct gt_obj_s * obj, gt_event_st * e) {
                 }
                 obj->process_attr.scroll.y = obj->area.h - style->max_height;
             }
+            gt_disp_invalid_area(obj);
             break;
 
         case GT_EVENT_TYPE_INPUT_SCROLL_END:
@@ -502,13 +505,17 @@ gt_obj_st * gt_textarea_create(gt_obj_st * parent) {
 
 void gt_textarea_set_text(gt_obj_st * textarea, char * text)
 {
+    gt_textarea_set_text_by_len(textarea, text, strlen(text));
+}
+
+void gt_textarea_set_text_by_len(gt_obj_st * textarea, char * text, uint16_t len)
+{
     if (false == gt_obj_is_type(textarea, OBJ_TYPE)) {
         return ;
     }
     _gt_textarea_st * style = (_gt_textarea_st * )textarea;
     uint8_t style_mask = GT_FONT_STYLE_NONE;
     gt_color_t color = style->color_font;
-    uint16_t len = 0;
 
     if (style->cnt_contents) {
 #if GT_TEXTAREA_CUSTOM_FONT_STYLE
@@ -522,7 +529,6 @@ void gt_textarea_set_text(gt_obj_st * textarea, char * text)
     if (NULL == text) {
         return;
     }
-    len = strlen(text);
     style->contents  = gt_mem_malloc( sizeof(gt_textarea_param_st) );
     GT_CHECK_BACK(style->contents);
     style->contents[0].len  = len;
@@ -712,6 +718,17 @@ void gt_textarea_set_font_gray(gt_obj_st * textarea, uint8_t gray)
     _gt_textarea_st * style = (_gt_textarea_st * )textarea;
     style->font_info.gray = gray;
 }
+
+void gt_textarea_set_indent(gt_obj_st * textarea, uint16_t indent)
+{
+    if (false == gt_obj_is_type(textarea, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_textarea_st * style = (_gt_textarea_st * )textarea;
+    style->indent = indent;
+    gt_event_send(textarea, GT_EVENT_TYPE_DRAW_START, NULL);
+}
+
 void gt_textarea_set_font_align(gt_obj_st * textarea, gt_align_et align)
 {
     if (false == gt_obj_is_type(textarea, OBJ_TYPE)) {
@@ -724,6 +741,7 @@ void gt_textarea_set_font_align(gt_obj_st * textarea, gt_align_et align)
 
     style->font_align = align;
 }
+
 void gt_textarea_set_font_color(gt_obj_st * textarea, gt_color_t color)
 {
     if (false == gt_obj_is_type(textarea, OBJ_TYPE)) {

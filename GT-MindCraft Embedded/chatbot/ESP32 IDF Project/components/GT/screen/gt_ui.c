@@ -11,16 +11,22 @@ static const gt_scr_list_st gt_scr_list[] = {
 	{GT_ID_FORGET_PASSWORD, gt_init_forget_password},
 	{GT_ID_CONNECTION_FAILED, gt_init_connection_failed},
 	{GT_ID_WIFI_LIST, gt_init_wifi_list},
+	{GT_ID_HISTORY_PAGE, gt_init_History_page},
+    {GT_ID_FUNCTION_SETTINGS, gt_init_Function_settings},
 };
 
-static const char* age_items[] = {
-    "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"
-};
-static const char* role_items[] = {"老师", "朋友", "密友", "心理咨询师"};
-static const char* char_items[] = {"外向", "正经", "搞怪", "内向"};
-static const char* ai_name_items[] = {"智酱","聊天侠","老羞"};
-static const char* timbre_items[] = {"可爱男童","萌萌女童","卡通猪小琪","妩媚御姐","俏皮萌妹"};
-static const char* voice_id_items[] = {"cute_boy", "lovely_girl", "peppa_pig", "wumei_yujie", "qiaopi_mengmei"};
+static const char* role_items[] = {"老师", "朋友", "密友", "心理咨询师", "健康顾问", "老年护理专家", ""};
+static const char* char_items[] = {"外向", "正经", "搞怪", "内向", ""};
+static const char* ai_name_items[] = {"智酱","蔡机"};
+static const char* timbre_items[] = {"可爱男童","萌萌女童","卡通猪小琪","妩媚御姐","俏皮萌妹", "菜机", "少女音色", "成熟女性音色", "甜美女性音色", "男性有声书2", "青年大学生音色", "精英男青年音色"};
+static const char* voice_id_items[] = {"cute_boy", "lovely_girl", "peppa_pig", "wumei_yujie", "qiaopi_mengmei", "mindcraft-58-7e8355d2b12145f488d068db04017f04", "female-shaonv", "female-chengshu", "female-tianmei", "audiobook_male_2", "male-qn-daxuesheng", "male-qn-jingying"};
+static const char* tx_timbre_items[] = {"爱小广", "爱小栋", "爱小海", "爱小霞", "爱小玲", "爱小章", "爱小峰", "爱小亮"};
+static const char* tx_voice_id_items[] = {"301000", "301001", "301002", "301003", "301004", "301005", "301006", "301007"};
+static const char* bot_description_items[] = {"你是住在芯片王国里的AI机器人，可以帮助用户解决各式各样的问题。", "你是练习时长两年半的AI练习生，喜欢唱，调，rap，篮球”。"};
+static const char* model_cn_items[] = {"标准", "标准-拟人","专家", "专家-拟人"};
+static const char* model_en_items[] = {"standard", "standard_character", "pro", "pro_character"};
+static const char* reply_style_cn_items[] = {"正常", "聊天"};
+static const char* reply_style_en_items[] = {"normal", "conversation"};
 
 void gt_ui_init(void) {
 
@@ -269,6 +275,43 @@ void set_emojis_in_player(gt_obj_st * obj, gt_ai_emojis_et emojis)
         }
         break;
     }
+    case AI_EMOJIS_CJ: {
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            if (i == 1)
+            {
+                set_player_many_times(obj, "f:img_10_00_228x184.jpg", sizeof("f:img_10_00_228x184.jpg"), 5);
+            }else {
+                gt_player_add_item(obj, "f:img_10_00_228x184.jpg", sizeof("f:img_10_00_228x184.jpg"));
+            }
+            gt_player_add_item(obj, "f:img_10_01_228x184.jpg", sizeof("f:img_10_01_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_02_228x184.jpg", sizeof("f:img_10_02_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_03_228x184.jpg", sizeof("f:img_10_03_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_04_228x184.jpg", sizeof("f:img_10_04_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_05_228x184.jpg", sizeof("f:img_10_05_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_06_228x184.jpg", sizeof("f:img_10_06_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_07_228x184.jpg", sizeof("f:img_10_07_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_08_228x184.jpg", sizeof("f:img_10_08_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_09_228x184.jpg", sizeof("f:img_10_09_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_10_228x184.jpg", sizeof("f:img_10_10_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_11_228x184.jpg", sizeof("f:img_10_11_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_12_228x184.jpg", sizeof("f:img_10_12_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_13_228x184.jpg", sizeof("f:img_10_13_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_14_228x184.jpg", sizeof("f:img_10_14_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_17_228x184.jpg", sizeof("f:img_10_17_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_15_228x184.jpg", sizeof("f:img_10_15_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_16_228x184.jpg", sizeof("f:img_10_16_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_18_228x184.jpg", sizeof("f:img_10_18_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_19_228x184.jpg", sizeof("f:img_10_19_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_20_228x184.jpg", sizeof("f:img_10_20_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_21_228x184.jpg", sizeof("f:img_10_21_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_22_228x184.jpg", sizeof("f:img_10_22_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_23_228x184.jpg", sizeof("f:img_10_23_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_24_228x184.jpg", sizeof("f:img_10_24_228x184.jpg"));
+            gt_player_add_item(obj, "f:img_10_25_228x184.jpg", sizeof("f:img_10_25_228x184.jpg"));
+        }
+        break;
+    }
     case AI_ANIM_AUDIO: {
         gt_player_add_item(obj, "f:img_09_00_80x30.png", sizeof("f:img_09_00_80x30.png"));
         gt_player_add_item(obj, "f:img_09_01_80x30.png", sizeof("f:img_09_01_80x30.png"));
@@ -331,11 +374,51 @@ void add_items_to_listview(gt_obj_st * obj, const char* items[], size_t item_cou
     }
 }
 
+#if 0
+static const char* age_items[] = {
+    "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
+    "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25",
+    "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36",
+    "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47",
+    "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58",
+    "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69",
+    "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80",
+    "81", "82", "83", "84", "85", "86", "87", "88", "89", "90"
+};
+#else
+#define AGE_ITEMS_MIN 3
+#define AGE_ITEMS_MAX 90
+#define AGE_ITEM_COUNT (AGE_ITEMS_MAX - AGE_ITEMS_MIN + 1)
+const char *age_items[AGE_ITEM_COUNT];
+
+void init_age_items() {
+
+    for (size_t i = AGE_ITEMS_MIN; i <= AGE_ITEMS_MAX; i++)
+    {
+        char *age_str = (char *)audio_malloc(3 * sizeof(char));
+        if (age_str != NULL)
+        {
+            sprintf(age_str, "%d", i);
+            age_items[i - AGE_ITEMS_MIN] = age_str;
+        } else {
+            printf("Memory allocation failed for age %d\n", i);
+            return;
+        }
+
+    }
+}
+#endif
+
 void set_items_in_listview(gt_obj_st * obj, gt_ai_setting_et option) {
     gt_listview_clear_all_items(obj);
     switch (option) {
     case AI_SETTING_AGE: {
+        init_age_items();
         add_items_to_listview(obj, age_items, sizeof(age_items) / sizeof(age_items[0]));
+
+        for (int i = 0; i < AGE_ITEM_COUNT; i++) {
+            audio_free((void*)age_items[i]);
+        }
         break;
     }
     case AI_SETTING_ROLE: {
@@ -347,11 +430,24 @@ void set_items_in_listview(gt_obj_st * obj, gt_ai_setting_et option) {
         break;
     }
     case AI_SETTING_TIMBRE: {
-        add_items_to_listview(obj, timbre_items, sizeof(timbre_items) / sizeof(timbre_items[0]));
+        if (strcmp(cb_data.settings->mode, "pro") == 0 || strcmp(cb_data.settings->mode, "pro_character") == 0) {
+            add_items_to_listview(obj, timbre_items, sizeof(timbre_items) / sizeof(timbre_items[0]));
+        } else if (strcmp(cb_data.settings->mode, "standard") == 0 || strcmp(cb_data.settings->mode, "standard_character") == 0) {
+            add_items_to_listview(obj, tx_timbre_items, sizeof(tx_timbre_items) / sizeof(tx_timbre_items[0]));
+        }
+
         break;
     }
     case AI_SETTING_AI_NAME: {
         add_items_to_listview(obj, ai_name_items, sizeof(ai_name_items) / sizeof(ai_name_items[0]));
+        break;
+    }
+    case AI_SETTING_MODEL: {
+        add_items_to_listview(obj, model_cn_items, sizeof(model_cn_items) / sizeof(model_cn_items[0]));
+        break;
+    }
+    case AI_SETTING_REPLY_STYLE: {
+        add_items_to_listview(obj, reply_style_cn_items, sizeof(reply_style_cn_items) / sizeof(reply_style_cn_items[0]));
         break;
     }
     default:
@@ -361,24 +457,150 @@ void set_items_in_listview(gt_obj_st * obj, gt_ai_setting_et option) {
 
 char* gt_vocie_id_string_get(char *timbre)
 {
-    int i = 0, len = sizeof(timbre_items) / sizeof(timbre_items[0]);
+    static const char ** cur_timbre_items;
+    static const char ** cur_voice_id_items;
+    static int cur_len;
+
+    if (strcmp(cb_data.settings->mode, "pro") == 0 || strcmp(cb_data.settings->mode, "pro_character") == 0) {
+        cur_timbre_items = timbre_items;
+        cur_voice_id_items = voice_id_items;
+        cur_len = sizeof(voice_id_items) / sizeof(voice_id_items[0]);
+    } else if (strcmp(cb_data.settings->mode, "standard") == 0 || strcmp(cb_data.settings->mode, "standard_character") == 0) {
+        cur_timbre_items = tx_timbre_items;
+        cur_voice_id_items = tx_voice_id_items;
+        cur_len = sizeof(tx_voice_id_items) / sizeof(tx_voice_id_items[0]);
+    }
+
+    int i = 0, len = cur_len;
     for(i = 0; i < len; i++) {
-        if (strcmp(timbre, timbre_items[i]) == 0) {
-            return (char*)voice_id_items[i];
+        if (strcmp(timbre, cur_timbre_items[i]) == 0) {
+            return (char*)cur_voice_id_items[i];
         }
     }
-    return (char*)voice_id_items[0];
+    return (char*)cur_voice_id_items[0];
 }
 
 char* gt_timber_string_get(char *voice_id)
 {
-    int i = 0, len = sizeof(voice_id_items) / sizeof(voice_id_items[0]);
+    static const char ** cur_timbre_items;
+    static const char ** cur_voice_id_items;
+    static int cur_len;
+
+    if (strcmp(cb_data.settings->mode, "pro") == 0 || strcmp(cb_data.settings->mode, "pro_character") == 0) {
+        cur_timbre_items = timbre_items;
+        cur_voice_id_items = voice_id_items;
+        cur_len = sizeof(voice_id_items) / sizeof(voice_id_items[0]);
+    } else if (strcmp(cb_data.settings->mode, "standard") == 0 || strcmp(cb_data.settings->mode, "standard_character") == 0) {
+        cur_timbre_items = tx_timbre_items;
+        cur_voice_id_items = tx_voice_id_items;
+        cur_len = sizeof(tx_voice_id_items) / sizeof(tx_voice_id_items[0]);
+    }
+
+    int i = 0, len = cur_len;
     for(i = 0; i < len; i++) {
-        if (strcmp(voice_id_items[i], voice_id) == 0) {
-            return (char*)timbre_items[i];
+        if (strcmp(cur_voice_id_items[i], voice_id) == 0) {
+            return (char*)cur_timbre_items[i];
         }
     }
-    return (char*)timbre_items[0];
+    return (char*)cur_timbre_items[0];
 
 }
 
+char* gt_bot_description_string_get(char *ai_name)
+{
+    int i = 0, len = sizeof(bot_description_items) / sizeof(bot_description_items[0]);
+    for(i = 0; i < len; i++) {
+        if (strcmp(ai_name_items[i], ai_name) == 0) {
+            return (char*)bot_description_items[i];
+        }
+    }
+    return (char*)bot_description_items[0];
+}
+
+char* gt_mode_en_string_get(char *mode)
+{
+    int i = 0, len = sizeof(model_cn_items) / sizeof(model_cn_items[0]);
+    for(i = 0; i < len; i++) {
+        if (strcmp(mode, model_cn_items[i]) == 0) {
+            return (char*)model_en_items[i];
+        }
+    }
+    return (char*)model_en_items[0];
+}
+
+char* gt_mode_cn_string_get(char *mode)
+{
+    int i = 0, len = sizeof(model_en_items) / sizeof(model_en_items[0]);
+    for(i = 0; i < len; i++) {
+        if (strcmp(mode, model_en_items[i]) == 0) {
+            return (char*)model_cn_items[i];
+        }
+    }
+    return (char*)model_cn_items[0];
+}
+char* gt_reply_style_en_string_get(char *reply_style)
+{
+    int i = 0, len = sizeof(reply_style_cn_items) / sizeof(reply_style_cn_items[0]);
+    for(i = 0; i < len; i++) {
+        if (strcmp(reply_style, reply_style_cn_items[i]) == 0) {
+            return (char*)reply_style_en_items[i];
+        }
+    }
+    return (char*)reply_style_en_items[0];
+}
+
+char* gt_reply_style_cn_string_get(char *reply_style)
+{
+    int i = 0, len = sizeof(reply_style_en_items) / sizeof(reply_style_en_items[0]);
+    for(i = 0; i < len; i++) {
+        if (strcmp(reply_style, reply_style_en_items[i]) == 0) {
+            return (char*)reply_style_cn_items[i];
+        }
+    }
+    return (char*)reply_style_cn_items[0];
+}
+
+
+gt_obj_st * _Unstable_network_dialog1_init() {
+
+    gt_obj_st * dialog1 = NULL;
+	gt_obj_st * lab6 = NULL;
+	gt_obj_st * img1 = NULL;
+
+
+	/** dialog1 */
+	/** 清空历史记录 */
+	dialog1 = gt_dialog_create(false);
+	gt_obj_set_pos(dialog1, 1, 86);
+	gt_obj_set_size(dialog1, 234, 159);
+	gt_dialog_set_bgcolor(dialog1, gt_color_hex(0x181B22));
+	gt_dialog_set_border_color(dialog1, gt_color_hex(0xc7c7c7));
+	gt_dialog_set_border_width(dialog1, 0);
+	gt_dialog_set_border_radius(dialog1, 20);
+    // gt_dialog_set_outside_auto_hide(dialog1, false);
+
+
+	/** lab6 */
+	lab6 = gt_label_create(dialog1);
+	gt_obj_set_pos(lab6, 25, 195);
+	gt_obj_set_size(lab6, 199, 33);
+	gt_label_set_font_color(lab6, gt_color_hex(0xffffff));
+	gt_label_set_font_family(lab6, gray_black_20);
+	gt_label_set_font_cjk(lab6, 0);
+	gt_label_set_font_align(lab6, GT_ALIGN_CENTER_MID);
+	gt_label_set_text(lab6, "网络不稳定");
+
+
+	/** img1 */
+	img1 = gt_img_create(dialog1);
+	gt_obj_set_pos(img1, 69, 104);
+	gt_obj_set_size(img1, 109, 84);
+	gt_img_set_src(img1, "f:img_u11_109x84.jpg");
+
+
+
+
+	gt_dialog_show(dialog1);
+
+	return dialog1;
+}

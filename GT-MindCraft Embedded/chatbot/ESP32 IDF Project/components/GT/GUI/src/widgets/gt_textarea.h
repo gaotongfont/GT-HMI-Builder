@@ -77,6 +77,8 @@ gt_obj_st * gt_textarea_create(gt_obj_st * parent);
  */
 void gt_textarea_set_text(gt_obj_st * textarea, char * text);
 
+void gt_textarea_set_text_by_len(gt_obj_st * textarea, char * text, uint16_t len);
+
 /**
  * @brief hide textarea background
  *
@@ -137,6 +139,8 @@ void gt_textarea_set_space(gt_obj_st * textarea, uint8_t space_x, uint8_t space_
  */
 void gt_textarea_set_font_size(gt_obj_st * textarea, uint8_t size);
 void gt_textarea_set_font_gray(gt_obj_st * textarea, uint8_t gray);
+
+void gt_textarea_set_indent(gt_obj_st * textarea, uint16_t indent);
 
 /**
  * @brief Set font alignment

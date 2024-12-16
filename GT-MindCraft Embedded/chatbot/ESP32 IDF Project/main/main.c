@@ -55,16 +55,22 @@
 #include "freertos/queue.h"
 #include "audio_thread.h"
 /* ------------------------------------------------------------------------ */
+#if USE_FUNC_LOCATE_DATA
+#include "zk_app.h"
+#endif //!USE_FUNC_LOCATE_DATA
+/* ------------------------------------------------------------------------ */
 static const char *TAG = "APP_MAIN";
 static esp_periph_set_handle_t set = NULL;
 audio_board_handle_t gt_board_handle = NULL;
 static esp_lcd_panel_handle_t lcd_handle = NULL;
 static tp_dev_t* gt_tp_dev = NULL;
 
+#define MONITOR_WIFI_SIGNAL 0
+
 static portMUX_TYPE my_spinlock = portMUX_INITIALIZER_UNLOCKED;
 
 ChatbotData cb_data;
-bool is_auto_connected_end = false;
+bool is_auto_connected_end = true;
 
 QueueHandle_t mYxQueue;
 QueueHandle_t mYxQueue2;
@@ -206,20 +212,41 @@ void gt_gui_task(void *pvParameters)
             if (receive_evt != NULL/*received_msg >= 0 && received_msg < 6*//*ESP_OK == received_msg*/) {
                 ESP_LOGI(TAG,"<<<<<---------------receive_evt->is_first_response: %d\n", receive_evt->is_first_response);
                 if (receive_evt->is_first_response == true) {
-                    gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SUBTITLE, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
+
+                    gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                    ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+                    if (screen_id != GT_ID_SCREEN_SUBTITLE)
+                    {
+                        gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SUBTITLE, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
+                    }
+
                 }
                 xQueueSend(audio_uri_queue, &receive_evt, portMAX_DELAY);
                 receive_evt = NULL;
             } else {
                 //切换语音识别失败时的ui
-                identification_failed_ui();
+                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                ESP_LOGI(TAG,">>1---------------screen_id: %d\n",screen_id);
+                if ( screen_id == GT_ID_SCREEN_HOME )
+                {
+                    identification_failed_ui();
+                } else if ( screen_id == GT_ID_SCREEN_SUBTITLE ){
+                    identifying_failed_ui_in_subtitle();
+                }
             }
         }
         if (xQueueReceive(mYxQueue2, &received_msg, 1) == pdPASS) {
             ESP_LOGI(TAG, "mYxQueue2-------------------received_msg = %d\n", received_msg);
             if (ESP_FAIL == received_msg) {
                 //切换语音识别失败时的ui
-                identification_failed_ui();
+                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                ESP_LOGI(TAG,">>2---------------screen_id: %d\n",screen_id);
+                if ( screen_id == GT_ID_SCREEN_HOME )
+                {
+                    identification_failed_ui();
+                } else if ( screen_id == GT_ID_SCREEN_SUBTITLE ){
+                    identifying_failed_ui_in_subtitle();
+                }
             }
         }
         gt_task_handler();
@@ -241,7 +268,14 @@ void gt_gui_task(void *pvParameters)
                 gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SUBTITLE, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
             } else {
                 //切换语音识别失败时的ui
-                identification_failed_ui();
+                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                ESP_LOGI(TAG,">>3---------------screen_id: %d\n",screen_id);
+                if ( screen_id == GT_ID_SCREEN_HOME )
+                {
+                    identification_failed_ui();
+                } else if ( screen_id == GT_ID_SCREEN_SUBTITLE ){
+                    identifying_failed_ui_in_subtitle();
+                }
             }
         }
         gt_task_handler();
@@ -289,6 +323,36 @@ void gt_streamAudio_task()
     }
 }
 #endif //!USE_HTTP_STREAM
+
+#if MONITOR_WIFI_SIGNAL
+void get_wifi_signal_anytime()
+{
+    int level = 0;
+    gt_obj_st * dialog = NULL;
+    while(1)
+    {
+        level = get_current_rssi_level();
+        printf("wifi_scan_anytime level   ======== %d\r\n",level);
+        if (level != WIFI_SIGNAL_4 && dialog == NULL) {
+            dialog = _Unstable_network_dialog1_init();
+            ESP_LOGI(TAG,"11-------------------dialog----------------%p\r\n",dialog);
+            ESP_LOGI(TAG,"11111111111111111111111\n");
+        }
+        if(level == WIFI_SIGNAL_4 && dialog != NULL) {
+            ESP_LOGI(TAG,"11-------------------dialog----------------%p\r\n",dialog);
+            gt_dialog_close(dialog);
+            dialog = NULL;
+            ESP_LOGI(TAG,"2222222222222222222222\n");
+        }
+        gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+        if (screen_id == GT_ID_MAIN_INTERFACE)
+        {
+            set_wifi_status_icon(level);
+        }
+        vTaskDelay(5000/portTICK_PERIOD_MS);
+    }
+}
+#endif
 
 void app_main(void)
 {
@@ -340,13 +404,15 @@ void app_main(void)
     esp_periph_config_t set_periph_cfg = DEFAULT_ESP_PERIPH_SET_CONFIG();
     set_periph_cfg.extern_stack = true;
     set = esp_periph_set_init(&set_periph_cfg);
+
+#if !USE_HTTP_STREAM
     // sdcard init
 #ifdef CONFIG_ESP32_S3_GT_BOARD
     audio_board_sdcard_init(set, SD_MODE_SPI);
 #else
     audio_board_sdcard_init(set, SD_MODE_1_LINE);
 #endif
-
+#endif //USE_HTTP_STREAM
 
     xl955_config(&pca_cfg);             /* 初始化扩展IO */
     xl9555_init(&pca_cfg);
@@ -385,11 +451,22 @@ void app_main(void)
     cb_data.settings = (SendSettingsData*)audio_malloc(sizeof(SendSettingsData));
     memset(cb_data.settings, 0, sizeof(SendSettingsData));
 
+    //FUNCT SETTING
+    sprintf(cb_data.settings->mode,"%s", "pro");        //专家模式
+    sprintf(cb_data.settings->bot_response_style,"%s","normal");
+    cb_data.settings->max_output_size = 50;
+
+    //AI SETTINGS
     sprintf(cb_data.settings->emotion_output,"%s","true");
     cb_data.settings->user_age = 6;
-    sprintf(cb_data.settings->bot_character,"%s","朋友");
-    sprintf(cb_data.settings->bot_personality,"%s","外向");
-    sprintf(cb_data.settings->voice_id,"%s","cute_boy");
+    sprintf(cb_data.settings->bot_character,"%s","");
+    sprintf(cb_data.settings->bot_personality,"%s","");
+    sprintf(cb_data.settings->bot_description,"%s",gt_bot_description_string_get(cb_data.settings->bot_name));
+    if (strcmp(cb_data.settings->mode, "pro") == 0 || strcmp(cb_data.settings->mode, "pro_character") == 0) {
+        sprintf(cb_data.settings->voice_id,"%s","cute_boy");
+    } else if (strcmp(cb_data.settings->mode, "standard") == 0 || strcmp(cb_data.settings->mode, "standard_character") == 0) {
+        sprintf(cb_data.settings->voice_id,"%s","301000");
+    }
     sprintf(cb_data.settings->bot_name,"%s","智酱");
     sprintf(cb_data.settings->output_format,"%s","mp3");
 
@@ -404,18 +481,24 @@ void app_main(void)
     xTaskCreate(gt_streamAudio_task, "gt_streamAudio_task", 3*1024, NULL, 2, NULL);
 #endif //!USE_HTTP_STREAM
 
+#if MONITOR_WIFI_SIGNAL
+    xTaskCreate(&get_wifi_signal_anytime, "get_wifi_signal_anytime", 3*1024, NULL, 2, NULL);
+#endif
+
     taskEXIT_CRITICAL(&my_spinlock);
     print_memory_info();
 
 
     //自动连接上一次的wifi
     wifi_config_t last_wifi_config = get_current_wifi_config();
-    is_auto_connected_end = false;
-    wifi_sta_connect((char *)last_wifi_config.sta.ssid, (char *)last_wifi_config.sta.password);
-    gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
-    if (is_auto_connected_end && screen_id == GT_ID_MAIN_INTERFACE)
-    {
-        update_wifi_icon();
+    if (strcmp((char *)last_wifi_config.sta.ssid, "") != 0 && strcmp((char *)last_wifi_config.sta.password, "")!= 0) {
+        is_auto_connected_end = false;
+        wifi_sta_connect((char *)last_wifi_config.sta.ssid, (char *)last_wifi_config.sta.password);
+        gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+        if (is_auto_connected_end && screen_id == GT_ID_MAIN_INTERFACE)
+        {
+            update_wifi_icon();
+        }
     }
 
 
