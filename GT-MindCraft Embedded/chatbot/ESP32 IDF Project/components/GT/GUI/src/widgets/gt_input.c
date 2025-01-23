@@ -140,8 +140,7 @@ static inline void _gt_input_init_widget(gt_obj_st * input) {
     rect_attr.border_color = style->border_color;
 
     /* draw base shape */
-    gt_area_st box_area = gt_area_reduce(input->area, gt_obj_get_reduce(input));
-    draw_bg(input->draw_ctx, &rect_attr, &box_area);
+    draw_bg(input->draw_ctx, &rect_attr, &input->area);
 
     /* draw font */
     gt_font_st font;
@@ -185,7 +184,7 @@ static inline void _gt_input_init_widget(gt_obj_st * input) {
     };
 
     /*draw text before cursor*/
-    gt_area_st area_font = gt_area_reduce(box_area , style->border_width + 2);
+    gt_area_st area_font = gt_area_reduce(input->area , style->border_width);
     font_attr.logical_area = area_font;
     font_attr.opa = GT_OPA_0;
     /** calc text max width */
@@ -226,7 +225,7 @@ static inline void _gt_input_init_widget(gt_obj_st * input) {
         draw_text(input->draw_ctx, &font_attr, &area_font);
     }
 
-    draw_focus(input , rect_attr.radius);
+    draw_focus(input);
 
     if (star_str) {
         gt_mem_free(star_str);
@@ -282,7 +281,7 @@ static void _input_key_handler( gt_obj_st* obj, uint32_t key)
  * @param obj
  */
 static void _input_init_cb(gt_obj_st * obj) {
-    GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
+    // GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
 
     _gt_input_init_widget(obj);
 }
@@ -783,6 +782,15 @@ void gt_input_set_font_encoding(gt_obj_st * input, gt_encoding_et encoding)
     }
     _gt_input_st * style = (_gt_input_st * )input;
     style->font_info.encoding = encoding;
+}
+
+void gt_input_set_font_style(gt_obj_st * input, gt_font_style_et font_style)
+{
+    if (false == gt_obj_is_type(input, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_input_st * style = (_gt_input_st * )input;
+    style->font_info.style.all = font_style;
 }
 
 void gt_input_set_space(gt_obj_st * input, uint8_t space_x, uint8_t space_y)

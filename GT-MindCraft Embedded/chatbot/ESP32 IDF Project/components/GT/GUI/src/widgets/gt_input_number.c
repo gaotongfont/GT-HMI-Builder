@@ -129,7 +129,7 @@ static void _update_label_value(_gt_input_number_st * style) {
 
 static void _init_cb(gt_obj_st * obj) {
     // focus
-    draw_focus(obj , 0);
+    draw_focus(obj);
 }
 
 static void _event_cb(struct gt_obj_s * obj, gt_event_st * e) {
@@ -452,6 +452,18 @@ void gt_input_number_set_font_thick_cn(gt_obj_st * obj, uint8_t thick)
         return;
     }
     gt_label_set_font_thick_cn(style->label, thick);
+}
+
+void gt_input_number_set_font_style(gt_obj_st * obj, gt_font_style_et font_style)
+{
+    if (false == gt_obj_is_type(obj, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_input_number_st * style = (_gt_input_number_st * )obj;
+    if (NULL == style->label) {
+        return;
+    }
+    gt_label_set_font_style(style->label, font_style);
 }
 
 void gt_input_number_set_space(gt_obj_st * obj, uint8_t space_x, uint8_t space_y)

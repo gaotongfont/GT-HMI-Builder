@@ -1,0 +1,17 @@
+#ifndef GT_PROTOCOL_CONFIG_H
+
+
+#define HTTP_STREAM 0
+#define HTTP_NO_STREAM 1
+#define WEBSOCKET 2
+#define WEBSOCKET_HTTP_SWITCH WEBSOCKET
+
+
+#define GT_WS_URI 
+
+#define WEB_REQUEST_ARG 
+#define WEB_CREATE_ARG 
+
+
+
+#endif // !_GT_PROTOCOL_CONFIG_H

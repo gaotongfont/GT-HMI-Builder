@@ -116,10 +116,10 @@ static void _btn_init_cb(gt_obj_st * obj) {
     rect_attr.bg_color      = fg_color;
     rect_attr.border_color  = style->color_border;
 
-    gt_area_st area = gt_area_reduce(obj->area, gt_obj_get_reduce(obj));
     // 1:base shape
-    draw_bg(obj->draw_ctx, &rect_attr, &area);
+    draw_bg(obj->draw_ctx, &rect_attr, &obj->area);
 
+    gt_area_st area = obj->area;
     // 2:font
     gt_attr_font_st font_attr = {
         .font           = &font,
@@ -151,7 +151,7 @@ static void _btn_init_cb(gt_obj_st * obj) {
     draw_text(obj->draw_ctx, &font_attr, &area);
 
     // focus
-    draw_focus(obj, obj->radius);
+    draw_focus(obj);
 }
 
 /**
@@ -248,7 +248,7 @@ static void _btn_event_cb(struct gt_obj_s * obj, gt_event_st * e) {
     }
 }
 
-static bool _contents_free_cb(void * item) {
+static GT_ATTRIBUTE_RAM_TEXT bool _contents_free_cb(void * item) {
     if (NULL == item) {
         return false;
     }
@@ -256,18 +256,11 @@ static bool _contents_free_cb(void * item) {
     return true;
 }
 
-static bool _contents_equal_cb(void * item, void * target) {
+static GT_ATTRIBUTE_RAM_TEXT bool _contents_equal_cb(void * item, void * target) {
     return strcmp(item, target) ? false : true;
 }
 
 /* global functions / API interface -------------------------------------*/
-
-/**
- * @brief create a btn obj
- *
- * @param parent btn's parent element
- * @return gt_obj_st* btn obj
- */
 gt_obj_st * gt_btn_create(gt_obj_st * parent)
 {
     gt_obj_st * obj = gt_obj_class_create(MY_CLASS, parent);
@@ -540,11 +533,7 @@ void gt_btn_set_indent(gt_obj_st * btn, uint16_t indent)
 
 void gt_btn_set_radius(gt_obj_st * btn, gt_radius_t radius)
 {
-    if (false == gt_obj_is_type(btn, OBJ_TYPE)) {
-        return ;
-    }
-    btn->radius = radius;
-    gt_event_send(btn, GT_EVENT_TYPE_DRAW_START, NULL);
+    gt_obj_set_radius(btn, radius);
 }
 
 bool gt_btn_add_state_content(gt_obj_st * btn, const char * str)
@@ -626,6 +615,15 @@ void gt_btn_set_font_encoding(gt_obj_st * btn, gt_encoding_et encoding)
     }
     _gt_btn_st * style = (_gt_btn_st * )btn;
     style->font_info.encoding = encoding;
+}
+
+void gt_btn_set_font_style(gt_obj_st * btn, gt_font_style_et fotn_style)
+{
+    if(false == gt_obj_is_type(btn, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_btn_st * style = (_gt_btn_st * )btn;
+    style->font_info.style.all = fotn_style;
 }
 
 void gt_btn_set_space(gt_obj_st * btn, uint8_t space_x, uint8_t space_y)

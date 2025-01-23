@@ -18,8 +18,9 @@ extern "C" {
 #include <stdbool.h>
 #include "board.h"
 #include "audio_def.h"
+#include "esp_task_wdt.h"
 /* define ---------------------------------------------------------------*/
-#define GT_AUDIO_I2C_RATE  (48000)
+#define GT_AUDIO_I2C_RATE  (16000)
 
 
 /* typedef --------------------------------------------------------------*/
@@ -93,7 +94,42 @@ audio_err_t gt_audio_player_vol_set(int vol);
  */
 audio_err_t gt_audio_player_vol_get(int* vol);
 
+/**
+ * @brief Set the time_ms of the audio player
+ * 
+ * @param time_ms 
+ * @return audio_err_t 
+ */
+audio_err_t gt_esp_audio_play_timeout_set(int time_ms);
+
+
 audio_err_t gt_audio_player_stop_and_prepare_next(void);
+
+/**
+ * @brief stop play audio    TERMINATION_TYPE_NOW 
+ * 
+ * @return audio_err_t 
+ */
+audio_err_t gt_audio_stop_now(void);
+
+/**
+ * @brief play audio is finishing 
+ * 
+ * @return audio_err_t 
+ */
+audio_err_t gt_audio_isFinish_stop(void);
+
+/**
+ * @brief get audio prefer type ; it is set start speed
+ * 
+ */
+audio_err_t gt_audio_prefer_type_get(void);
+
+
+audio_err_t gt_audio_player_start_sync(const char *uri);
+
+esp_err_t gt_audio_element_report_status(void);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

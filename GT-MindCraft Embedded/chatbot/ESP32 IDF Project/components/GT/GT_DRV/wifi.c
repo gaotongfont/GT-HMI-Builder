@@ -1,5 +1,6 @@
 #include "wifi.h"
 
+#if 01
 // 定义事件标志组和标志位
 EventGroupHandle_t wifi_event_group;
 #define WIFI_SCAN_DONE_BIT  BIT0  // 扫描完成标志
@@ -143,7 +144,8 @@ void connet_display(uint8_t flag)
         {
             update_wifi_icon();
         } else if (screen_id == GT_ID_WIFI_LIST){
-            gt_disp_stack_load_scr_anim(GT_ID_CONNECTION_FAILED, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
+            vTaskDelay(300);
+            gt_disp_stack_load_scr_anim(GT_ID_CONNECTION_FAILED, GT_SCR_ANIM_TYPE_NONE, 200, 0, true);
         }
         is_auto_connected_end = true;
         ESP_LOGI(TAG,"--------wifi connecting fail\n");
@@ -352,3 +354,4 @@ void wifi_sta_connect(char *name, char *password) {
         ESP_LOGE(TAG, "Unexpected event occurred.");
     }
 }
+#endif

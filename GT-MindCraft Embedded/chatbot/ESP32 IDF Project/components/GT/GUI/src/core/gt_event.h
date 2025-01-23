@@ -67,6 +67,8 @@ typedef enum gt_event_type_e {
     GT_EVENT_TYPE_DRAW_START,    // need to start draw widget
     GT_EVENT_TYPE_DRAW_END,      // draw widget ok
     GT_EVENT_TYPE_DRAW_REDRAW,
+    GT_EVENT_TYPE_SCREEN_LOAD_BEFORE,       // [Called by core inside] screen loading to draw before
+    GT_EVENT_TYPE_SCREEN_BEFORE_GO_BACK,    // [Called by core inside] screen before go back
 
     /* CHANGE events */
     GT_EVENT_TYPE_CHANGE_CHILD_REMOVE,     // [Called by core inside] remove child but not delete child
@@ -136,7 +138,7 @@ bool gt_event_is_enabled(void);
 #endif  /** GT_USE_SCREEN_ANIM */
 
 /**
- * @brief Adding an event to an object
+ * @brief Adding an user event to an object
  *
  * @param obj Which object need to add event callback
  * @param event The callback function
@@ -144,6 +146,17 @@ bool gt_event_is_enabled(void);
  * @param user_data memory free by user [default or unused: NULL]
  */
 void gt_obj_add_event_cb(struct gt_obj_s * obj, gt_event_cb_t event, gt_event_type_et filter, void * user_data);
+
+/**
+ * @brief Using user's event() to replace the core event_cb() callback handler,
+ *      [Warn] The core event_cb() event type inline handler will be ignored.
+ *
+ * @param obj
+ * @param event The callback function
+ * @param filter
+ * @param user_data
+ */
+void gt_obj_add_replace_core_event_cb(struct gt_obj_s * obj, gt_event_cb_t event, gt_event_type_et filter, void * user_data);
 
 /**
  * @brief Check if the event callback is already added
@@ -259,11 +272,12 @@ gt_res_t gt_global_event_send(gt_event_type_et event, void * parms);
  * @brief [Warn, Called by indev] Send an event code to the global register user event.
  *      Not for the user to call.
  *
+ * @param org The orgin object
  * @param event The event code to send
  * @param parms User data [default or unused: NULL]
  * @return gt_res_t The result status @ref gt_res_t
  */
-gt_res_t _gt_global_core_indev_event_send(gt_event_type_et event, void * parms);
+gt_res_t _gt_global_core_indev_event_send(struct gt_obj_s * org, gt_event_type_et event, void * parms);
 
 #endif  /** GT_USE_LAYER_TOP */
 

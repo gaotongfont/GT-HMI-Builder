@@ -254,6 +254,20 @@ err_lb:
     return ret;
 }
 
+static gt_res_t _gt_sjpg_info_raw(struct _gt_img_decoder_s * decoder,
+    const void * raw_data, uint32_t raw_len, _gt_img_info_st * header)
+{
+    gt_fs_fp_st * fp = gt_fs_open_raw(raw_data, raw_len, GT_FS_MODE_RD);
+    gt_res_t ret = GT_RES_OK;
+    if (!fp) {
+        return GT_RES_INV;
+    }
+    ret = _common_sjpg_info(decoder, fp, header);
+
+    gt_fs_close(fp);
+    return ret;
+}
+
 static inline _sjpg_st * _malloc_sjpg_st(struct _gt_img_dsc_s * dsc) {
     _sjpg_st * sjpg = (_sjpg_st *)dsc->customs_data;
     if (sjpg) {
@@ -380,7 +394,11 @@ err_lb:
 
 static gt_res_t _gt_sjpg_open(struct _gt_img_decoder_s * decoder, struct _gt_img_dsc_s * dsc)
 {
-    dsc->fp = gt_fs_open((char * )dsc->src, GT_FS_MODE_RD);
+    if (dsc->src) {
+        dsc->fp = gt_fs_open((char * )dsc->src, GT_FS_MODE_RD);
+    } else if (dsc->raw_p) {
+        dsc->fp = gt_fs_open_raw(dsc->raw_p, dsc->raw_len, GT_FS_MODE_RD);
+    }
     if (NULL == dsc->fp) {
         return GT_RES_INV;
     }
@@ -416,7 +434,7 @@ static gt_res_t _gt_sjpg_read_line(struct _gt_img_dsc_s * dsc,
     uint8_t * cache = (uint8_t *)&sjpg->frame_cache[(x + (y % sjpg->sjpeg_single_frame_height) * sjpg->sjpeg_x_res) * color_depth];
 
 #if GT_COLOR_DEPTH == 32
-    for (uint32_t i = 0, offset = 0; i < len; i++) {
+    for (uint32_t i = 0, offset = 0, length = len / color_depth; i < length; i++) {
         buffer[offset + 3] = 0xff;
         buffer[offset + 2] = *cache++;
         buffer[offset + 1] = *cache++;
@@ -424,7 +442,16 @@ static gt_res_t _gt_sjpg_read_line(struct _gt_img_dsc_s * dsc,
         offset += 4;
     }
 #elif GT_COLOR_DEPTH == 16
+#if GT_COLOR_16_SWAP
+    len >>= 1;
+    for (uint32_t i = 0, offset = 0; i < len; i++) {
+        buffer[offset + 1] = *cache++;
+        buffer[offset] = *cache++;
+        offset += 2;
+    }
+#else
     gt_memcpy(buffer, cache, len);
+#endif
 #elif GT_COLOR_DEPTH == 8
     uint8_t color = 0;
     for (uint32_t i = 0, offset = 0; i < len; i++) {
@@ -510,6 +537,7 @@ void gt_sjpg_init(void)
     _gt_img_decoder_st * decoder = gt_img_decoder_create();
 
     gt_img_decoder_set_info_cb(decoder, _gt_sjpg_info);
+    gt_img_decoder_set_info_raw_cb(decoder, _gt_sjpg_info_raw);
     gt_img_decoder_set_open_cb(decoder, _gt_sjpg_open);
     gt_img_decoder_set_read_line_cb(decoder, _gt_sjpg_read_line);
     gt_img_decoder_set_close_cb(decoder, _gt_sjpg_close);

@@ -262,7 +262,8 @@ struct gt_obj_s * gt_obj_class_create(const gt_obj_class_st * c, struct gt_obj_s
     obj->scroll_dir = GT_SCROLL_ALL;
     obj->bgcolor    = gt_color_white();
     obj->radius     = 4;
-    obj->reduce     = REDUCE_DEFAULT;
+    obj->focus_w    = FOCUS_W_DEFAULT;
+    obj->focus_gap  = FOCUS_W_DEFAULT;
 
     /** Inherit from the parent class */
     if (parent) {
@@ -384,6 +385,8 @@ void _gt_obj_class_destroy_children(struct gt_obj_s * self)
     for (gt_size_t i = self->cnt_child - 1; i >= 0; i--) {
         _gt_obj_class_destroy(self->child[i]);
     }
+    self->cnt_child = 0;
+    self->child = NULL;
 }
 
 void _gt_obj_class_inherent_attr_from_parent(struct gt_obj_s * obj, struct gt_obj_s * parent)

@@ -33,11 +33,25 @@ extern "C" {
 #endif
 
 #if GT_CFG_USE_SYMBOL_ENABLE
+    #ifndef GT_CFG_USE_SYMBOL_12x12
+        /**
+         * @brief 0: Disabled; 1[default]: Use 12x12 symbol
+         */
+        #define GT_CFG_USE_SYMBOL_12x12	        1
+    #endif
+
     #ifndef GT_CFG_USE_SYMBOL_16x16
         /**
          * @brief 0: Disabled; 1[default]: Use 16x16 symbol
          */
         #define GT_CFG_USE_SYMBOL_16x16	        1
+    #endif
+
+    #ifndef GT_CFG_USE_SYMBOL_20x20
+        /**
+         * @brief 0: Disabled; 1[default]: Use 20x20 symbol
+         */
+        #define GT_CFG_USE_SYMBOL_20x20         1
     #endif
 
     #ifndef GT_CFG_USE_SYMBOL_24x24
@@ -420,6 +434,46 @@ extern "C" {
 #if !defined GT_SYMBOL_VOICE_PLAY_RIGHT_3
 #define GT_SYMBOL_VOICE_PLAY_RIGHT_3        "\xEE\x84\x88" /*57608, 0xE108*/
 #define GT_SYMBOL_VOICE_PLAY_RIGHT_3_GBK    "\xE1\x08"
+#endif
+
+#if !defined GT_SYMBOL_LEFT_SOLID
+#define GT_SYMBOL_LEFT_SOLID                "\xEE\x84\x89" /*57609, 0xE109*/
+#define GT_SYMBOL_LEFT_SOLID_GBK            "\xE1\x09"
+#endif
+
+#if !defined GT_SYMBOL_RIGHT_SOLID
+#define GT_SYMBOL_RIGHT_SOLID               "\xEE\x84\x8a" /*57610, 0xE10a*/
+#define GT_SYMBOL_RIGHT_SOLID_GBK           "\xE1\x0a"
+#endif
+
+#if !defined GT_SYMBOL_UP_SOLID
+#define GT_SYMBOL_UP_SOLID                  "\xEE\x84\x8b" /*57611, 0xE10b*/
+#define GT_SYMBOL_UP_SOLID_GBK              "\xE1\x0b"
+#endif
+
+#if !defined GT_SYMBOL_DOWN_SOLID
+#define GT_SYMBOL_DOWN_SOLID                "\xEE\x84\x8c" /*57612, 0xE10c*/
+#define GT_SYMBOL_DOWN_SOLID_GBK            "\xE1\x0c"
+#endif
+
+#if !defined GT_SYMBOL_RECORD
+#define GT_SYMBOL_RECORD                    "\xEE\x84\x8d" /*57613, 0xE10d*/
+#define GT_SYMBOL_RECORD_GBK                "\xE1\x0d"
+#endif
+
+#if !defined GT_SYMBOL_OK_SOLID
+#define GT_SYMBOL_OK_SOLID                  "\xEE\x84\x8e" /*57614, 0xE10e*/
+#define GT_SYMBOL_OK_SOLID_GBK              "\xE1\x0e"
+#endif
+
+#if !defined GT_SYMBOL_CALENDAR_HOLIDAY
+    #define GT_SYMBOL_CALENDAR_HOLIDAY         "\xEE\x84\x8f" /*57615, 0xE10f*/
+    #define GT_SYMBOL_CALENDAR_HOLIDAY_GBK     "\xE1\x0f"
+#endif
+
+#if !defined GT_SYMBOL_CALENDAR_WORKDAY
+    #define GT_SYMBOL_CALENDAR_WORKDAY         "\xEE\x84\x90" /*57616, 0xE110*/
+    #define GT_SYMBOL_CALENDAR_WORKDAY_GBK     "\xE1\x10"
 #endif
 
 #endif // GT_CFG_USE_SYMBOL_ENABLE

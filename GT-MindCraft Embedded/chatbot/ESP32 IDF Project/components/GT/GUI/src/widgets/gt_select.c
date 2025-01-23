@@ -28,6 +28,7 @@
 #define OBJ_TYPE    GT_TYPE_SELECT
 #define MY_CLASS    &gt_select_class
 
+#define _DEFAULT_OPTION_COUNT       3
 
 
 /* private typedef ------------------------------------------------------*/
@@ -64,7 +65,7 @@ static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_select_class = {
 
 /* static functions -----------------------------------------------------*/
 static void _select_init_cb(gt_obj_st * obj) {
-    draw_focus(obj, 0);
+    draw_focus(obj);
 }
 
 static void _select_deinit_cb(gt_obj_st * obj) {
@@ -84,12 +85,14 @@ static void _update_input_area(gt_obj_st * obj) {
     gt_obj_set_area(style->ipt_p, obj->area);
 }
 
+
 static void _update_lisview_area(gt_obj_st * obj) {
     _gt_select_st * style = (_gt_select_st *)obj;
     if (NULL == style->lv_p) {
         return;
     }
-    gt_obj_set_size(style->lv_p, obj->area.w, obj->area.h * 3);
+    gt_obj_set_size(style->lv_p, obj->area.w,
+        gt_listview_get_resize_height(style->lv_p, _DEFAULT_OPTION_COUNT));
     gt_obj_set_pos_always_full_display(style->lv_p, obj->area.x, obj->area.y + obj->area.h);
 }
 
@@ -131,7 +134,7 @@ static void _select_item_cb(gt_event_st * e) {
 
 static gt_obj_st * _create_listview(gt_obj_st * obj) {
     gt_obj_st * lv_p = gt_listview_create(gt_disp_get_layer_top());
-    gt_obj_set_size(lv_p, obj->area.w, obj->area.h * 3);
+    gt_obj_set_size(lv_p, obj->area.w, gt_listview_get_resize_height(lv_p, _DEFAULT_OPTION_COUNT));
     gt_obj_add_event_cb(lv_p, _select_item_cb, GT_EVENT_TYPE_INPUT_RELEASED, obj);
     gt_obj_set_visible(lv_p, false);
     gt_obj_set_focus_disabled(lv_p, GT_DISABLED);
@@ -310,6 +313,52 @@ void gt_select_set_font_encoding(gt_obj_st * select, gt_encoding_et encoding)
     gt_input_set_font_encoding(style->ipt_p, encoding);
     gt_listview_set_font_encoding(style->lv_p, encoding);
 }
+
+void gt_select_set_font_style(gt_obj_st * select, gt_font_style_et font_style)
+{
+    if (false == gt_obj_is_type(select, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_select_st * style = (_gt_select_st * )select;
+    gt_input_set_font_style(style->ipt_p, font_style);
+    gt_listview_set_font_style(style->lv_p, font_style);
+    gt_event_send(select, GT_EVENT_TYPE_DRAW_START, NULL);
+}
+
+void gt_select_set_selected_anti_font(gt_obj_st * select, bool enabled)
+{
+    if (false == gt_obj_is_type(select, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_select_st * style = (_gt_select_st * )select;
+    gt_listview_set_selected_anti_font(style->lv_p, enabled);
+}
+
+bool gt_select_is_selected_anti_font(gt_obj_st * select)
+{
+    if (false == gt_obj_is_type(select, OBJ_TYPE)) {
+        return false;
+    }
+    _gt_select_st * style = (_gt_select_st * )select;
+    return gt_listview_is_selected_anti_font(style->lv_p);
+}
+void gt_select_set_selected_anti_font_color(gt_obj_st * select, gt_color_t anti_color)
+{
+    if (false == gt_obj_is_type(select, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_select_st * style = (_gt_select_st * )select;
+    gt_listview_set_selected_anti_font_color(style->lv_p, anti_color);
+}
+gt_color_t gt_select_get_selected_anti_font_color(gt_obj_st * select)
+{
+    if (false == gt_obj_is_type(select, OBJ_TYPE)) {
+        return gt_color_black();
+    }
+    _gt_select_st * style = (_gt_select_st * )select;
+    return gt_listview_get_selected_anti_font_color(style->lv_p);
+}
+
 
 #endif  /** GT_CFG_ENABLE_SELECT */
 /* end ------------------------------------------------------------------*/

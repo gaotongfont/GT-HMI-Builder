@@ -174,8 +174,7 @@ esp_err_t stream_http_rest_with_url(SendSettingsData* send_data)
     const char boundary[] = {"----WebKitFormBoundary7MA4YWxkTrZu0gW"};//分隔符
 
     esp_http_client_config_t config = {
-        // .url = "http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/",
-        .url = "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",//"http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/stream/",//"http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/stream/",//"http://grayapi.mindcraft.com.cn/v1/agent/chat_bot_v1/",
+        .url = "http://api.mindcraft.com.cn/v1/agent/chat_bot_v1/",
         .event_handler = stream_http_event_handler,
         .user_data = NULL,//local_response_buffer,        // Pass address of local buffer to get response
         .buffer_size = 1024,
@@ -460,6 +459,8 @@ void read_wav_file_from_sd(const char * file_path, uint8_t ** wav_data, size_t *
 
 esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* receive_data)
 {
+    char personality_str[50];
+    sprintf(personality_str, "%s,%s,%s,%s", send_data->bot_personality[0],send_data->bot_personality[1], send_data->bot_personality[2], send_data->bot_personality[3]);
     const char *post_data = "{\"field1\":\"value1\"}";
     const char *boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";//分隔符
     int written_len = 0;
@@ -510,6 +511,9 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
         "Content-Disposition: form-data; name=\"voice_id\"\r\n\r\n"
         "%s"
         "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"user_name\"\r\n\r\n"
+        "%s"
+        "\r\n--%s\r\n"
         "Content-Disposition: form-data; name=\"user_age\"\r\n\r\n"
         "%d"
         "\r\n--%s\r\n"
@@ -530,10 +534,15 @@ esp_err_t http_rest_with_url(SendSettingsData* send_data, ReceivedAnswerData* re
         "\r\n--%s\r\n"
         "Content-Disposition: form-data; name=\"mode\"\r\n\r\n"
         "%s"
+        "\r\n--%s\r\n"
+        "Content-Disposition: form-data; name=\"bot_tone\"\r\n\r\n"
+        "%s"
         "\r\n--%s\r\n",
-        boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_age,boundary,send_data->bot_name,
-        boundary,send_data->bot_character,boundary,send_data->bot_personality,boundary,send_data->output_format, boundary,"false",boundary,"pro",boundary);
+        boundary,send_data->emotion_output,boundary,send_data->voice_id,boundary,send_data->user_name,boundary,send_data->user_age,boundary,send_data->bot_name,
+        boundary,send_data->bot_character,boundary,personality_str,boundary,send_data->output_format, boundary,"false",boundary,"pro",boundary,send_data->bot_tone,boundary);
     size_t extra_pram_len = strlen(extra_param);
+
+    printf("%s\r\n",extra_param);
 
     char content_type_header[100] = {0};
     snprintf(content_type_header, sizeof(content_type_header), "multipart/form-data; boundary=%s", boundary);

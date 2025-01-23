@@ -82,7 +82,7 @@ static inline void _gt_radio_init_widget(gt_obj_st * radio) {
         radio->area.h = style->font_info.size + 4;  // Force height equal to font size
     }
 
-    gt_area_st area_base = gt_area_reduce(radio->area, gt_obj_get_reduce(radio));
+    gt_area_st area_base = radio->area;
     area_base.w = style->font_info.size + 4;
     area_base.h = area_base.w;
     // area_base.y = radio->area.y + ((radio->area.h - area_base.h) >> 1);
@@ -146,7 +146,7 @@ static inline void _gt_radio_init_widget(gt_obj_st * radio) {
     draw_text(radio->draw_ctx, &font_attr, &area_font);
 
     // focus
-    draw_focus(radio , 0);
+    draw_focus(radio);
 }
 
 /**
@@ -155,7 +155,7 @@ static inline void _gt_radio_init_widget(gt_obj_st * radio) {
  * @param obj
  */
 static void _init_cb(gt_obj_st * obj) {
-    GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
+    // GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
 
     _gt_radio_init_widget(obj);
 }
@@ -414,6 +414,15 @@ void gt_radio_set_font_encoding(gt_obj_st * radio, gt_encoding_et encoding)
     }
     _gt_radio_st * style = (_gt_radio_st * )radio;
     style->font_info.encoding = encoding;
+}
+
+void gt_radio_set_font_style(gt_obj_st * radio, gt_font_style_et font_style)
+{
+    if (false == gt_obj_is_type(radio, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_radio_st * style = (_gt_radio_st * )radio;
+    style->font_info.style.all = font_style;
 }
 
 void gt_radio_set_space(gt_obj_st * radio, uint8_t space_x, uint8_t space_y)

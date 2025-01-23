@@ -1,5 +1,6 @@
 #include "gt_ui.h"
 #include "gt_font_config.h"
+#include "gt_websocket.h"
 
 static const char *TAG = "SCREEN_HISTORY_PAGE";
 
@@ -68,7 +69,11 @@ void clear_chat_history() {
 
     // gt_imgbtn_set_src(Historybt, "f:img_History_22x19.png");
     // gt_imgbtn_set_src(emptybt, "f:img_empty2_18x18.png");
+#if 0
     clear_historical_message_http();
+#else
+    gt_websocket_client_clear_history_message();
+#endif
     if (screen_id == GT_ID_HISTORY_PAGE)
     {
         gt_chat_clean_all_msg(chat1);

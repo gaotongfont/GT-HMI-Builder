@@ -247,12 +247,20 @@ typedef GT_CONCAT3(gt_color, GT_COLOR_DEPTH, _t) gt_color_t;
 
 typedef uint8_t gt_opa_t;
 
+/**
+ * @brief Select one of the invocation modes, mode 1 or 2.
+ */
 typedef struct gt_color_img_raw_s {
-    gt_color_t const * buffer;    /** color channel, necessary */
-    gt_opa_t   const * opa;       /** alpha channel, unnecessary */
+    /** MODE 1 */
+    gt_color_t const * buffer;      /** color channel, necessary */
+    gt_opa_t   const * opa;         /** alpha channel, unnecessary */
+    /** MODE 2 */
+    char * file_raw_p;           /** file raw data, such as: png, jpeg, bmp... */
+    uint32_t raw_len;               /** raw data len */
+
     gt_color_t color;
-    uint16_t   width;             /** width of the image */
-    uint16_t   height;            /** height of the image */
+    uint16_t   width;               /** width of the image */
+    uint16_t   height;              /** height of the image */
 }gt_color_img_raw_st;
 
 /* macros ---------------------------------------------------------------*/
@@ -365,6 +373,7 @@ static inline gt_color_t gt_color_gray(void) { return gt_color_make(0x80, 0x80, 
 static inline gt_color_t gt_color_dark_gray(void) { return gt_color_make(0x40, 0x40, 0x40); }
 static inline gt_color_t gt_color_bright_gray(void) { return gt_color_make(0xc0, 0xc0, 0xc0); }
 static inline gt_color_t gt_color_orange(void) { return gt_color_make(0xFF, 0xA5, 0x00); }
+static inline gt_color_t gt_color_green(void) { return gt_color_make(0x00, 0xFF, 0x00); }
 
 
 /**
@@ -434,7 +443,12 @@ static inline gt_color_t gt_color_mix(gt_color_t c1, gt_color_t c2, uint8_t mix)
 void gt_color_fill(gt_color_t * color_arr, uint32_t len, gt_color_t color);
 
 gt_color_t gt_color_focus(void);
-void gt_color_focus_set(uint32_t col);
+/**
+ * @brief Set the focus color
+ *
+ * @param color default: GT_FOCUS_COLOR_SELECT
+ */
+void gt_color_focus_set(uint32_t color);
 
 #ifdef __cplusplus
 } /*extern "C"*/

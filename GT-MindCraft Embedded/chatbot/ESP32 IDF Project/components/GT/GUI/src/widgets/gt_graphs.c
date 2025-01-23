@@ -108,9 +108,8 @@ static void _graphs_init_cb(gt_obj_st * obj) {
         rect_attr.fg_color      = obj->bgcolor;
         rect_attr.bg_color      = obj->bgcolor;
 
-        gt_area_st area = gt_area_reduce(obj->area, gt_obj_get_reduce(obj));
         /** base shape */
-        draw_bg(obj->draw_ctx, &rect_attr, &area);
+        draw_bg(obj->draw_ctx, &rect_attr, &obj->area);
     }
 
     if (_is_self_adaptive(obj) || _is_hor_range_zero(style) || _is_ver_range_zero(style)) {
@@ -1217,6 +1216,14 @@ void gt_graphs_set_font_encoding(gt_obj_st * graphs, gt_encoding_et encoding)
     }
     _gt_graphs_st * style = (_gt_graphs_st * )graphs;
     style->font_info.encoding = encoding;
+}
+void gt_graphs_set_font_style(gt_obj_st * graphs, gt_font_style_et font_style)
+{
+    if (false == gt_obj_is_type(graphs, OBJ_TYPE)) {
+        return ;
+    }
+    _gt_graphs_st * style = (_gt_graphs_st * )graphs;
+    style->font_info.style.all = font_style;
 }
 
 uint8_t gt_graphs_get_font_size(gt_obj_st * graphs)

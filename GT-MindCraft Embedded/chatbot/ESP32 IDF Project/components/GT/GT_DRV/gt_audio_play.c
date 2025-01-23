@@ -59,13 +59,59 @@ extern audio_board_handle_t gt_board_handle;
 static const char *TAG = "GT_AUDIO_PLAY";
 static esp_audio_handle_t _gt_player = NULL;
 
-
+static audio_element_handle_t mp3_element = NULL;
 /* macros ---------------------------------------------------------------*/
 
 
 
 /* static functions -----------------------------------------------------*/
+esp_err_t _http_stream_audio_event_handle(http_stream_event_msg_t *msg)
+{
+    esp_http_client_handle_t http = (esp_http_client_handle_t)msg->http_client;
 
+    char len_buf[16];
+    static int total_write = 0;
+
+    if (msg->event_id == HTTP_STREAM_PRE_REQUEST) {
+        // set header
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_PRE_REQUEST, lenght=%d", msg->buffer_len);
+        return ESP_OK;
+    }
+
+    if (msg->event_id == HTTP_STREAM_ON_REQUEST) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_ON_REQUEST, lenght=%d", msg->buffer_len);
+        return msg->buffer_len;
+    }
+
+    if (msg->event_id == HTTP_STREAM_POST_REQUEST) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_POST_REQUEST, write end chunked marker");
+        return ESP_OK;
+    }
+
+    if (msg->event_id == HTTP_STREAM_FINISH_REQUEST) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_FINISH_REQUEST");
+        return ESP_OK;
+    }
+
+     if (msg->event_id == HTTP_STREAM_ON_RESPONSE) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_FINISH_REQUEST");
+        return ESP_OK;
+    }
+     if (msg->event_id == HTTP_STREAM_RESOLVE_ALL_TRACKS) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_FINISH_REQUEST");
+        return ESP_OK;
+    }
+
+     if (msg->event_id == HTTP_STREAM_FINISH_TRACK) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_FINISH_REQUEST");
+        return ESP_OK;
+    }
+     if (msg->event_id == HTTP_STREAM_FINISH_PLAYLIST) {
+        ESP_LOGI(TAG, "[ + ] HTTP client HTTP_STREAM_FINISH_REQUEST");
+        return ESP_OK;
+    }
+    return ESP_OK;
+}
 
 
 /* global functions / API interface -------------------------------------*/
@@ -81,7 +127,7 @@ void gt_audio_player_init(void)
     cfg.vol_handle = gt_board_handle->audio_hal;
     cfg.vol_set = (audio_volume_set)audio_hal_set_volume;
     cfg.vol_get = (audio_volume_get)audio_hal_get_volume;
-    cfg.resample_rate = 48000;
+    cfg.resample_rate = GT_AUDIO_I2C_RATE;//48000;
     cfg.prefer_type = ESP_AUDIO_PREFER_MEM;
 
     _gt_player = esp_audio_create(&cfg);
@@ -98,6 +144,7 @@ void gt_audio_player_init(void)
     http_stream_cfg_t http_cfg = HTTP_STREAM_CFG_DEFAULT();
     http_cfg.type = AUDIO_STREAM_READER;
     http_cfg.stack_in_ext = true;
+    http_cfg.event_handle = _http_stream_audio_event_handle;
 
     esp_audio_input_stream_add(_gt_player, fatfs_stream_init(&fs_reader));
     esp_audio_input_stream_add(_gt_player, raw_stream_init(&raw_reader));
@@ -111,7 +158,7 @@ void gt_audio_player_init(void)
     mp3_decoder_cfg_t  mp3_dec_cfg  = DEFAULT_MP3_DECODER_CONFIG();
     wav_dec_cfg.stack_in_ext = true;
     esp_audio_codec_lib_add(_gt_player, AUDIO_CODEC_TYPE_DECODER, mp3_decoder_init(&mp3_dec_cfg));
-
+    mp3_element = mp3_decoder_init(&mp3_dec_cfg);
     // Create writers and add to esp_audio
 // #if (CONFIG_ESP32_S3_GT_KORVO2_V3_BOARD == 1) && (CONFIG_AFE_MIC_NUM == 1)
 //     i2s_stream_cfg_t i2s_writer = I2S_STREAM_CFG_DEFAULT_WITH_PARA(I2S_NUM_0, GT_AUDIO_I2C_RATE, I2S_DATA_BIT_WIDTH_16BIT, AUDIO_STREAM_WRITER);
@@ -221,6 +268,16 @@ audio_err_t gt_audio_player_vol_get(int* vol)
     return esp_audio_vol_get(_gt_player, vol);
 }
 
+audio_err_t gt_esp_audio_play_timeout_set(int time_ms)
+{
+    if(!_gt_player){
+        ESP_LOGW(TAG, "player is not init!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+    return esp_audio_play_timeout_set(_gt_player, time_ms);
+
+}
+
 audio_err_t gt_audio_player_stop_and_prepare_next(void)
 {
     ESP_LOGI(TAG, "stop and prepare for next player music!");
@@ -241,6 +298,60 @@ audio_err_t gt_audio_player_stop_and_prepare_next(void)
     ESP_LOGI(TAG, "Player state set to FINISHED.");
 
     return ESP_OK;
+}
+
+audio_err_t gt_audio_stop_now(void)
+{
+    ESP_LOGI(TAG, "stop player music!");
+    if(!_gt_player){
+        ESP_LOGW(TAG, "player is not init!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+    return esp_audio_stop(_gt_player, TERMINATION_TYPE_NOW);
+}
+
+audio_err_t gt_audio_isFinish_stop(void)
+{
+    ESP_LOGI(TAG, "stop player music!");
+    if(!_gt_player){
+        ESP_LOGW(TAG, "player is not init!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+    return esp_audio_stop(_gt_player, TERMINATION_TYPE_DONE);
+}
+
+
+audio_err_t gt_audio_prefer_type_get(void)
+{
+    ESP_LOGI(TAG, "gt_audio_prefer_type_get");
+    if(!_gt_player){
+        ESP_LOGW(TAG, "player is not init!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+    return esp_audio_prefer_type_get(_gt_player, ESP_AUDIO_PREFER_SPEED);
+}
+
+audio_err_t gt_audio_player_start_sync(const char *uri)
+{
+    ESP_LOGI(TAG, "start player music!");
+    if(!_gt_player || !uri){
+        ESP_LOGW(TAG, "player is not init or uri is null!");
+        return ESP_ERR_AUDIO_FAIL;
+    }
+    // return esp_audio_sync_play(_gt_player, uri, 0);
+    return esp_audio_sync_play(_gt_player, uri, 0);
+}
+
+
+esp_err_t gt_audio_element_report_status(void)
+{
+    ESP_LOGI(TAG, "gt_audio_element_report_status");
+    if(!mp3_element){
+        ESP_LOGW(TAG, "player is not init or uri is null!");
+        return ESP_FAIL;
+    }
+
+    return audio_element_report_status(mp3_element, AEL_STATUS_STATE_FINISHED);
 }
 
 /* end of file ----------------------------------------------------------*/

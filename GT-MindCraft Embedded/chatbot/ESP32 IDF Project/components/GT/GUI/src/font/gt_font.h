@@ -27,6 +27,9 @@ typedef enum {
     GT_FONT_TYPE_FLAG_DOT_MATRIX           = 1,
     GT_FONT_TYPE_FLAG_DOT_MATRIX_NON_WIDTH = 2,
     GT_FONT_TYPE_FLAG_VEC                  = 3,
+
+    GT_FONT_TYPE_FLAG_EMOJI                = 6,
+
 }gt_font_type_em;
 
 #if GT_CFG_ENABLE_ZK_FONT == 1
@@ -74,6 +77,23 @@ typedef enum {
     #endif
 #endif
 /* typedef --------------------------------------------------------------*/
+/**
+ * @brief The styles of the font display
+ */
+typedef enum gt_font_style_e {
+    GT_FONT_STYLE_NONE          = 0x00,     ///< default status
+    GT_FONT_STYLE_UNDERLINE     = 0x01,     ///< underline
+    GT_FONT_STYLE_STRIKETHROUGH = 0x02,     ///< strikethrough
+    GT_FONT_STYLE_BOLD          = 0x04,     // < bold
+    GT_FONT_STYLE_ITALIC        = 0x08,     // < italic
+}gt_font_style_et;
+typedef struct{
+    uint8_t underline : 1;
+    uint8_t strikethrough : 1;
+    uint8_t bold : 1;
+    uint8_t italic : 1;
+    uint8_t reserved : 4;
+}gt_font_style_st;
 
 typedef struct _gt_font_info_s {
     gt_color_t palette;  ///< set: font color
@@ -93,6 +113,14 @@ typedef struct _gt_font_info_s {
     uint8_t gray;        ///< set: font gray
     uint8_t encoding;    ///< set: font encoding
     int8_t offset_y;    ///< 0: [default] don't move; < 0: move up; > 0: move down
+
+    /* font style */
+    union
+    {
+        uint8_t all;
+        gt_font_style_st reg;
+    }style;
+
 }gt_font_info_st;
 
 /**
@@ -105,21 +133,11 @@ typedef struct _gt_font_s {
     gt_font_info_st info;
 }gt_font_st;
 
-/**
- * @brief The styles of the font display
- */
-typedef enum gt_font_style_e {
-    GT_FONT_STYLE_NONE          = 0x00,     ///< default status
-    GT_FONT_STYLE_UNDERLINE     = 0x01,     ///< underline
-    GT_FONT_STYLE_STRIKETHROUGH = 0x02,     ///< strikethrough
-}gt_font_style_et;
+
 
 typedef struct _gt_text_style_s {
     ///< 0[default]: Set the text beginning position by direct point, by start_x and start_y.
     uint8_t enabled_start   : 1;
-
-    ///< font style value @ref gt_font_style_et
-    uint8_t style           : 2;
 
     ///< 0[default]: multi-line, 1: single-line
     uint8_t single_line     : 1;
@@ -206,6 +224,8 @@ typedef enum _gt_font_lan_e {
     FONT_LAN_JAPANESE,
     FONT_LAN_KOREAN,
     FONT_LAN_NUMBER,
+    FONT_LAN_EMOTICON,
+    FONT_LAN_EMOJI,
     //
     FONT_LAN_MAX_COUNT,
     //
@@ -255,8 +275,22 @@ typedef enum {
     GT_FONT_CJK_J,
     GT_FONT_CJK_K,
 }gt_font_cjk_et;
-/* macros ---------------------------------------------------------------*/
 
+typedef struct gt_font_split_line_s {
+    char * text;
+    uint32_t len;
+    uint32_t max_w;
+    uint32_t start_w;
+    uint16_t space;
+    uint16_t indent;    /** the total width of indent which calc by font size */
+}gt_font_split_line_st;
+
+/* macros ---------------------------------------------------------------*/
+static GT_ATTRIBUTE_RAM_TEXT inline gt_size_t
+gt_font_get_indent_width(gt_font_info_st const * const font_info_p, uint16_t indent) {
+    if (NULL == font_info_p) { return 0; }
+    return (font_info_p->size >> 1) * indent;
+}
 
 
 /* global functions / API interface -------------------------------------*/
@@ -306,15 +340,6 @@ uint8_t gt_utf8_check_char(uint8_t * utf8);
  * @return _gt_font_dot_ret_st
  */
 _gt_font_dot_ret_st gt_font_get_dot(gt_font_st * font, uint32_t unicode);
-
-
-/**
- * @brief get string all width
- *
- * @param font string msg
- * @return uint32_t all width
- */
-uint32_t gt_font_get_string_width(gt_font_st * font);
 
 /**
  * @brief Get the width of a character
@@ -374,6 +399,9 @@ int gt_font_code_transform(font_convertor_st *convert);
 int gt_font_convertor_data_get(font_convertor_st *convert, uint32_t pos);
 #endif
 
+int32_t gt_font_split_line_str(const gt_font_st * fonts, uint32_t max_w, uint32_t space, uint32_t * width,
+                                gt_bidi_st** bidi, uint16_t* bidi_len, uint16_t* bidi_max, uint8_t * overlength,
+                                bool is_first_line);
 uint32_t gt_font_split(gt_font_st *fonts, uint32_t width, uint32_t dot_w, uint32_t space, uint32_t *ret_w, uint8_t * lan, uint32_t * lan_len);
 
 #if _GT_FONT_ENABLE_CONVERTOR
@@ -392,7 +420,7 @@ uint8_t right_to_left_lan_get(uint16_t style);
 uint8_t right_to_left_lan_get(gt_font_st* font);
 #endif
 
-uint32_t gt_font_split_line_numb(gt_font_info_st* info, const char * text, uint32_t max_w, uint32_t start_w, uint16_t space, uint32_t * ret_max_w);
+uint32_t gt_font_split_line_numb(gt_font_info_st* info, gt_font_split_line_st * sp_line, uint32_t * ret_max_w);
 
 
 #if _GT_FONT_GET_WORD_BY_TOUCH_POINT
@@ -413,9 +441,16 @@ uint16_t gt_font_get_word_byte_length(char const * const text, uint16_t length, 
 
 void gt_font_family_init(const gt_font_family_st* fam_list, uint16_t count);
 uint16_t gt_font_family_get_size(uint16_t fam);
-uint16_t gt_font_family_get_option(uint16_t fam , int16_t lan, uint8_t cjk);
+uint16_t gt_font_family_get_option(uint16_t fam, int16_t lan, uint8_t cjk);
 bool gt_font_family_is_one_style(uint16_t fam);
 void gt_font_set_family(gt_font_info_st *font_info, gt_family_t fam);
+/**
+ * @brief
+ *
+ * @param font_size
+ * @return gt_size_t -1: illegal font size, not found id.
+ */
+gt_size_t gt_font_family_get_id_by(uint16_t font_size);
 
 uint16_t gt_encoding_convert(const uint8_t *src, uint16_t src_len, uint8_t* dst, uint16_t dst_len, gt_encoding_convert_et enc_cov);
 

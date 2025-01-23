@@ -191,7 +191,7 @@ esp_err_t get_historical_message_http()
     char urlString[255] = {0};
     sprintf(urlString, "https://api.mindcraft.com.cn/v1/message/?size=%d&session_token=%s",HISTORY_GROUP_COUNT*2, receive_buf);
     esp_http_client_config_t config = {
-        .url = urlString,//"https://api.mindcraft.com.cn/v1/message/?size=3&session_token=868f5d40-a4a7-49c0-a283-09a57d992f11",
+        .url = urlString,
         .user_data = NULL,//local_response_buffer,        // Pass address of local buffer to get response
         .buffer_size = 1024,
         .disable_auto_redirect = true,

@@ -9,6 +9,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 include_directories($ENV{IDF_PATH}/examples/common_components/protocol_examples_common/include)
 include_directories($ENV{IDF_PATH}/components/esp_http_client/include)
+include_directories($ENV{IDF_PATH}/components/esp_websocket_client/include)
 
 include_directories($ENV{ADF_PATH}/components/input_key_service/include)
 include_directories($ENV{ADF_PATH}/components/esp-adf-libs/esp_codec/include)

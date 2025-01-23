@@ -10,6 +10,8 @@ static gt_obj_st * lab1 = NULL;
 static gt_obj_st * btn1 = NULL;
 static gt_obj_st * lab2 = NULL;
 static gt_obj_st * btn2 = NULL;
+static gt_obj_st * btn_emotion = NULL;
+static gt_obj_st * lab_emotion = NULL;
 static gt_obj_st * lab4 = NULL;
 static gt_obj_st * lab5 = NULL;
 static gt_obj_st * btn3 = NULL;
@@ -25,7 +27,7 @@ static uint8_t funct_list_option = AI_SETTING_NONE;
 
 static void screen_setup_0_cb(gt_event_st * e) {
 	funct_list_option = AI_SETTING_NONE;
-    gt_scr_id_t * pre_screen_id = gt_scr_stack_get_prev_id();
+    gt_scr_id_t pre_screen_id = gt_scr_stack_get_prev_id();
     ESP_LOGI(TAG,"--------------------pre_screen_id = %d\n", pre_screen_id);
     if (pre_screen_id == GT_ID_SCREEN_SETUP)
     {
@@ -294,6 +296,7 @@ static uint8_t get_func_funct_list_option(gt_obj_st* obj)
 
 	if(obj == btn1) return AI_SETTING_MODEL;
 	else if(obj == btn2) return AI_SETTING_REPLY_STYLE;
+	else if(obj == btn_emotion) return AI_SETTING_EMOTION_VALUE;
 	return AI_SETTING_NONE;
 }
 
@@ -312,7 +315,14 @@ static void disp_list_cb(gt_event_st * e) {
 		return;
 	}
 
-	gt_obj_set_pos(list1, x, y+h+3);
+	printf("tmp_option = %d\r\n",tmp_option);
+	if(AI_SETTING_EMOTION_VALUE == tmp_option){
+		gt_obj_set_pos(list1, x, y-3-list1->area.h);
+		printf("y = %d\r\n", y-3-list1->area.h);
+	}
+	else{
+		gt_obj_set_pos(list1, x, y+h+3);
+	}
 
 	if(funct_list_option == tmp_option){
 		gt_obj_set_visible(list1, !visible);
@@ -347,7 +357,10 @@ static void list_item_cb(gt_event_st * e) {
 			gt_btn_set_text(btn2, " %s", selectedItem);
 			sprintf(cb_data.settings->bot_response_style, "%s", gt_reply_style_en_string_get(selectedItem));
 			break;
-
+		case AI_SETTING_EMOTION_VALUE:
+			gt_btn_set_text(btn_emotion, " %s", selectedItem);
+			sprintf(cb_data.settings->emotion_value, "%s", selectedItem);
+			break;
 		default:
 			break;
 	}
@@ -454,6 +467,29 @@ gt_obj_st * gt_init_Function_settings(void)
 	gt_label_set_font_align(lab5, GT_ALIGN_CENTER_MID);
 	gt_label_set_text(lab5, "最大输出：");
 
+	lab_emotion = gt_label_create(Function_settings);
+	gt_obj_set_pos(lab_emotion, 12, 320);
+	gt_obj_set_size(lab_emotion, 84, 23);
+	gt_label_set_font_color(lab_emotion, gt_color_hex(0x94a5b3));
+	gt_label_set_font_family(lab_emotion, gray_black_16);
+	gt_label_set_font_cjk(lab_emotion, 0);
+	gt_label_set_font_align(lab_emotion, GT_ALIGN_CENTER_MID);
+	gt_label_set_text(lab_emotion, "情绪识别：");
+
+	btn_emotion = gt_btn_create(Function_settings);
+	gt_obj_set_pos(btn_emotion, 12, 350);
+	gt_obj_set_size(btn_emotion, 217, 36);
+	gt_btn_set_font_color(btn_emotion, gt_color_hex(0x4193fb));
+	gt_btn_set_font_family(btn_emotion, gray_black_16);
+	gt_btn_set_font_cjk(btn_emotion, 0);
+	gt_btn_set_font_align(btn_emotion, GT_ALIGN_LEFT_MID);
+	gt_btn_set_text(btn_emotion, " %s", cb_data.settings->emotion_value);
+	gt_btn_set_color_background(btn_emotion, gt_color_hex(0x181b22));
+	gt_btn_set_color_pressed(btn_emotion, gt_color_hex(0x00a8ff));
+	gt_btn_set_font_color_pressed(btn_emotion, gt_color_hex(0x000000));
+	gt_btn_set_radius(btn_emotion, 6);
+	gt_obj_add_event_cb(btn_emotion, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+
 
 #if 0
 	/** btn3 */
@@ -542,7 +578,7 @@ gt_obj_st * gt_init_Function_settings(void)
 	list1 = gt_listview_create(Function_settings);
 	gt_obj_set_pos(list1, 19, 180);
 	gt_obj_set_size(list1, 216, 80);
-	gt_listview_set_font_color(list1, gt_color_hex(0xcadded));
+	// gt_listview_set_font_color(list1, gt_color_hex(0xcadded));
 	gt_listview_set_font_family(list1, gray_black_16);
 	gt_listview_set_font_cjk(list1, 0);
 	gt_listview_set_font_align(list1, GT_ALIGN_CENTER_MID);
@@ -551,7 +587,8 @@ gt_obj_st * gt_init_Function_settings(void)
 	gt_listview_set_border_width(list1, 1);
 	gt_listview_set_septal_line(list1, 0);
 	gt_listview_set_highlight_mode(list1, 1);
-	gt_listview_set_bg_color(list1, gt_color_hex(0x1d2026));
+	// gt_listview_set_bg_color(list1, gt_color_hex(0x1d2026));
+	gt_listview_set_bg_color(list1, gt_color_hex(0xffffff));
 	gt_listview_set_item_reduce(list1, 2);
 	gt_listview_set_item_radius(list1, 6);
 	gt_listview_set_scale(list1, 25, 75);

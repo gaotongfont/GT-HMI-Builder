@@ -19,13 +19,38 @@ extern "C" {
 #include "../gt_conf.h"
 #include "string.h"
 #include "../others/gt_log.h"
+#include "../others/gt_types.h"
 
 /* define ---------------------------------------------------------------*/
+
+#ifdef GT_ARCH_64
+    #define MEM_UNIT        uint64_t
+    #define ALIGN_MASK      0x07
+#else
+    #define MEM_UNIT        uint32_t
+    #define ALIGN_MASK      0x03
+#endif
 
 
 
 /* typedef --------------------------------------------------------------*/
+/**
+ * @brief
+ *
+ * @param start Get the start address of the memory pool
+ * @param end Get the end address of the memory pool
+ * @param current Get the current address of the memory pool
+ * @param used Get the used memory of the memory pool
+ * @param blocks Get the using blocks of the memory pool
+ */
+typedef struct gt_mem_info_s {
+    MEM_UNIT start;
+    MEM_UNIT end;
+    MEM_UNIT current;
 
+    MEM_UNIT used;          /** current used memory when enabled @ref USE_MEM_REAL_USED_REMARK */
+    MEM_UNIT blocks;        /** current using block count when enabled @ref USE_MEM_REAL_USED_REMARK */
+}gt_mem_info_st;
 
 
 /* macros ---------------------------------------------------------------*/
@@ -43,6 +68,17 @@ void gt_mem_init(void);
  */
 void gt_mem_deinit(void);
 
+#if GT_MEM_CUSTOM_POINTER
+/**
+ * @brief Set the memory pool pointer, The memory size is defined
+ *      by GT_MEM_SIZE and must be aligned with MEM_UNIT bytes
+ *      [Warning: This function must be called before gt_init()]
+ *
+ * @param pool_pointer The memory size is defined by GT_MEM_SIZE
+ *      and must be aligned with MEM_UNIT bytes
+ */
+void gt_mem_set_pool_pointer(char * pool_pointer);
+#endif
 /**
  * @brief malloc memory
  *
@@ -122,6 +158,12 @@ int gt_memcmp(const void * dst, const void * src, size_t size);
 
 void gt_mem_check_used(void);
 
+/**
+ * @brief Get the memory pool address space
+ *
+ * @param mem_info Get the memory pool information
+ */
+void gt_mem_heap_get_space(gt_mem_info_st * mem_info);
 
 #define gt_mem_malloc(size) _mem_malloc(size, _GT_LOG_PRINT_FILE, __func__, __LINE__)
 #define gt_mem_realloc(ptr, size) _mem_realloc(ptr, size, _GT_LOG_PRINT_FILE, __func__, __LINE__)

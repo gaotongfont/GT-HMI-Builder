@@ -25,25 +25,34 @@
 #include "gt_pipe_send.h"
 #include "gt_record_http.h"
 
-#define USE_HTTP_STREAM 01 //使用流式代码宏,1:流式，0:非流式
+#define USE_HTTP_STREAM 1 //使用流式代码宏,1:流式，0:非流式
 
 typedef struct{
 //AI SETTINGS
     char emotion_output[10];
-    int  user_age;
-    char bot_name[10];
-    char bot_character[20];
-    char bot_personality[10];
     char output_format[10];
-    char voice_id[60];
-    char bot_description[120];
+
+    char user_name[120];
+    int  user_age;
+
+    char bot_name[10];
+    char bot_description[250];
+    char voice_id[80];
+    char *bot_personality[4];
+    char bot_tone[200];
+
+    // char bot_personality[10];
+    char bot_character[20];             //not used
+
 //FUNCT SETTING
     char mode[30];
     char bot_response_style[15];
     int max_output_size;
+    char emotion_value[10];
 }SendSettingsData;
 
 typedef struct{
+    char *socket_type;
     char *llm_response;
     char *emotion_value;
     char *tts_audio;

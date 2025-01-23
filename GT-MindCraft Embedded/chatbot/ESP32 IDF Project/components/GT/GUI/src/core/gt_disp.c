@@ -158,9 +158,8 @@ static GT_ATTRIBUTE_RAM_TEXT void _check_and_copy_foreach(gt_obj_st * obj, _flus
     uint16_t idx = 0;
     gt_obj_st * child_p = NULL;
     gt_area_st area_cross = area_parent;
-    gt_area_st reduce = gt_area_reduce(obj->area, gt_obj_get_reduce(obj));
 
-    if (false == gt_area_cover_screen(&area_parent, &reduce, &area_cross)) {
+    if (false == gt_area_cover_screen(&area_parent, &obj->area, &area_cross)) {
         if (GT_TYPE_GROUP != gt_obj_class_get_type(obj)) {
             /** The Group ignores the area effects */
             return ;
@@ -219,9 +218,6 @@ static GT_ATTRIBUTE_RAM_TEXT void _scr_anim_del_ready_cb(struct gt_anim_s * anim
     gt_obj_st * old_scr = (gt_obj_st * )anim->tar;
     old_scr->using_sta = 0;
     _gt_obj_class_destroy(old_scr);
-// #if GT_USE_UD_LR_TO_CONTROL_FOCUS_EN
-//     gt_indev_release_focus_lock();
-// #endif
 }
 
 #if GT_USE_SCREEN_ANIM
@@ -233,6 +229,8 @@ static GT_ATTRIBUTE_RAM_TEXT void _scr_anim_start_cb(struct gt_anim_s * anim) {
     /** Remark the begin status prev and scr position */
     disp->anim_scr_remark.x = disp->scr_act->area.x;
     disp->anim_scr_remark.y = disp->scr_act->area.y;
+
+    gt_event_send(disp->scr_act, GT_EVENT_TYPE_SCREEN_LOAD_BEFORE, NULL);
 
     /** Can not calling other event by all of input device */
     gt_indev_set_enabled(false);
@@ -883,6 +881,7 @@ gt_scr_id_t gt_disp_stack_go_back(gt_stack_size_t step)
 #if _GT_STACK_USE_LOADING_LOG
         GT_LOGD(GT_LOG_TAG_GUI, "layer[%d] = new_scr[0x%X = %d]", gt_scr_stack_get_count(), new_item.current_scr_id, new_item.current_scr_id);
 #endif
+        gt_event_send(new_item.current_scr, GT_EVENT_TYPE_SCREEN_BEFORE_GO_BACK, NULL);
         gt_disp_load_scr_anim(new_item.current_scr, new_item.anim_type, new_item.time, new_item.delay, true);
     }
 
@@ -1071,6 +1070,7 @@ void gt_disp_load_scr_anim(gt_obj_st * scr, gt_scr_anim_type_et type, uint32_t t
 #if GT_USE_UD_LR_TO_CONTROL_FOCUS_EN
         gt_indev_release_focus_lock();
 #endif
+        gt_event_send(scr, GT_EVENT_TYPE_SCREEN_LOAD_BEFORE, NULL);
         gt_disp_ref_area(&disp->area_act);
 
         if (del_prev_scr && scr_old && scr_old != scr) {
@@ -1365,7 +1365,7 @@ void gt_disp_invalid_area(gt_obj_st * obj)
         obj->area.w = gt_disp_get_res_hor(NULL);
         obj->area.h = gt_disp_get_res_ver(NULL);
     }
-    gt_area_st invalid = obj->area;
+    gt_area_st invalid = gt_area_reduce(obj->area, -(gt_obj_get_focus_offset_value(obj)));
 #if GT_USE_LAYER_TOP
     gt_obj_st * top = gt_disp_get_layer_top();
 

@@ -54,7 +54,7 @@ static GT_ATTRIBUTE_RAM_DATA const gt_obj_class_st gt_option_class = {
  * @param obj
  */
 static void _init_cb(gt_obj_st * obj) {
-    GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
+    // GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
 
 }
 

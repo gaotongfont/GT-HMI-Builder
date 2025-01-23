@@ -343,15 +343,15 @@ static GT_ATTRIBUTE_RAM_TEXT inline void _indev_scroll_throw_handler_anim_start(
         _indev_scroll_throw_reset(indev);
         return ;
     }
-    gt_anim_st anim;
-    gt_anim_init(&anim);
-    gt_anim_set_target(&anim, indev);
-    gt_anim_set_value(&anim, 0, 1024);
-    gt_anim_set_time(&anim, 1024);
-    gt_anim_set_exec_cb(&anim, _indev_scroll_throw_exec_cb);
-    gt_anim_set_ready_cb(&anim, _indev_scroll_throw_ready_cb);
-    gt_anim_set_deleted_cb(&anim, _indev_scroll_throw_deleted_cb);
-    indev->scroll_throw_anim = gt_anim_start(&anim);
+    // gt_anim_st anim;
+    // gt_anim_init(&anim);
+    // gt_anim_set_target(&anim, indev);
+    // gt_anim_set_value(&anim, 0, 1024);
+    // gt_anim_set_time(&anim, 1024);
+    // gt_anim_set_exec_cb(&anim, _indev_scroll_throw_exec_cb);
+    // gt_anim_set_ready_cb(&anim, _indev_scroll_throw_ready_cb);
+    // gt_anim_set_deleted_cb(&anim, _indev_scroll_throw_deleted_cb);
+    // indev->scroll_throw_anim = gt_anim_start(&anim);
 }
 
 /**
@@ -753,7 +753,7 @@ static GT_ATTRIBUTE_RAM_TEXT void _gt_indev_handler_keypad(gt_indev_st* indev) {
         _indev_params.param.keypad_key = indev->data.keypad.key;
 #if GT_USE_LAYER_TOP
         if (_kp_is_global_key_value(indev->data.keypad.key) && gt_global_get_event_count()) {
-            _gt_global_core_indev_event_send(GT_EVENT_TYPE_INPUT_KEY_RELEASED, &_indev_params);
+            _gt_global_core_indev_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY_RELEASED, &_indev_params);
         }
 #endif
         gt_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY_RELEASED, &_indev_params);
@@ -845,7 +845,7 @@ _key_pressed:
                 return ;
             }
             if (_kp_is_global_key_value(indev->data.keypad.key) && gt_global_get_event_count()) {
-                _gt_global_core_indev_event_send(GT_EVENT_TYPE_INPUT_KEY, &_indev_params);
+                _gt_global_core_indev_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY, &_indev_params);
             }
 #endif
             gt_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY, &_indev_params);
@@ -938,7 +938,7 @@ _key_pressing:
 
 #if GT_USE_LAYER_TOP
                 if (_kp_is_global_key_value(indev->data.keypad.key) && gt_global_get_event_count()) {
-                    _gt_global_core_indev_event_send(GT_EVENT_TYPE_INPUT_KEY_PRESSING, &_indev_params);
+                    _gt_global_core_indev_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY_PRESSING, &_indev_params);
                 }
 #endif
                 gt_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY_PRESSING, &_indev_params);
@@ -960,7 +960,7 @@ _key_pressing:
         _indev_params.param.keypad_key = indev->data.keypad.key;
 #if GT_USE_LAYER_TOP
         if (_kp_is_global_key_value(indev->data.keypad.key) && gt_global_get_event_count()) {
-            _gt_global_core_indev_event_send(GT_EVENT_TYPE_INPUT_KEY_LONG_PRESSED, &_indev_params);
+            _gt_global_core_indev_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY_LONG_PRESSED, &_indev_params);
         }
 #endif
         gt_event_send(indev->data.keypad.obj_origin, GT_EVENT_TYPE_INPUT_KEY_LONG_PRESSED, &_indev_params);

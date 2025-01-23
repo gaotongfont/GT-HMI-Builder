@@ -1,5 +1,6 @@
 #include "gt_ui.h"
 #include "gt_font_config.h"
+#include "gt_websocket.h"
 
 static const char *TAG = "SCREEN_SETUP";
 
@@ -27,6 +28,11 @@ static gt_obj_st * imgbtn9CopyCopy = NULL;
 static gt_obj_st * imgbtn10 = NULL;
 static gt_obj_st * imgbtn11 = NULL;
 
+static gt_obj_st * btn_personality[4] = {NULL};
+static gt_obj_st * txt_tone = NULL;
+
+uint32_t btn_bgcolor_hex[4] = {0x452a0d, 0x48420c, 0x063e04, 0x2c4405};
+uint32_t btn_font_color_hex[4] = {0xd4731d, 0xe0c324, 0x2d9b14, 0x7bc004};
 /* -------------------------------------------------------------------------- */
 static gt_obj_st* go_back_rect = NULL;
 static gt_obj_st* list1 = NULL;
@@ -35,18 +41,40 @@ static uint8_t list_option = AI_SETTING_NONE;
 static uint8_t get_list_option(gt_obj_st* obj)
 {
 	if(!obj) return AI_SETTING_NONE;
-
+#if 0
 	if(obj == btn2) return AI_SETTING_AGE;
 	else if(obj == btn4) return AI_SETTING_ROLE;
 	else if(obj == btn5) return AI_SETTING_CHAR;
 	else if(obj == btn3) return AI_SETTING_TIMBRE;
 	else if(obj == btn1) return AI_SETTING_AI_NAME;
+#else
+	if(obj == btn3) return AI_SETTING_AGE;
+	else if(obj == btn2) return AI_SETTING_USER_NAME;
+	else if(obj == btn1) return AI_SETTING_AI_NAME;
+#endif
 	return AI_SETTING_NONE;
 }
 
 static void go_back_to_previous_page(gt_event_st * e) {
 	list_option = AI_SETTING_NONE;
 	gt_disp_stack_go_back(1);
+    if (strcmp(cb_data.settings->bot_name, "小智") == 0)
+    {
+        set_emote_data_to_ram(AI_EMOTE_XIAOZHI_DISGUST);
+        set_emote_data_to_ram(AI_EMOTE_XIAOZHI_FEAR);
+        // set_emote_data_to_ram(AI_EMOTE_XIAOZHI_SADNESS);
+        set_emote_data_to_ram(AI_EMOTE_XIAOZHI_SURPRISE);
+        set_emote_data_to_ram(AI_EMOTE_XIAOZHI_ANGER);
+        set_emote_data_to_ram(AI_EMOTE_XIAOZHI_HAPPY);
+    } else if (strcmp(cb_data.settings->bot_name, "菜机") == 0)
+    {
+        set_emote_data_to_ram(AI_EMOTE_CAIJI_DISGUST);
+        set_emote_data_to_ram(AI_EMOTE_CAIJI_FEAR);
+        // set_emote_data_to_ram(AI_EMOTE_CAIJI_SADNESS);
+        set_emote_data_to_ram(AI_EMOTE_CAIJI_SURPRISE);
+        set_emote_data_to_ram(AI_EMOTE_CAIJI_ANGER);
+        set_emote_data_to_ram(AI_EMOTE_CAIJI_HAPPY);
+    }
 }
 /**
  * @brief 按钮点击回调，根据点击对象，给列表设置不同的选项内容与显示位置
@@ -66,7 +94,7 @@ static void disp_list_cb(gt_event_st * e) {
 		return;
 	}
 
-	if(AI_SETTING_AGE == tmp_option || AI_SETTING_ROLE == tmp_option || AI_SETTING_CHAR == tmp_option){
+	if(AI_SETTING_AGE == tmp_option || AI_SETTING_USER_NAME == tmp_option){
 		gt_obj_set_pos(list1, x, y-3-list1->area.h);
 	}
 	else{
@@ -102,14 +130,43 @@ static void list_item_cb(gt_event_st * e) {
 			gt_btn_set_text(btn1, " %s", selectedItem);
 			sprintf(cb_data.settings->bot_name, "%s", selectedItem);
 
-			sprintf(cb_data.settings->bot_description, "%s", gt_bot_description_string_get(selectedItem));
+            gt_ai_bot_role_st ai_bot_role_info = gt_get_ai_bot_infos(cb_data.settings->bot_name);
+            memcpy(cb_data.settings->bot_personality, ai_bot_role_info.personality, sizeof(ai_bot_role_info.personality));
+            for (size_t i = 0; i < 4; i++)
+            {
+                gt_btn_set_text(btn_personality[i], cb_data.settings->bot_personality[i]);
+            }
+			sprintf(cb_data.settings->bot_description, "%s", ai_bot_role_info.character_desc);
             gt_textarea_set_text(txt1, cb_data.settings->bot_description);
+
+			sprintf(cb_data.settings->voice_id, "%s", ai_bot_role_info.voice_id);
+			gt_btn_set_text(btn4, " %s", gt_timber_string_get(cb_data.settings->voice_id));
+
+            sprintf(cb_data.settings->bot_tone, "%s", ai_bot_role_info.tone);
+            gt_textarea_set_text(txt_tone, cb_data.settings->bot_tone);
+
+            gt_websocket_client_clear_history_message();
+
+            if (strcmp(cb_data.settings->bot_name, "小智") == 0)
+            {
+                set_emote_data_to_ram(AI_EMOTE_XIAOZHI_NEUTRAL);
+                set_emote_data_to_ram(AI_EMOTE_XIAOZHI_SADNESS);
+            } else if (strcmp(cb_data.settings->bot_name, "菜机") == 0)
+            {
+                set_emote_data_to_ram(AI_EMOTE_CAIJI_NEUTRAL);
+                set_emote_data_to_ram(AI_EMOTE_CAIJI_SADNESS);
+            }
 
 			break;
 		case AI_SETTING_AGE:
-			gt_btn_set_text(btn2, " %s", selectedItem);
+			gt_btn_set_text(btn3, " %s", selectedItem);
 			cb_data.settings->user_age = atoi(selectedItem);
 			break;
+		case AI_SETTING_USER_NAME:
+			gt_btn_set_text(btn2, " %s", selectedItem);
+			sprintf(cb_data.settings->user_name, "%s", selectedItem);
+			break;
+#if 0
     	case AI_SETTING_TIMBRE:
 			gt_btn_set_text(btn3, " %s", selectedItem);
 			sprintf(cb_data.settings->voice_id, "%s", gt_vocie_id_string_get(selectedItem));
@@ -122,7 +179,7 @@ static void list_item_cb(gt_event_st * e) {
 			gt_btn_set_text(btn5, " %s", selectedItem);
 			sprintf(cb_data.settings->bot_personality, "%s", selectedItem);
 			break;
-
+#endif
 		default:
 			break;
 	}
@@ -230,7 +287,7 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_family(btn2, gray_black_16);
 	gt_btn_set_font_cjk(btn2, 0);
 	gt_btn_set_font_align(btn2, GT_ALIGN_LEFT_MID);
-    gt_btn_set_text(btn2, " %d", cb_data.settings->user_age);
+    gt_btn_set_text(btn2, " %s", cb_data.settings->user_name);
 	gt_btn_set_color_background(btn2, gt_color_hex(0x181b22));
 	gt_btn_set_color_pressed(btn2, gt_color_hex(0x00a8ff));
 	gt_btn_set_font_color_pressed(btn2, gt_color_hex(0x000000));
@@ -248,7 +305,7 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_label_set_font_family(lab4, gray_black_16);
 	gt_label_set_font_cjk(lab4, 0);
 	gt_label_set_font_align(lab4, GT_ALIGN_CENTER_MID);
-	gt_label_set_text(lab4, "用户年龄：");
+	gt_label_set_text(lab4, "用户昵称：");
 
 
 
@@ -260,7 +317,7 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_label_set_font_family(lab5, gray_black_16);
 	gt_label_set_font_cjk(lab5, 0);
 	gt_label_set_font_align(lab5, GT_ALIGN_CENTER_MID);
-	gt_label_set_text(lab5, "音色设定：");
+	gt_label_set_text(lab5, "用户年龄：");
 
 
 
@@ -272,7 +329,7 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_family(btn3, gray_black_16);
 	gt_btn_set_font_cjk(btn3, 0);
 	gt_btn_set_font_align(btn3, GT_ALIGN_LEFT_MID);
-    gt_btn_set_text(btn3, " %s", gt_timber_string_get(cb_data.settings->voice_id));
+    gt_btn_set_text(btn3, " %d", cb_data.settings->user_age);
 	gt_btn_set_color_background(btn3, gt_color_hex(0x181b22));
 	gt_btn_set_color_pressed(btn3, gt_color_hex(0x00a8ff));
 	gt_btn_set_font_color_pressed(btn3, gt_color_hex(0x000000));
@@ -317,7 +374,7 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_label_set_font_family(lab6, gray_black_16);
 	gt_label_set_font_cjk(lab6, 0);
 	gt_label_set_font_align(lab6, GT_ALIGN_LEFT_MID);
-	gt_label_set_text(lab6, "角色设定：");
+	gt_label_set_text(lab6, "音色设定：");
 
 
 
@@ -329,21 +386,21 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_btn_set_font_family(btn4, gray_black_16);
 	gt_btn_set_font_cjk(btn4, 0);
 	gt_btn_set_font_align(btn4, GT_ALIGN_LEFT_MID);
-    gt_btn_set_text(btn4, " %s", cb_data.settings->bot_character);
+    gt_btn_set_text(btn4, " %s", gt_timber_string_get(cb_data.settings->voice_id));
 	gt_btn_set_color_background(btn4, gt_color_hex(0x181b22));
 	gt_btn_set_color_pressed(btn4, gt_color_hex(0x00a8ff));
 	gt_btn_set_font_color_pressed(btn4, gt_color_hex(0x000000));
 	gt_btn_set_radius(btn4, 6);
-	gt_obj_add_event_cb(btn4, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+	// gt_obj_add_event_cb(btn4, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
     gt_obj_set_fixed(btn4, true);
 
 
-	/** imgbtn9Copy */
-	imgbtn9Copy = gt_imgbtn_create(screen_setup);
-	gt_obj_set_pos(imgbtn9Copy, 198, 417);
-	gt_obj_set_size(imgbtn9Copy, 27, 20);
-	gt_imgbtn_set_src(imgbtn9Copy, "f:img_down1_27x20.png");
-	gt_imgbtn_add_state_item(imgbtn9Copy, "f:img_up1_27x20.png");
+	// /** imgbtn9Copy */
+	// imgbtn9Copy = gt_imgbtn_create(screen_setup);
+	// gt_obj_set_pos(imgbtn9Copy, 198, 417);
+	// gt_obj_set_size(imgbtn9Copy, 27, 20);
+	// gt_imgbtn_set_src(imgbtn9Copy, "f:img_down1_27x20.png");
+	// gt_imgbtn_add_state_item(imgbtn9Copy, "f:img_up1_27x20.png");
 
 
 
@@ -358,7 +415,7 @@ gt_obj_st * gt_init_screen_setup(void)
     gt_textarea_set_text(txt1, cb_data.settings->bot_description);
 	gt_textarea_set_bg_color(txt1, gt_color_hex(0x181b22));
     gt_textarea_set_border_color(txt1, gt_color_hex(0x272d38));
-    gt_obj_set_fixed(txt1, true);
+    // gt_obj_set_fixed(txt1, true);
 
 
 	/** lab7 */
@@ -373,35 +430,70 @@ gt_obj_st * gt_init_screen_setup(void)
 
 
 
-	/** btn5 */
-	btn5 = gt_btn_create(screen_setup);
-	gt_obj_set_pos(btn5, 12, 479);
-	gt_obj_set_size(btn5, 216, 36);
-	gt_btn_set_font_color(btn5, gt_color_hex(0x4193fb));
-	gt_btn_set_font_family(btn5, gray_black_16);
-	gt_btn_set_font_cjk(btn5, 0);
-	gt_btn_set_font_align(btn5, GT_ALIGN_LEFT_MID);
-	gt_btn_set_text(btn5, " %s", cb_data.settings->bot_personality);
-	gt_btn_set_color_background(btn5, gt_color_hex(0x181b22));
-	gt_btn_set_color_pressed(btn5, gt_color_hex(0x00a8ff));
-	gt_btn_set_font_color_pressed(btn5, gt_color_hex(0x000000));
-	gt_btn_set_radius(btn5, 6);
-	gt_obj_add_event_cb(btn5, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
-    gt_obj_set_fixed(btn5, true);
+	// /** btn5 */
+	// btn5 = gt_btn_create(screen_setup);
+	// gt_obj_set_pos(btn5, 12, 479);
+	// gt_obj_set_size(btn5, 216, 36);
+	// gt_btn_set_font_color(btn5, gt_color_hex(0x4193fb));
+	// gt_btn_set_font_family(btn5, gray_black_16);
+	// gt_btn_set_font_cjk(btn5, 0);
+	// gt_btn_set_font_align(btn5, GT_ALIGN_LEFT_MID);
+	// gt_btn_set_text(btn5, " %s", cb_data.settings->bot_personality);
+	// gt_btn_set_color_background(btn5, gt_color_hex(0x181b22));
+	// gt_btn_set_color_pressed(btn5, gt_color_hex(0x00a8ff));
+	// gt_btn_set_font_color_pressed(btn5, gt_color_hex(0x000000));
+	// gt_btn_set_radius(btn5, 6);
+	// gt_obj_add_event_cb(btn5, disp_list_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);
+    // gt_obj_set_fixed(btn5, true);
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        btn_personality[i] = gt_btn_create(screen_setup);
+	    gt_obj_set_pos(btn_personality[i], 12 + (50 + 5) * i, 480);
+	    gt_obj_set_size(btn_personality[i], 50, 35);
+        gt_btn_set_font_color(btn_personality[i], gt_color_hex(btn_font_color_hex[i]));
+        gt_btn_set_font_family(btn_personality[i], gray_black_16);
+	    gt_btn_set_font_cjk(btn_personality[i], 0);
+	    gt_btn_set_font_align(btn_personality[i], GT_ALIGN_CENTER_MID);
+        gt_btn_set_text(btn_personality[i], cb_data.settings->bot_personality[i]);
+	    gt_btn_set_color_background(btn_personality[i], gt_color_hex(btn_bgcolor_hex[i]));
+	    gt_btn_set_color_pressed(btn_personality[i], gt_color_hex(btn_bgcolor_hex[i]));
+	    gt_btn_set_font_color_pressed(btn_personality[i], gt_color_hex(btn_font_color_hex[i]));
+	    gt_btn_set_radius(btn_personality[i], 4);
+    }
 
 
-	/** imgbtn9CopyCopy */
-	imgbtn9CopyCopy = gt_imgbtn_create(screen_setup);
-	gt_obj_set_pos(imgbtn9CopyCopy, 198, 490);
-	gt_obj_set_size(imgbtn9CopyCopy, 27, 20);
-	gt_imgbtn_set_src(imgbtn9CopyCopy, "f:img_down1_27x20.png");
-	gt_imgbtn_add_state_item(imgbtn9CopyCopy, "f:img_up1_27x20.png");
+	/** lab7 */
+	lab7 = gt_label_create(screen_setup);
+	gt_obj_set_pos(lab7, 12, 527);
+	gt_obj_set_size(lab7, 90, 23);
+	gt_label_set_font_color(lab7, gt_color_hex(0x94a5b3));
+	gt_label_set_font_family(lab7, gray_black_16);
+	gt_label_set_font_cjk(lab7, 0);
+	gt_label_set_font_align(lab7, GT_ALIGN_LEFT_MID);
+	gt_label_set_text(lab7, "沟通风格");
+
+
+
+	/** txt_tone */
+	txt_tone = gt_textarea_create(screen_setup);
+	gt_obj_set_pos(txt_tone, 12, 549);
+	gt_obj_set_size(txt_tone, 217, 58);
+	gt_textarea_set_font_family(txt_tone, gray_black_16);
+	gt_textarea_set_font_cjk(txt_tone, 0);
+	gt_textarea_set_font_align(txt_tone, GT_ALIGN_LEFT);
+	gt_textarea_set_font_color(txt_tone, gt_color_hex(0x4193fb));
+    gt_textarea_set_text(txt_tone, cb_data.settings->bot_tone);
+	gt_textarea_set_bg_color(txt_tone, gt_color_hex(0x181b22));
+    gt_textarea_set_border_color(txt_tone, gt_color_hex(0x272d38));
+    // gt_obj_set_fixed(txt_tone, true);
+
 
 
 	list1 = gt_listview_create(screen_setup);
 	gt_obj_set_pos(list1, 19, 180);
 	gt_obj_set_size(list1, 216, 80);
-	gt_listview_set_font_color(list1, gt_color_hex(0xcadded));
+	// gt_listview_set_font_color(list1, gt_color_hex(0x191919));
 	gt_listview_set_font_family(list1, gray_black_16);
 	gt_listview_set_font_cjk(list1, 0);
 	gt_listview_set_font_align(list1, GT_ALIGN_CENTER_MID);
@@ -409,9 +501,9 @@ gt_obj_st * gt_init_screen_setup(void)
 	gt_listview_set_border_color(list1,gt_color_hex(0x454d5a));
 	gt_listview_set_border_width(list1, 1);
 	gt_listview_set_septal_line(list1, 0);
-	gt_listview_set_highlight_mode(list1, 1);
-	gt_listview_set_bg_color(list1, gt_color_hex(0x1d2026));
-	gt_listview_set_item_reduce(list1, 2);
+    gt_listview_set_highlight_mode(list1, false);
+	gt_listview_set_bg_color(list1, gt_color_hex(0xffffff));
+	gt_listview_set_item_reduce(list1, 0);
 	gt_listview_set_item_radius(list1, 6);
 	gt_listview_set_scale(list1, 25, 75);
 	gt_listview_set_scale_triple(list1, 20, 60, 20);

@@ -54,6 +54,11 @@
 #include "wifi.h"
 #include "freertos/queue.h"
 #include "audio_thread.h"
+#include "gt_role_emote.h"
+#include "gt_websocket.h"
+// #include "gt_i2s.h"
+#include "gt_audio_storage.h"
+#include "gt_pipeline_play.h"
 /* ------------------------------------------------------------------------ */
 #if USE_FUNC_LOCATE_DATA
 #include "zk_app.h"
@@ -78,6 +83,8 @@ QueueHandle_t mYxQueue2;
 QueueHandle_t mYxQueue3 = NULL;
 QueueHandle_t audio_uri_queue = NULL;
 #endif //!USE_HTTP_STREAM
+SemaphoreHandle_t tts_audio_sem = NULL;
+
 
 void print_memory_info(void) {
     // 获取总的空闲堆内存
@@ -90,7 +97,14 @@ void print_memory_info(void) {
     ESP_LOGW(">>> ","Total free heap size: %zu bytes", free_heap_size);
     ESP_LOGW(">>> ","Free internal heap size: %zu bytes", free_internal_heap_size);
     ESP_LOGW(">>> ","Free SPIRAM heap size: %zu bytes\n", free_spiram_heap_size);
+
+    if (heap_caps_check_integrity(MALLOC_CAP_INTERNAL, true)) {
+        ESP_LOGI("HEAP", "Heap integrity check passed");
+    } else {
+        ESP_LOGE("HEAP", "Heap integrity check failed");
+    }
 }
+
 
 /* ------------------------------------------------------------------------ */
 /**
@@ -201,7 +215,7 @@ unsigned long r_dat_bat(unsigned long address, unsigned long DataLen, unsigned c
     return 1;
 }
 
-#if USE_HTTP_STREAM
+#if 0//USE_HTTP_STREAM
 void gt_gui_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "--------------------------gt_gui_task\n");
@@ -253,7 +267,7 @@ void gt_gui_task(void *pvParameters)
         // vTaskDelay(1);
     }
 }
-#else //!USE_HTTP_STREAM
+#elif 0 //!USE_HTTP_STREAM
 void gt_gui_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "--------------------------gt_gui_task\n");
@@ -282,46 +296,248 @@ void gt_gui_task(void *pvParameters)
         // vTaskDelay(1);
     }
 }
+
+#elif 1
+void gt_gui_task(void *pvParameters)
+{
+    ESP_LOGI(TAG, "--------------------------gt_gui_task\n");
+    int received_msg = 0;
+    ReceivedAnswerData* receive_evt = NULL;
+    bool is_first_response = true;
+    while(1){
+        gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+        if (xQueueReceive(mYxQueue3, &receive_evt, 1) == pdPASS)
+        {
+            if (receive_evt != NULL/*received_msg >= 0 && received_msg < 6*//*ESP_OK == received_msg*/)
+            {
+                ESP_LOGI(TAG,"receive != NULL  receive_evt = %s", receive_evt->llm_response);
+                ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+                if(is_first_response == true)
+                {
+                    if (screen_id != GT_ID_SCREEN_SUBTITLE)
+                    {
+                        gt_disp_stack_load_scr_anim(GT_ID_SCREEN_SUBTITLE, GT_SCR_ANIM_TYPE_NONE, 50, 0, true);
+                        is_first_response = false;
+                    }
+                }
+
+
+                update_subtitles(receive_evt);
+                if(receive_evt != NULL)
+                {
+                    audio_free(receive_evt);
+                    receive_evt = NULL;
+                    ESP_LOGI(TAG, "free receive_evt!!!!!!!!!!!!");
+                }
+                // audio_free(receive_evt->socket_type);
+                // receive_evt->socket_type = NULL;
+                // audio_free(receive_evt->tts_audio);
+                // receive_evt->tts_audio = NULL;
+                // audio_free(receive_evt->emotion_value);
+                // receive_evt->emotion_value = NULL;
+                // audio_free(receive_evt->llm_response);
+                // receive_evt->llm_response = NULL;
+
+            }
+            else
+            {
+                //切换语音识别失败时的ui
+                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                ESP_LOGI(TAG,">>1---------------screen_id: %d\n",screen_id);
+                if ( screen_id == GT_ID_SCREEN_HOME )
+                {
+                    identification_failed_ui();
+                } else if ( screen_id == GT_ID_SCREEN_SUBTITLE ){
+                    identifying_failed_ui_in_subtitle();
+                }
+            }
+        }
+        if (xQueueReceive(mYxQueue2, &received_msg, 1) == pdPASS) {
+            ESP_LOGI(TAG, "mYxQueue2-------------------received_msg = %d\n", received_msg);
+            if (ESP_FAIL == received_msg) {
+                //切换语音识别失败时的ui
+                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+                ESP_LOGI(TAG,">>2---------------screen_id: %d\n",screen_id);
+                if ( screen_id == GT_ID_SCREEN_HOME )
+                {
+                    identification_failed_ui();
+                } else if ( screen_id == GT_ID_SCREEN_SUBTITLE ){
+                    identifying_failed_ui_in_subtitle();
+                }
+            }
+        }
+        gt_task_handler();
+    }
+}
 #endif //!USE_HTTP_STREAM
 
 /* ------------------------------------------------------------------------ */
-#if USE_HTTP_STREAM
+#if 0
+// void gt_streamAudio_task()
+// {
+//     ESP_LOGI(TAG, "-------------------gt_StreamAudio_task\n");
+//     int audio_status = -1;
+//     ReceivedAnswerData* receive_evt = NULL;
+//     while(1)
+//     {
+//         audio_status = gt_audio_player_state_get();
+//         ESP_LOGI(TAG,"audio_status ============== %d\n",audio_status);
+//         if (audio_status != AUDIO_STATUS_RUNNING) {
+//             if (audio_uri_queue != NULL && xQueueReceive(audio_uri_queue, &receive_evt, portMAX_DELAY) == pdPASS) {
+//                 gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+//                 ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+
+//                 if (screen_id == GT_ID_SCREEN_SUBTITLE || screen_id == GT_ID_SCREEN_SETUP)
+//                 {
+//                     update_subtitles(receive_evt);
+//                     gt_audio_player_start("http://api.mindcraft.com.cn/v1/data/stream_tts/0a9680fee19345af97ecb450b9d2b281/");
+//                     // gt_audio_player_start(receive_evt->tts_audio);
+
+//                     audio_free(receive_evt->tts_audio);
+//                     receive_evt->tts_audio = NULL;
+
+//                     audio_free(receive_evt->emotion_value);
+//                     receive_evt->emotion_value = NULL;
+
+//                     audio_free(receive_evt->llm_response);
+//                     receive_evt->llm_response = NULL;
+//                 } else {
+//                     audio_free(receive_evt);
+//                     receive_evt = NULL;
+//                 }
+//             }
+//         }
+//         vTaskDelay(500);  // 延迟100ms，避免过度占用CPU
+//     }
+// }
+
+#elif 1
 void gt_streamAudio_task()
 {
     ESP_LOGI(TAG, "-------------------gt_StreamAudio_task\n");
     int audio_status = -1;
+    bool isFinishing = false, startListen = false;
     ReceivedAnswerData* receive_evt = NULL;
+    audio_event_iface_msg_t* msg = NULL;
+    msg = get_iface_msg(gt_pipeline_single());
+    GTPIPELINE* gt_pipeline_obj = gt_pipeline_single();
     while(1)
     {
-        audio_status = gt_audio_player_state_get();
-        ESP_LOGI(TAG,"audio_status ============== %d\n",audio_status);
-        if (audio_status != AUDIO_STATUS_RUNNING) {
-            if (audio_uri_queue != NULL && xQueueReceive(audio_uri_queue, &receive_evt, portMAX_DELAY) == pdPASS) {
-                gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
-                ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+        // AEL_MSG_CMD_REPORT_STATUS AEL_IO_DONE  AUDIO_ELEMENT_TYPE_ELEMENT  AEL_MSG_CMD_REPORT_STATUS
+        if(get_startListen() == true)
+        {
+            audio_event_iface_listen(get_evt(gt_pipeline_obj), msg, pdMS_TO_TICKS(400));
+            ESP_LOGI(TAG, "msg->data_1  =====  %d", (int)msg->data);
+        }
+        ESP_LOGI(TAG, "msg->data_2  =====  %d", (int)msg->data);
+        if(get_startListen() == true && msg->source == (void *) get_i2s_stream_writer(gt_pipeline_single()) && (int)msg->data == AEL_STATUS_STATE_FINISHED
+            && msg->cmd == AEL_MSG_CMD_REPORT_STATUS && msg->source_type == AUDIO_ELEMENT_TYPE_ELEMENT)
+        {
+            gt_audio_pipeline_stop(gt_pipeline_single());
+            ESP_LOGI(TAG, "gt_audio_pipeline_stop");
+            set_startListen(gt_pipeline_obj, false);
+        }
+        ESP_LOGI(TAG, "msg->data_3  =====  %d", (int)msg->data);
+        // if(msg->source == (void *) get_i2s_stream_writer(gt_pipeline_single()) )
+        // {
+        //     ESP_LOGI(TAG, "get_i2s_stream_writer  =====  %d", (int)msg->data);
+        // }
+        // else if(msg->source == (void *) get_mp3_decoder(gt_pipeline_single()))
+        // {
+        //     ESP_LOGI(TAG, "get_mp3_decoder  =====  %d", (int)msg->data);
+        // }
+        // else if(msg->source == (void *) get_http_stream_reader(gt_pipeline_single()))
+        // {
+        //     ESP_LOGI(TAG, "get_http_stream_reader  =====  %d", (int)msg->data);
+        // }
+        if((get_startListen() == false && (int)msg->data != AEL_STATUS_STATE_RUNNING) || get_startListen() == false || (int)msg->data != AEL_STATUS_STATE_RUNNING)
+        {
+            // startListen = false;
+            // if((int)msg->data == AEL_STATUS_STATE_FINISHED)
+            // {
+            //     gt_audio_pipeline_stop(gt_pipeline_single());
+            //     ESP_LOGI(TAG, "gt_audio_pipeline_stop");
+            // }
 
-                if (screen_id == GT_ID_SCREEN_SUBTITLE || screen_id == GT_ID_SCREEN_SETUP)
-                {
-                    update_subtitles(receive_evt);
-                    gt_audio_player_start(receive_evt->tts_audio);
-
-                    audio_free(receive_evt->tts_audio);
-                    receive_evt->tts_audio = NULL;
-
-                    audio_free(receive_evt->emotion_value);
-                    receive_evt->emotion_value = NULL;
-
-                    audio_free(receive_evt->llm_response);
-                    receive_evt->llm_response = NULL;
-                } else {
-                    audio_free(receive_evt);
-                    receive_evt = NULL;
-                }
+            // gt_audio_pipeline_stop(gt_pipeline_obj);
+            ESP_LOGE(TAG, "xSemaphoreTake!!!!!!!!!!!!\r\n");
+            xSemaphoreTake(tts_audio_sem, portMAX_DELAY);
+            gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+            ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+            char* chatbot_audio_uri = get_chatbot_audio_uri();
+            if(chatbot_audio_uri != NULL)
+            {
+                // gt_audio_pipeline_reset_items_state(gt_pipeline_single());
+                printf("chatbot_audio_uri_2 = %s\r\n", chatbot_audio_uri);
+                int res = gt_audio_pipeline_run(gt_pipeline_single(), chatbot_audio_uri);
+                ESP_LOGE(TAG, "res ==================%d",res);
+                startListen = true;
+                set_startListen(gt_pipeline_single(), true);
             }
+            free_chatbot_audio_uri();
         }
         vTaskDelay(500);  // 延迟100ms，避免过度占用CPU
     }
 }
+
+// void gt_streamAudio_task()
+// {
+//     ESP_LOGI(TAG, "-------------------gt_StreamAudio_task\n");
+//     int audio_status = -1;
+//     bool isFinishing = false;
+//     ReceivedAnswerData* receive_evt = NULL;
+//     while(1)
+//     {
+//         audio_status = gt_audio_player_state_get();
+//         ESP_LOGI(TAG,"audio_status ============== %d\n",audio_status);
+//         if (audio_status != AUDIO_STATUS_RUNNING)
+//         {
+//             if(audio_status == AUDIO_STATUS_FINISHED)
+//             {
+//                 ESP_LOGI(TAG, "gt_audio_isFinish_stop");
+//                 gt_audio_isFinish_stop();
+//             }
+//             xSemaphoreTake(tts_audio_sem, portMAX_DELAY);
+//             ESP_LOGI(TAG,"xSemaphoreTake");
+//             gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
+//             ESP_LOGI(TAG,">>---------------screen_id: %d\n",screen_id);
+//             char* chatbot_audio_uri = get_chatbot_audio_uri();
+//             if(chatbot_audio_uri != NULL)
+//             {
+//                 int timeout = gt_esp_audio_play_timeout_set(2000);
+//                 ESP_LOGE(TAG, "timeout ==================%d",timeout);
+//                 //print_memory_info();
+//                 int res = gt_audio_player_start(chatbot_audio_uri);
+//                 ESP_LOGE(TAG, "res ==================%d",res);
+//                 // gt_audio_player_start_sync(chatbot_audio_uri);
+//             }
+//             free_chatbot_audio_uri();AEL_STATUS_STATE_FINISHED   AEL_STATUS_NONE
+//         }
+//         vTaskDelay(500);  // 延迟100ms，避免过度占用CPU
+//     }
+// }
+
+// void gt_streamAudio_task()
+// {
+//     ESP_LOGI(TAG, "-------------------gt_StreamAudio_task\n");
+//     int audio_status = -1;
+//     char* receive_evt = NULL;
+//     while(1)
+//     {
+//         audio_status = gt_audio_player_state_get();
+//         ESP_LOGI(TAG,"audio_status ============== %d\n",audio_status);
+//         if (audio_status != AUDIO_STATUS_RUNNING) {
+//             ESP_LOGI(TAG,"receive_evt ==============\n");
+//             gt_audio_player_init();
+//             if (audio_uri_queue != NULL && xQueueReceive(audio_uri_queue, &receive_evt, portMAX_DELAY) == pdPASS) {
+//                     ESP_LOGI(TAG,"receive_evt ============== %s\n",receive_evt);
+//                     gt_audio_player_start(receive_evt);
+//                     audio_free(receive_evt);
+//             }
+//         }
+//         vTaskDelay(500);  // 延迟100ms，避免过度占用CPU
+//     }
+// }
 #endif //!USE_HTTP_STREAM
 
 #if MONITOR_WIFI_SIGNAL
@@ -336,13 +552,11 @@ void get_wifi_signal_anytime()
         if (level != WIFI_SIGNAL_4 && dialog == NULL) {
             dialog = _Unstable_network_dialog1_init();
             ESP_LOGI(TAG,"11-------------------dialog----------------%p\r\n",dialog);
-            ESP_LOGI(TAG,"11111111111111111111111\n");
         }
         if(level == WIFI_SIGNAL_4 && dialog != NULL) {
             ESP_LOGI(TAG,"11-------------------dialog----------------%p\r\n",dialog);
             gt_dialog_close(dialog);
             dialog = NULL;
-            ESP_LOGI(TAG,"2222222222222222222222\n");
         }
         gt_scr_id_t screen_id = gt_scr_stack_get_current_id();
         if (screen_id == GT_ID_MAIN_INTERFACE)
@@ -357,6 +571,13 @@ void get_wifi_signal_anytime()
 void app_main(void)
 {
     esp_xl9555_config_t pca_cfg = {0};
+
+    tts_audio_sem = xSemaphoreCreateBinary();
+    if(tts_audio_sem == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to create tts_audio_sem");
+        return;
+    }
 
     mYxQueue = xQueueCreate(3, sizeof(int));
     if (mYxQueue == NULL) {
@@ -374,9 +595,10 @@ void app_main(void)
     if (mYxQueue3 == NULL) {
         // 队列创建失败处理
         ESP_LOGE(TAG, "Failed to create queue");
+        return;
     }
 
-    audio_uri_queue = xQueueCreate(16, sizeof(ReceivedAnswerData *));
+    audio_uri_queue = xQueueCreate(16, sizeof(char *));
     if (audio_uri_queue == NULL) {
         // 队列创建失败处理
         ESP_LOGE(TAG, "Failed to create audio_uri_queue");
@@ -427,25 +649,33 @@ void app_main(void)
     spi2_init();
     lcd_init();                         /* 初始化LCD */
 
-    gt_init();                             /* gui初始化 */
-    gt_ui_init();                          /* 界面初始化 */
     esptim_int_init(1000);              /* 定时器初始化，定时1ms */
 
     gt_tp_dev = gt_touch_init();        /* 初始化触摸屏 */
 
+#if 0
     gt_audio_player_init();             /* 初始化播放器 */
     gt_audio_player_vol_set(100);
-
-#if USE_HTTP_STREAM
+#elif 1
+    // GTPIPELINE* gt_pipeline_obj = gt_pipeline_single();
+    // gt_pipeline_init(gt_pipeline_obj);
+#endif
+#if (WEBSOCKET_HTTP_SWITCH == 0)
     gt_pipe_send_init();
-#else //!USE_HTTP_STREAM
-    gt_recording_init();                /* 初始化录音 */
+#elif (WEBSOCKET_HTTP_SWITCH == 1)
+    gt_recording_init();  //初始化录音
+#elif (WEBSOCKET_HTTP_SWITCH == 2)
+    gt_audio_storage_init();
+    GTPIPELINE* gt_pipeline_obj = gt_pipeline_single();
+    gt_pipeline_init(gt_pipeline_obj);
 #endif //!USE_HTTP_STREAM
 
     LCD_PWR(1);
 
     wifi_init();
     wifi_event_init();
+
+    gt_role_emote_init();           /* 初始化角色表情 */
 
     /* 设置界面参数 */
     cb_data.settings = (SendSettingsData*)audio_malloc(sizeof(SendSettingsData));
@@ -454,36 +684,55 @@ void app_main(void)
     //FUNCT SETTING
     sprintf(cb_data.settings->mode,"%s", "pro");        //专家模式
     sprintf(cb_data.settings->bot_response_style,"%s","normal");
+    sprintf(cb_data.settings->emotion_value,"%s","打开");
+
     cb_data.settings->max_output_size = 50;
 
     //AI SETTINGS
+    sprintf(cb_data.settings->output_format,"%s","mp3");
     sprintf(cb_data.settings->emotion_output,"%s","true");
+
+    sprintf(cb_data.settings->user_name,"%s","海扁王");
     cb_data.settings->user_age = 6;
-    sprintf(cb_data.settings->bot_character,"%s","");
-    sprintf(cb_data.settings->bot_personality,"%s","");
-    sprintf(cb_data.settings->bot_description,"%s",gt_bot_description_string_get(cb_data.settings->bot_name));
+
+    gt_ai_bot_role_st default_ai_bot_info =  gt_get_ai_bot_infos("智酱");
+    sprintf(cb_data.settings->bot_name,"%s", default_ai_bot_info.name);
+    sprintf(cb_data.settings->bot_description,"%s", default_ai_bot_info.character_desc);
     if (strcmp(cb_data.settings->mode, "pro") == 0 || strcmp(cb_data.settings->mode, "pro_character") == 0) {
         sprintf(cb_data.settings->voice_id,"%s","cute_boy");
     } else if (strcmp(cb_data.settings->mode, "standard") == 0 || strcmp(cb_data.settings->mode, "standard_character") == 0) {
         sprintf(cb_data.settings->voice_id,"%s","301000");
     }
-    sprintf(cb_data.settings->bot_name,"%s","智酱");
-    sprintf(cb_data.settings->output_format,"%s","mp3");
+    sprintf(cb_data.settings->bot_tone,"%s", default_ai_bot_info.tone);
+    memcpy(cb_data.settings->bot_personality, default_ai_bot_info.personality, sizeof(default_ai_bot_info.personality));
 
     cb_data.answer = (ReceivedAnswerData*)audio_malloc(sizeof(ReceivedAnswerData));
     memset(cb_data.answer, 0, sizeof(ReceivedAnswerData));
 
+
+    char * mem_pool = (char *)audio_malloc(GT_MEM_SIZE);
+    gt_mem_set_pool_pointer(mem_pool);
+
+    gt_init();                             /* gui初始化 */
+    gt_ui_init();                          /* 界面初始化 */
+
     taskENTER_CRITICAL(&my_spinlock);
 
-    xTaskCreate(gt_gui_task, "gt_gui_task", 4*1024, NULL, 3, NULL);
+#if WEBSOCKET_HTTP_SWITCH == HTTP_STREAM
     xTaskCreate(&http_test_task, "http_test_task", 8*1024, &cb_data, 3, NULL);
-#if USE_HTTP_STREAM
     xTaskCreate(gt_streamAudio_task, "gt_streamAudio_task", 3*1024, NULL, 2, NULL);
+#elif WEBSOCKET_HTTP_SWITCH == HTTP_NO_STREAM
+    xTaskCreate(&http_test_task, "http_test_task", 8*1024, &cb_data, 3, NULL);
+#elif WEBSOCKET_HTTP_SWITCH == WEBSOCKET
+    xTaskCreate(gt_streamAudio_task, "gt_streamAudio_task", 3*1024, NULL, 5, NULL);
+
 #endif //!USE_HTTP_STREAM
 
 #if MONITOR_WIFI_SIGNAL
-    xTaskCreate(&get_wifi_signal_anytime, "get_wifi_signal_anytime", 3*1024, NULL, 2, NULL);
+    // xTaskCreate(&get_wifi_signal_anytime, "get_wifi_signal_anytime", 3*1024, NULL, 2, NULL);
 #endif
+
+    xTaskCreate(gt_gui_task, "gt_gui_task", 8*1024, NULL, 3, NULL);
 
     taskEXIT_CRITICAL(&my_spinlock);
     print_memory_info();
@@ -500,6 +749,11 @@ void app_main(void)
             update_wifi_icon();
         }
     }
+
+#if (WEBSOCKET_HTTP_SWITCH == 2)
+    serve_dialog_init();
+    gt_websocket_client_init();
+#endif
 
 
 }

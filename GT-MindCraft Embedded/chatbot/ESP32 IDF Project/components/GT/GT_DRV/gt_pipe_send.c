@@ -182,11 +182,7 @@ void gt_pipe_send_start(void)
     audio_pipeline_reset_elements(pipeline);
     audio_pipeline_terminate(pipeline);
 
-    // audio_element_set_uri(http_stream, "http://grayapi.mindcraft.com.cn/v1/data/chunk_update_file/");
     audio_element_set_uri(http_stream, "http://api.mindcraft.com.cn/v1/data/chunk_update_file/");
-
-    //audio_element_set_uri(http_stream, "http://192.168.1.128:10002/v1/data/chunk_update_file/");
-
     audio_pipeline_run(pipeline);
 }
 
@@ -313,7 +309,6 @@ void get_pipe_send_api_key(void)
     char *local_response_buffer = (char *)audio_malloc(MAX_HTTP_OUTPUT_BUFFER + 1);
     memset(local_response_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
     esp_http_client_config_t config = {
-        // .url = "http://grayapi.mindcraft.com.cn/v1/data/chunk_update_file/",
         .url = "http://api.mindcraft.com.cn/v1/data/chunk_update_file/",
         .event_handler = NULL,
         .user_data = local_response_buffer,        // Pass address of local buffer to get response
@@ -327,7 +322,7 @@ void get_pipe_send_api_key(void)
     snprintf(content_type_header, sizeof(content_type_header), "multipart/form-data; boundary=%s", boundary);
     esp_http_client_set_method(get_api_key, HTTP_METHOD_GET);//设置 HTTP 请求的方法
     esp_http_client_set_header(get_api_key, "Content-Type",content_type_header);//设置 HTTP 请求头
-    esp_http_client_set_header(get_api_key, "Authorization", "MC-4E98B66CC08B49A68B983C83AF2740E7");//设置请求头的时候要加上API keys
+    esp_http_client_set_header(get_api_key, "Authorization", "API keys");//设置请求头的时候要加上API keys
     size_t end_boundary_len = strlen(boundary) + 6;
 
 
@@ -433,7 +428,7 @@ esp_err_t _http_stream_event_handle(http_stream_event_msg_t *msg)
         // esp_http_client_delete_header(http, "Content-Type");
         // esp_http_client_set_header(http, "Content-Type","text/html; charset=utf-8");//设置 HTTP 请求头
 
-#if 1
+#if 0
         char* allBuff = (char*)audio_malloc(sizeof(headerbuff)+msg->buffer_len);
         memset(allBuff, 0, sizeof(headerbuff)+msg->buffer_len);
         memcpy(allBuff, headerbuff, sizeof(headerbuff));
@@ -452,7 +447,7 @@ esp_err_t _http_stream_event_handle(http_stream_event_msg_t *msg)
         audio_free(allBuff);
         return msg->buffer_len;
 
-#elif 0
+#elif 1
         esp_http_client_set_post_field(http, msg->buffer, msg->buffer_len);
         esp_err_t rret = esp_http_client_open(http, msg->buffer_len);
         if (esp_http_client_write(http, msg->buffer, msg->buffer_len) <= 0) {
@@ -512,7 +507,7 @@ void gt_pipe_send_init(void)
     printf("http_cfg.request_size ============ %d\n",http_cfg.request_size);
 
     //注：播放器和录音的数据格式要保持一致，都是48000,16
-    i2s_stream_cfg_t i2s_cfg = I2S_STREAM_CFG_DEFAULT_WITH_PARA(CODEC_ADC_I2S_PORT, 48000, 16, AUDIO_STREAM_READER);
+    i2s_stream_cfg_t i2s_cfg = I2S_STREAM_CFG_DEFAULT_WITH_PARA(CODEC_ADC_I2S_PORT, 16000, 16, AUDIO_STREAM_READER);
     i2s_cfg.type = AUDIO_STREAM_READER;
     i2s_cfg.out_rb_size = 64 * 1024;//16 * 1024; // Increase buffer to avoid missing data in bad network conditions
     fs_reader = i2s_stream_init(&i2s_cfg);
@@ -550,10 +545,7 @@ void gt_pipe_send_start(void)
     audio_pipeline_reset_elements(pipeline);
     audio_pipeline_terminate(pipeline);
 
-    // audio_element_set_uri(http_stream, "http://grayapi.mindcraft.com.cn/v1/data/chunk_update_file/");
-    audio_element_set_uri(http_stream, "http://api.mindcraft.com.cn/v1/stream_asr/update/");
-
-    //audio_element_set_uri(http_stream, "http://192.168.1.128:10002/v1/data/chunk_update_file/");
+    audio_element_set_uri(http_stream, "http://api.mindcraft.com.cn/v1/mode_chunk/update/");
 
     audio_pipeline_run(pipeline);
 }
@@ -647,14 +639,110 @@ static esp_err_t resolve_answer_json(char *jbuf)
  * @brief get请求，获取发送数据的api_key
  *
  */
+// void get_pipe_send_api_key(void)
+// {
+//     char *local_response_buffer = (char *)audio_malloc(MAX_HTTP_OUTPUT_BUFFER + 1);
+//     memset(local_response_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
+//     esp_http_client_config_t config = {
+//         .url =  "http://api.mindcraft.com.cn/v1/mode_chunk/",
+//         .event_handler = NULL,
+//         .user_data = local_response_buffer,        // Pass address of local buffer to get response
+//         .disable_auto_redirect = true,
+//         .cert_pem = NULL,
+//         .timeout_ms = 15000, //超时时间
+//     };
+//     esp_http_client_handle_t get_api_key = esp_http_client_init(&config);//初始化http客户端
+
+//     char content_type_header[100] = {0};
+//     snprintf(content_type_header, sizeof(content_type_header), "multipart/form-data; boundary=%s", boundary);
+//     esp_http_client_set_method(get_api_key, HTTP_METHOD_POST);//设置 HTTP 请求的方法
+//     esp_http_client_set_header(get_api_key, "Content-Type",content_type_header);//设置 HTTP 请求头
+//     esp_http_client_set_header(get_api_key, "Authorization", "API keys");//设置请求头的时候要加上API keys
+//     size_t end_boundary_len = strlen(boundary) + 6;
+
+
+//     //打开客户端连接服务器
+//       char *extra_param = (char *)audio_malloc(1300);
+//     memset(extra_param, 0, 1300);
+//     snprintf(extra_param, 1300,
+//         "\r\n--%s\r\n"
+//         "Content-Disposition: form-data; name=\"category\"\r\n\r\n"
+//         "%s"
+//         "\r\n--%s\r\n"
+//         "Content-Disposition: form-data; name=\"model\"\r\n\r\n"
+//         "%s"
+//         "\r\n--%s\r\n"
+//         "Content-Disposition: form-data; name=\"format\"\r\n\r\n"
+//         "%s"
+//         "\r\n--%s\r\n"
+//         "Content-Disposition: form-data; name=\"word_info\"\r\n\r\n"
+//         "%d"
+//         "\r\n--%s\r\n"
+//         "Content-Disposition: form-data; name=\"language\"\r\n\r\n"
+//         "%d"
+//         "\r\n--%s\r\n"
+//         "Content-Disposition: form-data; name=\"sample_rate\"\r\n\r\n"
+//         "%d"
+//         "\r\n--%s\r\n",
+//         boundary,"tencent_stream_asr",boundary,"16k_zh",boundary,"wav",boundary, 0, boundary, "auto", boundary,16000,boundary);
+//     size_t extra_pram_len = strlen(extra_param);
+//     size_t total_data_len =  extra_pram_len + end_boundary_len;
+
+
+
+//     //打开客户端连接服务器
+//     esp_err_t err = esp_http_client_open(get_api_key, total_data_len);
+//     if(err == ESP_OK)
+//     {
+//         //发送用户设置的参数
+//         esp_http_client_write(get_api_key, extra_param, extra_pram_len);
+
+//         // 发送multipart/form-data结束部分
+//         char end_boundary[50] = {0};
+//         snprintf(end_boundary, sizeof(end_boundary), "\r\n--%s--\r\n", boundary);
+//         esp_http_client_write(get_api_key, end_boundary, strlen(end_boundary));
+
+//         int content_length = 0;
+//         content_length = esp_http_client_fetch_headers(get_api_key);//从服务器获取响应头部
+//         if(content_length < 0)
+//         {
+//             ESP_LOGE(TAG, "HTTP client fetch headers failed");
+//             err = ESP_FAIL;
+//             goto FREE_LABEL;
+//         }
+//         else
+//         {
+//             int data_read = esp_http_client_read_response(get_api_key, local_response_buffer, MAX_HTTP_OUTPUT_BUFFER);//读取服务器返回的 HTTP 响应主体内容
+//             ESP_LOGD(TAG, "FILEOK");
+//             if(data_read >= 0)
+//             {
+//                 ESP_LOGI(TAG, "asr_uuid Received JSON response: %s", local_response_buffer);
+//                 err = resolve_answer_json(local_response_buffer);
+//                 printf("api_key_data: %s\r\n", user_asr_uuid);
+//             }else{
+//                 ESP_LOGE(TAG, "Failed to read response");
+//                 err = ESP_FAIL;
+//                 goto FREE_LABEL;
+//             }
+//         }
+//     }
+
+
+// FREE_LABEL:
+//     audio_free(local_response_buffer);
+//     local_response_buffer = NULL;
+//     esp_http_client_close(get_api_key);
+//     esp_http_client_cleanup(get_api_key);
+
+//     return ;
+// }
+
 void get_pipe_send_api_key(void)
 {
     char *local_response_buffer = (char *)audio_malloc(MAX_HTTP_OUTPUT_BUFFER + 1);
     memset(local_response_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
     esp_http_client_config_t config = {
-        // .url = "http://grayapi.mindcraft.com.cn/v1/data/chunk_update_file/",
-        // .url = "http://api.mindcraft.com.cn/v1/data/chunk_update_file/",
-        .url =  "http://api.mindcraft.com.cn/v1/stream_asr/",
+        .url =  "http://api.mindcraft.com.cn/v1/mode_chunk/",
         .event_handler = NULL,
         .user_data = local_response_buffer,        // Pass address of local buffer to get response
         .disable_auto_redirect = true,
@@ -671,47 +759,11 @@ void get_pipe_send_api_key(void)
     size_t end_boundary_len = strlen(boundary) + 6;
 
 
-    //打开客户端连接服务器
-      char *extra_param = (char *)audio_malloc(1300);
-    memset(extra_param, 0, 1300);
-    snprintf(extra_param, 1300,
-        "\r\n--%s\r\n"
-        "Content-Disposition: form-data; name=\"category\"\r\n\r\n"
-        "%s"
-        "\r\n--%s\r\n"
-        "Content-Disposition: form-data; name=\"model\"\r\n\r\n"
-        "%s"
-        "\r\n--%s\r\n"
-        "Content-Disposition: form-data; name=\"format\"\r\n\r\n"
-        "%s"
-        "\r\n--%s\r\n"
-        "Content-Disposition: form-data; name=\"word_info\"\r\n\r\n"
-        "%d"
-        "\r\n--%s\r\n"
-        "Content-Disposition: form-data; name=\"language\"\r\n\r\n"
-        "%d"
-        "\r\n--%s\r\n"
-        "Content-Disposition: form-data; name=\"sample_rate\"\r\n\r\n"
-        "%d"
-        "\r\n--%s\r\n",
-        boundary,"tencent_stream_asr",boundary,"16k_zh",boundary,"wav",boundary, 0, boundary, "auto", boundary,16000,boundary);
-    size_t extra_pram_len = strlen(extra_param);
-    size_t total_data_len =  extra_pram_len + end_boundary_len;
-
-
 
     //打开客户端连接服务器
-    esp_err_t err = esp_http_client_open(get_api_key, total_data_len);
+    esp_err_t err = esp_http_client_open(get_api_key, 0);
     if(err == ESP_OK)
     {
-        //发送用户设置的参数
-        esp_http_client_write(get_api_key, extra_param, extra_pram_len);
-
-        // 发送multipart/form-data结束部分
-        char end_boundary[50] = {0};
-        snprintf(end_boundary, sizeof(end_boundary), "\r\n--%s--\r\n", boundary);
-        esp_http_client_write(get_api_key, end_boundary, strlen(end_boundary));
-
         int content_length = 0;
         content_length = esp_http_client_fetch_headers(get_api_key);//从服务器获取响应头部
         if(content_length < 0)

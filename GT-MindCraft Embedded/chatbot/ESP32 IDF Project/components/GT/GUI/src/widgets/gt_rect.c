@@ -60,20 +60,22 @@ static inline void _gt_rect_init_widget(gt_obj_st * rect) {
     if( rect->area.w == 0 || rect->area.h == 0){
         return;
     }
-    gt_attr_rect_st rect_attr;
-    gt_graph_init_rect_attr(&rect_attr);
-    rect_attr.reg.is_fill    = style->fill;
-    rect_attr.border_width   = style->border;
-    rect_attr.border_color   = style->color_border;
-    rect_attr.bg_opa         = rect->opa;
-    rect_attr.bg_color       = style->color_background;
-    rect_attr.radius         = rect->radius;
+    if (rect->show_bg) {
+        gt_attr_rect_st rect_attr;
+        gt_graph_init_rect_attr(&rect_attr);
+        rect_attr.reg.is_fill    = style->fill;
+        rect_attr.border_width   = style->border;
+        rect_attr.border_color   = style->color_border;
+        rect_attr.bg_opa         = rect->opa;
+        rect_attr.bg_color       = style->color_background;
+        rect_attr.radius         = rect->radius;
 
-    gt_area_st area_base = rect->area;
-    draw_bg(rect->draw_ctx, &rect_attr, &area_base);
+        gt_area_st area_base = rect->area;
+        draw_bg(rect->draw_ctx, &rect_attr, &area_base);
+    }
 
     // focus
-    draw_focus(rect , 0);
+    draw_focus(rect);
 }
 
 /**
@@ -82,7 +84,7 @@ static inline void _gt_rect_init_widget(gt_obj_st * rect) {
  * @param obj
  */
 static void _init_cb(gt_obj_st * obj) {
-    GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
+    // GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
 
     _gt_rect_init_widget(obj);
 }
@@ -133,6 +135,7 @@ gt_obj_st * gt_rect_create(gt_obj_st * parent)
         return NULL;
     }
     obj->radius = 0;
+    obj->show_bg = true;
     _gt_rect_st * style = (_gt_rect_st * )obj;
 
     style->fill = 1;
@@ -161,11 +164,7 @@ void gt_rect_set_color_border(gt_obj_st * rect, gt_color_t color)
 }
 void gt_rect_set_radius(gt_obj_st * rect, gt_radius_t radius)
 {
-    if (false == gt_obj_is_type(rect, OBJ_TYPE)) {
-        return ;
-    }
-    rect->radius = radius;
-    gt_event_send(rect, GT_EVENT_TYPE_DRAW_START, NULL);
+    gt_obj_set_radius(rect, radius);
 }
 void gt_rect_set_border(gt_obj_st * rect, uint16_t border)
 {

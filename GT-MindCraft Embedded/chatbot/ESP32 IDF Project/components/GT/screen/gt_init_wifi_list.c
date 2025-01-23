@@ -20,11 +20,11 @@ void redraw_wifi_list() {
 
 void change_wifi_connect_tip(uint8_t flag) {
     const char *wifi_connect_tip[2] = {"连接中", "已连接"};
-    gt_obj_set_visible(lab3, true);
     ESP_LOGI(TAG,"--------flag = 0x%x\n", flag);
     switch (flag)
     {
     case 0x04:
+        gt_obj_set_visible(lab3, true);
         gt_label_set_text(lab3, wifi_connect_tip[0]);
 	    gt_label_set_font_color(lab3, gt_color_hex(0xFF7859));
         ESP_LOGI(TAG,"--------wifi_connect_tip[0] = %s\n", wifi_connect_tip[0]);
@@ -195,11 +195,11 @@ gt_obj_st * gt_init_wifi_list(void)
 	gt_listview_set_border_color(listv1,gt_color_hex(0xc7c7c7));
 	gt_listview_set_border_width(listv1, 0);
 	gt_listview_set_septal_line(listv1, 0);
-	gt_listview_set_highlight_mode(listv1, 1);
+	gt_listview_set_highlight_mode(listv1, false);
 	gt_listview_set_bg_color(listv1, gt_color_hex(0x000000));
 	gt_listview_set_item_bg_color(listv1, gt_color_hex(0x181B22));
 	gt_listview_show_item_bg(listv1, true);
-	gt_listview_set_item_reduce(listv1, 2);
+	gt_listview_set_item_reduce(listv1, 0);
 	gt_listview_set_item_radius(listv1, 8);
     set_item_by_wifi_list();
 	gt_obj_add_event_cb(listv1, listv1_0_cb, GT_EVENT_TYPE_INPUT_RELEASED, NULL);

@@ -98,7 +98,7 @@ static void _init_cb(gt_obj_st * obj) {
         rect_attr.bg_color = gt_color_white();
         rect_attr.border_color = gt_color_hex(0x409EFF);
     }
-    gt_area_st area = gt_area_reduce(obj->area , gt_obj_get_reduce(obj));
+    gt_area_st area = obj->area;
 
     gt_area_st area_box = area;
     area_box.w = style->font_info.size+4;
@@ -137,7 +137,7 @@ static void _init_cb(gt_obj_st * obj) {
     draw_text(obj->draw_ctx, &font_dsc, &area);
 
      // focus
-    draw_focus(obj , 0);
+    draw_focus(obj);
 }
 
 /**
@@ -384,6 +384,15 @@ void gt_checkbox_set_font_encoding(gt_obj_st * checkbox, gt_encoding_et encoding
     }
     _gt_checkbox_st * style = (_gt_checkbox_st * )checkbox;
     style->font_info.encoding = encoding;
+}
+
+void gt_checkbox_set_font_style(gt_obj_st * checkbox, gt_font_style_et font_style)
+{
+    if (false == gt_obj_is_type(checkbox, OBJ_TYPE)) {
+        return;
+    }
+    _gt_checkbox_st * style = (_gt_checkbox_st * )checkbox;
+    style->font_info.style.all = font_style;
 }
 
 void gt_checkbox_set_space(gt_obj_st * checkbox, uint8_t space_x, uint8_t space_y)

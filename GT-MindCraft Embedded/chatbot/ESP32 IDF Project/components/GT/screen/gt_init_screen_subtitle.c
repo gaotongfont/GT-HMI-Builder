@@ -20,24 +20,46 @@ static gt_obj_st * Historybt = NULL;
 static gt_obj_st * emptybt = NULL;
 static gt_obj_st * Voicebutton3 = NULL;
 
+static gt_obj_st * img_emote = NULL;
+
+
 void set_emojis() {
     if (cb_data.answer->emotion_value == NULL) {
         ESP_LOGE(TAG, "1111111111111111111111111111111\n");
         return;
     }
-    if (strcmp(cb_data.settings->bot_name, "蔡机") == 0){
-        set_emojis_in_player(player1, AI_EMOJIS_CJ);
-        gt_obj_set_pos(player1, 4, 47);
-	    gt_obj_set_size(player1, 228, 184);
-        gt_player_set_auto_play_period(player1, 20);
-        ESP_LOGE(TAG, "2222222222222222222222222222222222\n");
+    if (strcmp(cb_data.settings->bot_name, "菜机") == 0) {
+        // set_emojis_in_player(player1, AI_EMOJIS_CJ);
+        // gt_obj_set_pos(player1, 4, 47);
+	    // gt_obj_set_size(player1, 228, 184);
+        // gt_player_set_auto_play_period(player1, 20);
+        // ESP_LOGE(TAG, "2222222222222222222222222222222222\n");
 
-    } else {
-        if (strcmp(cb_data.answer->emotion_value, "开心") == 0) {
+        if (strcmp(cb_data.answer->emotion_value, "sad") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_SADNESS);
+        } else if (strcmp(cb_data.answer->emotion_value, "angry") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_ANGER);
+        } else if (strcmp(cb_data.answer->emotion_value, "happy") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_HAPPY);
+        }  else if (strcmp(cb_data.answer->emotion_value, "fearful") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_FEAR);
+        } else if (strcmp(cb_data.answer->emotion_value, "surprised") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_SURPRISE);
+        } else if (strcmp(cb_data.answer->emotion_value, "disgusted") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_DISGUST);
+        } else if (strcmp(cb_data.answer->emotion_value, "neutral") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_NEUTRAL);
+        } else {
+            set_emote_in_img(img_emote, AI_EMOTE_CAIJI_NEUTRAL);
+        }
+
+    }
+    else if (strcmp(cb_data.settings->bot_name, "智酱") == 0) {
+        if (strcmp(cb_data.answer->emotion_value, "happy") == 0) {
             set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
-        } else if (strcmp(cb_data.answer->emotion_value, "同情") == 0) {
+        } else if (strcmp(cb_data.answer->emotion_value, "sad") == 0) {
             set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
-        } else if (strcmp(cb_data.answer->emotion_value, "鼓励") == 0) {
+        } else if (strcmp(cb_data.answer->emotion_value, "surprised") == 0) {
             set_emojis_in_player(player1, AI_EMOJIS_ENCOURAGE);
         } else {
             set_emojis_in_player(player1, AI_EMOJIS_WAITING);
@@ -48,10 +70,33 @@ void set_emojis() {
         ESP_LOGE(TAG, "333333333333333333333333333333\n");
 
     }
+    else if (strcmp(cb_data.settings->bot_name, "小智") == 0) {
+        if (strcmp(cb_data.answer->emotion_value, "sad") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_SADNESS);
+        } else if (strcmp(cb_data.answer->emotion_value, "angry") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_ANGER);
+        } else if (strcmp(cb_data.answer->emotion_value, "happy") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_HAPPY);
+        }  else if (strcmp(cb_data.answer->emotion_value, "fearful") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_FEAR);
+        } else if (strcmp(cb_data.answer->emotion_value, "surprised") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_SURPRISE);
+        } else if (strcmp(cb_data.answer->emotion_value, "disgusted") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_DISGUST);
+        } else if (strcmp(cb_data.answer->emotion_value, "neutral") == 0) {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_NEUTRAL);
+        } else {
+            set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_NEUTRAL);
+        }
+    }
 }
 
-#if USE_HTTP_STREAM
+#if 1//USE_HTTP_STREAM
 void update_subtitles(ReceivedAnswerData* receive_data) {
+    if (receive_data == NULL) {
+        ESP_LOGE(TAG, "receive_data is NULL");
+        return;
+    }
     if (cb_data.answer == NULL) {
         ESP_LOGE(TAG, "cb_data.answer is NULL");
         return;
@@ -96,11 +141,49 @@ void update_subtitles(ReceivedAnswerData* receive_data) {
     gt_label_set_auto_scroll_total_time(lab2, total_time_ms);
     set_emojis();
 }
+
+#elif 0
+void update_subtitles(ReceivedAnswerData* receive_data) {
+    if (cb_data.answer == NULL) {
+        ESP_LOGE(TAG, "cb_data.answer is NULL");
+        return;
+    }
+
+    // 分配内存并检查 receive_data->llm_response 是否不为 NULL
+    if (receive_data->llm_response != NULL) {
+        cb_data.answer->llm_response = NULL;
+        audio_free(cb_data.answer->llm_response);
+        cb_data.answer->llm_response = (char *)audio_malloc(strlen(receive_data->llm_response) + 1);
+        if (cb_data.answer->llm_response == NULL) {
+            ESP_LOGE(TAG, "Failed to allocate memory for llm_response");
+            return;
+        }
+        strcpy(cb_data.answer->llm_response, receive_data->llm_response);
+    }
+
+    cb_data.answer->audio_seconds = receive_data->audio_seconds;
+    if (cb_data.answer->audio_seconds < 1)
+    {
+        cb_data.answer->audio_seconds = 1;
+    }
+
+    // ESP_LOGI(TAG, "<<------------------cb_data.answer->emotion_value: %s\n", cb_data.answer->emotion_value);
+    ESP_LOGI(TAG, "<<------------------cb_data.answer->llm_response: %s\n", cb_data.answer->llm_response);
+    ESP_LOGI(TAG, "<<------------------cb_data.answer->audio_seconds: %f\n", cb_data.answer->audio_seconds);
+    gt_label_set_auto_scroll_single_line(lab2, true);
+    gt_label_set_text(lab2, cb_data.answer->llm_response);
+    // gt_label_set_auto_scroll_total_time(lab2, cb_data.answer->audio_seconds * 1000);
+
+    int total_time_ms = (int)(cb_data.answer->audio_seconds * 1000);
+    ESP_LOGI(TAG, "------------------------total_time_ms = %d", total_time_ms);
+    gt_label_set_auto_scroll_total_time(lab2, total_time_ms);
+    set_emojis();
+}
 #endif //!USE_HTTP_STREAM
 
 //手势左滑返回到上一个界面
 static void screen_subtitle_0_cb(gt_event_st * e) {
-#if USE_HTTP_STREAM
+#if 0//USE_HTTP_STREAM
     int send_num = -1;
     xQueueReset(audio_uri_queue);
     int num = uxQueueMessagesWaiting(audio_uri_queue);
@@ -119,9 +202,20 @@ static void screen_subtitle_0_cb(gt_event_st * e) {
     audio_free(cb_data.answer->llm_response);
     cb_data.answer->llm_response = NULL;
     cb_data.answer->audio_seconds = 0.0f;
-#else //!USE_HTTP_STREAM
+#elif 0 //!USE_HTTP_STREAM
 	gt_audio_player_pause();
 	gt_disp_stack_go_back(1);
+#elif 1
+    gt_disp_stack_go_back(1);
+    if(get_startListen() == true)
+    {
+        set_startListen(gt_pipeline_single(), false);
+        free_chatbot_audio_uri();
+        // gt_audio_pipeline_stop(gt_pipeline_single());
+        ESP_LOGI(TAG, "gt_audio_player_stop !!!!!!!!!!!!!!!!!");
+        gt_websocket_client_stop_receive_data();
+    }
+    gt_audio_pipeline_stop(gt_pipeline_single());
 #endif //!USE_HTTP_STREAM
 }
 
@@ -132,7 +226,7 @@ static void stupbt_0_cb(gt_event_st * e) {
 
 //跳转到主界面
 static void imgbtn1_0_cb(gt_event_st * e) {
-#if USE_HTTP_STREAM
+#if 0//USE_HTTP_STREAM
     int send_num = -1;
     xQueueReset(audio_uri_queue);
     int num = uxQueueMessagesWaiting(audio_uri_queue);
@@ -152,9 +246,11 @@ static void imgbtn1_0_cb(gt_event_st * e) {
     audio_free(cb_data.answer->llm_response);
     cb_data.answer->llm_response = NULL;
     cb_data.answer->audio_seconds = 0.0f;
-#else //!USE_HTTP_STREAM
+#elif 0 //!USE_HTTP_STREAM
 	gt_audio_player_pause();
 	gt_disp_stack_load_scr_anim(GT_ID_SCREEN_HOME, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
+#elif 1
+    gt_disp_stack_load_scr_anim(GT_ID_SCREEN_HOME, GT_SCR_ANIM_TYPE_NONE, 500, 0, true);
 #endif //!USE_HTTP_STREAM
 }
 
@@ -169,15 +265,18 @@ static void emptybt_0_cb(gt_event_st * e) {
 
 static void speaking_ui_in_subtitle(void) {
     gt_label_set_text(lab2, "正在说话...");
-    set_emojis_in_player(player1, AI_EMOJIS_RECORDING);
+    // set_emojis_in_player(player1, AI_EMOJIS_RECORDING);
+    set_role_emote(player1, img_emote, AI_EMOJIS_RECORDING, AI_EMOTE_XIAOZHI_NEUTRAL, AI_EMOTE_CAIJI_NEUTRAL);
 }
 static void identifying_ui_in_subtitle(void) {
     gt_label_set_text(lab2, "正在识别...");
-    set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
+    // set_emojis_in_player(player1, AI_EMOJIS_HAPPY);
+    set_role_emote(player1, img_emote, AI_EMOJIS_HAPPY, AI_EMOTE_XIAOZHI_NEUTRAL, AI_EMOTE_CAIJI_NEUTRAL);
 }
 void identifying_failed_ui_in_subtitle(void) {
     gt_label_set_text(lab2, "识别失败，请重试");
-    set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
+    // set_emojis_in_player(player1, AI_EMOJIS_SYMPATHY);
+    set_role_emote(player1, img_emote, AI_EMOJIS_SYMPATHY, AI_EMOTE_XIAOZHI_SADNESS, AI_EMOTE_CAIJI_SADNESS);
 }
 
 static void voice_btn_recording_cb(gt_event_st * e) {
@@ -195,6 +294,36 @@ gt_obj_st * gt_init_screen_subtitle(void)
 	screen_subtitle = gt_obj_create(NULL);
 	gt_obj_add_event_cb(screen_subtitle, screen_subtitle_0_cb, GT_EVENT_TYPE_INPUT_HOME_GESTURE_LEFT, NULL);
 	gt_screen_set_bgcolor(screen_subtitle, gt_color_hex(0x000000));
+
+	/** player1 */
+	/** 说话 */
+	player1 = gt_player_create(screen_subtitle);
+	gt_player_set_type(player1, GT_PLAYER_TYPE_IMG);
+	gt_player_set_mode(player1, GT_PLAYER_MODE_LOOP);
+	gt_player_set_auto_play_period(player1, 35);
+
+	img_emote = gt_img_create(screen_subtitle);
+    gt_obj_set_pos(img_emote, 35, 35);
+	gt_obj_set_size(img_emote, 169, 204);
+    if (strcmp(cb_data.settings->bot_name, "智酱") == 0)
+    {
+        gt_obj_set_visible(img_emote, GT_INVISIBLE);
+        set_emojis_in_player(player1, AI_EMOJIS_WAITING);
+        gt_obj_set_visible(player1, GT_VISIBLE);
+    } else if (strcmp(cb_data.settings->bot_name, "小智") == 0) {
+        gt_obj_set_visible(player1, GT_INVISIBLE);
+        gt_obj_set_visible(img_emote, GT_VISIBLE);
+        set_emote_in_img(img_emote, AI_EMOTE_XIAOZHI_NEUTRAL);
+
+    } else if (strcmp(cb_data.settings->bot_name, "菜机") == 0)
+    {
+        gt_obj_set_visible(player1, GT_INVISIBLE);
+        gt_obj_set_visible(img_emote, GT_VISIBLE);
+        set_emote_in_img(img_emote, AI_EMOTE_CAIJI_NEUTRAL);
+    }
+
+    //根据返回的情绪值设置不同的表情
+    set_emojis();
 
 	/** img2 */
 	img2 = gt_img_create(screen_subtitle);
@@ -272,16 +401,6 @@ gt_obj_st * gt_init_screen_subtitle(void)
 	gt_obj_set_size(imgbtn1, 16, 16);
 	gt_img_set_src(imgbtn1, "f:img_fh_16x16.png");
 	gt_obj_set_touch_parent(imgbtn1, true);
-
-
-	/** player1 */
-	/** 说话 */
-	player1 = gt_player_create(screen_subtitle);
-	gt_player_set_type(player1, GT_PLAYER_TYPE_IMG);
-	gt_player_set_mode(player1, GT_PLAYER_MODE_LOOP);
-	gt_player_set_auto_play_period(player1, 35);
-    //根据返回的情绪值设置不同的表情
-    set_emojis();
 
 
 	/** rect1 */

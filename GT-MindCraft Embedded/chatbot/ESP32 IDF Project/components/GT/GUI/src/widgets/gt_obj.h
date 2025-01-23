@@ -93,6 +93,9 @@ typedef struct gt_obj_s {
     struct gt_obj_s ** child;
     const gt_obj_class_st * classes;
 
+    /** user's custom events callback replace core events handler */
+    gt_obj_event_attr_st * replace_core_event_attr;
+    /** user's events */
     gt_obj_event_attr_st * event_attr;
     struct _gt_draw_ctx_s * draw_ctx;
     gt_obj_process_attr_st process_attr;
@@ -112,7 +115,8 @@ typedef struct gt_obj_s {
     uint16_t cnt_child;
     gt_radius_t radius;
     uint8_t opa;            /* @ref gt_color.h */
-    uint8_t reduce;
+    uint8_t focus_w;        /* focus width */
+    uint8_t focus_gap;      /* focus gap */
 #if GT_USE_WIDGET_LAYOUT
     gt_obj_container_st container;
 #endif

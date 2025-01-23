@@ -27,8 +27,8 @@
 
 /* static variables -----------------------------------------------------*/
 static const gt_font_family_st _font_family[] = {
-    {16, {157, 175, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}},
-	{20, {224, 182, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}},
+    {16, {157, 175, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+	{20, {224, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
 };
 
 /* macros ---------------------------------------------------------------*/
@@ -48,4 +48,3 @@ void gt_font_config_init(void)
 
 /* end of file ----------------------------------------------------------*/
 
-    

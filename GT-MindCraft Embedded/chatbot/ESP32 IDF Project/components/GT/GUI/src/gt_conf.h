@@ -90,16 +90,26 @@ extern "C" {
  * @brief memory mode. 1: array as memory pool; 0:  c library api.
  */
 #ifndef GT_MEM_CUSTOM
-    #define GT_MEM_CUSTOM           0
+    #define GT_MEM_CUSTOM           01
 #endif
 
 #if GT_MEM_CUSTOM
     #define GT_MEM_CUSTOM_INCLUDE   "../others/gt_tlsf.h"
 
-    #define GT_MEM_SIZE             (48 * 1024U)    //Byte
+    #define GT_MEM_SIZE             (480 * 1024U)    //Byte
 
     #define gt_tlsf_assert(_expr)   ( (void)0 )
+
+#ifndef GT_MEM_CUSTOM_POINTER
+    /**
+     * @brief Using custom memory pool pointer:
+     *      1: use custom memory pool pointer, 0: use default memory pool pointer
+     *      [default: 0]
+     */
+    #define GT_MEM_CUSTOM_POINTER   01
+#endif
 #else
+
     #define GT_MEM_CUSTOM_INCLUDE       "audio_mem.h"   // "stdlib.h"
 
     #define GT_MEM_CUSTOM_MALLOC        audio_malloc    // malloc
@@ -193,11 +203,11 @@ extern "C" {
      * @brief use old font family
      *
      */
-    #define GT_FONT_FAMILY_OLD_ENABLE  0
+    #define GT_FONT_FAMILY_OLD_ENABLE   0
 #endif
 
 /* default font style and size */
-#define GT_CFG_DEFAULT_FONT_FAMILY          (0xFFFF)
+#define GT_CFG_DEFAULT_FONT_FAMILY          (0)
 #define GT_CFG_DEFAULT_FONT_SIZE            (16)
 
 #if (defined(GT_FONT_FAMILY_OLD_ENABLE) && (GT_FONT_FAMILY_OLD_ENABLE == 1))
@@ -451,6 +461,14 @@ extern "C" {
      * [default: 1]
      */
     #define GT_USE_GIF          01
+#endif
+
+#ifndef GT_USE_MD4C
+    /**
+     * @brief use md4c markdown parser library
+     * [default: 1]
+     */
+    #define GT_USE_MD4C         01
 #endif
 
 /**

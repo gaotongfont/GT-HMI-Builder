@@ -17,9 +17,8 @@
 #include "../others/gt_anim.h"
 
 /* private define -------------------------------------------------------*/
-#define _set_style_prop_val(obj, prop, val)     (obj->style->prop = val)
-// #define _set_area_prop_val(obj, prop, val)      (obj->area.prop = val)  // unused
 #define _get_area_prop(obj, prop)               (obj->area.prop)
+
 
 /* private typedef ------------------------------------------------------*/
 
@@ -207,6 +206,11 @@ void gt_obj_set_pos_anim(gt_obj_st * obj, gt_size_t x, gt_size_t y)
     }
 }
 
+void gt_obj_set_pos_step(gt_obj_st * obj, gt_size_t step_x, gt_size_t step_y)
+{
+    gt_obj_set_pos(obj, obj->area.x + step_x, obj->area.y + step_y);
+}
+
 #if GT_USE_CUSTOM_TOUCH_EXPAND_SIZE
 void gt_obj_set_touch_expand_area(gt_obj_st * obj, gt_size_t hor, gt_size_t ver)
 {
@@ -319,6 +323,13 @@ void gt_obj_set_size_anim(gt_obj_st * obj, uint16_t w, uint16_t h)
     }
 }
 
+void gt_obj_set_size_step(gt_obj_st * obj, gt_size_t step_w, gt_size_t step_h)
+{
+    if (obj->area.w + step_w < 0) { step_w = -obj->area.w; }
+    if (obj->area.h + step_h < 0) { step_h = -obj->area.h; }
+    gt_obj_set_size(obj, obj->area.w + step_w, obj->area.h + step_h);
+}
+
 void gt_obj_set_x(gt_obj_st * obj, gt_size_t x)
 {
     GT_CHECK_BACK(obj);
@@ -329,6 +340,11 @@ void gt_obj_set_x_anim(gt_obj_st * obj, gt_size_t x)
 {
     GT_CHECK_BACK(obj);
     gt_obj_set_pos_anim(obj, x, obj->area.y);
+}
+
+void gt_obj_set_x_step(gt_obj_st * obj, gt_size_t step_x)
+{
+    gt_obj_set_pos(obj, obj->area.x + step_x, obj->area.y);
 }
 
 void gt_obj_set_y(gt_obj_st * obj, gt_size_t y)
@@ -343,6 +359,11 @@ void gt_obj_set_y_anim(gt_obj_st * obj, gt_size_t y)
     gt_obj_set_pos_anim(obj, obj->area.x, y);
 }
 
+void gt_obj_set_y_step(gt_obj_st * obj, gt_size_t step_y)
+{
+    gt_obj_set_pos(obj, obj->area.x, obj->area.y + step_y);
+}
+
 void gt_obj_set_w(gt_obj_st * obj, uint16_t w)
 {
     gt_obj_set_size(obj, w, obj->area.h);
@@ -353,6 +374,11 @@ void gt_obj_set_w_anim(gt_obj_st * obj, uint16_t w)
     gt_obj_set_size_anim(obj, w, obj->area.h);
 }
 
+void gt_obj_set_w_step(gt_obj_st * obj, gt_size_t step_w)
+{
+    gt_obj_set_size(obj, obj->area.w + step_w, obj->area.h);
+}
+
 void gt_obj_set_h(gt_obj_st * obj, uint16_t h)
 {
     gt_obj_set_size(obj, obj->area.w, h);
@@ -361,6 +387,11 @@ void gt_obj_set_h(gt_obj_st * obj, uint16_t h)
 void gt_obj_set_h_anim(gt_obj_st * obj, uint16_t h)
 {
     gt_obj_set_size_anim(obj, obj->area.w, h);
+}
+
+void gt_obj_set_h_step(gt_obj_st * obj, gt_size_t step_h)
+{
+    gt_obj_set_size(obj, obj->area.w, obj->area.h + step_h);
 }
 
 void gt_obj_set_opa(gt_obj_st * obj, gt_opa_t opa)
@@ -384,6 +415,16 @@ void gt_obj_set_opa_anim(gt_obj_st * obj, gt_opa_t opa)
     gt_anim_set_value(&anim, obj->opa, opa);
     gt_anim_set_exec_cb(&anim, _opa_anim_exec_cb);
     gt_anim_start(&anim);
+}
+
+void gt_obj_set_opa_step(gt_obj_st * obj, gt_size_t step_opa)
+{
+    if (obj->opa + step_opa < 0) {
+        step_opa = -(gt_size_t)obj->opa;
+    } else if (obj->opa + step_opa > GT_OPA_COVER) {
+        step_opa = (gt_size_t)GT_OPA_COVER - obj->opa;
+    }
+    gt_obj_set_opa(obj, (gt_opa_t)(obj->opa + step_opa));
 }
 
 gt_size_t gt_obj_get_x(gt_obj_st * obj)
@@ -486,7 +527,7 @@ void gt_obj_size_change(gt_obj_st * obj, gt_area_st * area_new)
 {
     GT_CHECK_BACK(obj);
     gt_area_st area_old = obj->area;
-    gt_area_st area;
+    gt_area_st area = {0};
     if (area_new->x <= area_old.x) {
         area.x = area_new->x;
     } else {
@@ -822,22 +863,41 @@ bool gt_obj_is_untouchability(gt_obj_st * obj)
     return obj->untouchability;
 }
 
-void gt_obj_set_reduce(gt_obj_st * obj, uint8_t reduce)
+void gt_obj_set_focus_w(gt_obj_st * obj, uint8_t focus_w)
 {
     GT_CHECK_BACK(obj);
-    obj->reduce = reduce;
+    obj->focus_w = focus_w;
 }
 
-uint8_t gt_obj_get_reduce(gt_obj_st * obj)
+uint8_t gt_obj_get_focus_w(gt_obj_st * obj)
 {
     GT_CHECK_BACK_VAL(obj, 0);
-    return obj->reduce;
+    return obj->focus_w;
+}
+
+void gt_obj_set_focus_gap(gt_obj_st * obj, uint8_t focus_gap)
+{
+    GT_CHECK_BACK(obj);
+    obj->focus_gap = focus_gap;
+}
+
+uint8_t gt_obj_get_focus_gap(gt_obj_st * obj)
+{
+    GT_CHECK_BACK_VAL(obj, 0);
+    return obj->focus_gap;
+}
+
+uint16_t gt_obj_get_focus_offset_value(gt_obj_st * obj)
+{
+    GT_CHECK_BACK_VAL(obj, 0);
+    return obj->focus_w + obj->focus_gap;
 }
 
 void gt_obj_set_radius(gt_obj_st * obj, gt_radius_t radius)
 {
     GT_CHECK_BACK(obj);
     obj->radius = radius;
+    gt_event_send(obj, GT_EVENT_TYPE_DRAW_START, NULL);
 }
 
 void gt_obj_set_radius_anim(gt_obj_st * obj, gt_radius_t radius)
@@ -853,6 +913,11 @@ void gt_obj_set_radius_anim(gt_obj_st * obj, gt_radius_t radius)
         gt_anim_set_exec_cb(&anim, _radius_anim_exec_cb);
         gt_anim_start(&anim);
     }
+}
+
+void  gt_obj_set_radius_step(gt_obj_st * obj, gt_radius_t step_radius)
+{
+    gt_obj_set_radius(obj, obj->radius + step_radius);
 }
 
 gt_radius_t gt_obj_get_radius(gt_obj_st * obj)

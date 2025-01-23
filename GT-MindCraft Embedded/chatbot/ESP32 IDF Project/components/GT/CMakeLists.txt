@@ -11,8 +11,6 @@ set(src_dirs
             CJSON
             GUI
             GUI/driver
-            GUI/examples
-            GUI/examples/widgets
             GUI/src
             GUI/src/core
             GUI/src/extra
@@ -39,8 +37,6 @@ set(include_dirs
             CJSON
             GUI
             GUI/driver
-            GUI/examples
-            GUI/examples/widgets
             GUI/src
             GUI/src/core
             GUI/src/extra

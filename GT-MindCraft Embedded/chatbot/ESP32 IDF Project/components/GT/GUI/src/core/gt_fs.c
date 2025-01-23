@@ -150,6 +150,16 @@ gt_fs_fp_st * gt_fs_open(const char * path, gt_fs_mode_et mode)
     return (gt_fs_fp_st * )drv->open_cb(drv, (char *)path, mode);
 }
 
+gt_fs_fp_st * gt_fs_open_raw(const char * raw_data, uint32_t raw_len, gt_fs_mode_et mode)
+{
+    gt_fs_drv_st * drv = gt_src_get_drv();
+
+    if (!drv || !drv->open_cb_raw) {
+        return NULL;
+    }
+    return (gt_fs_fp_st * )drv->open_cb_raw(drv, (uint8_t *)raw_data, raw_len, mode);
+}
+
 #if GT_USE_FILE_HEADER
 gt_fs_fp_st * gt_fs_fh_open(gt_file_header_param_st const * const fh_param, gt_fs_mode_et mode)
 {
@@ -303,6 +313,27 @@ gt_fs_res_et gt_fs_direct_addr_read_img_wh(gt_addr_t addr, uint16_t * w, uint16_
 }
 #endif
 
+#if GT_USE_DIRECT_ADDR_CUSTOM_SIZE
+gt_fs_res_et gt_fs_direct_addr_custom_size_read_img_wh(gt_direct_addr_custom_size_st * custom_addr, uint16_t * w, uint16_t * h)
+{
+    if (gt_hal_is_invalid_custom_size_addr(custom_addr)) {
+        return GT_FS_RES_FAIL;
+    }
+    gt_fs_fp_st * fp = gt_fs_custom_size_addr_open(custom_addr, GT_FS_MODE_RD);
+    if (NULL == fp) {
+        return GT_FS_RES_FAIL;
+    }
+
+    *w = fp->msg.pic.w;
+    *h = fp->msg.pic.h;
+
+    gt_fs_close(fp);
+
+    return GT_FS_RES_OK;
+}
+#endif
+
+
 uint32_t gt_fs_read_direct_physical(gt_addr_t addr, uint32_t len, uint8_t * data)
 {
     gt_fs_drv_st * drv = gt_vf_get_drv();
@@ -321,7 +352,13 @@ uint32_t gt_fs_read_direct_physical(gt_addr_t addr, uint32_t len, uint8_t * data
     }
 
     /* start read */
+#ifdef _GT_PORT_SIMULATOR_ENVS
+    // TODO change to call back function,  do not force to use direct read
+    extern unsigned long r_dat_bat(unsigned long address, unsigned long DataLen, unsigned char * pBuff);
+    return r_dat_bat(addr, len, data);
+#else
     return drv->rw_cb(data_write, len_write, data, len);
+#endif
 }
 
 void gt_fs_close(gt_fs_fp_st * fp)

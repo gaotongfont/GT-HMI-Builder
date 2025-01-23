@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 
-#define API_KEY 
+#define API_KEY
 
 //创建任务url
 #define CREATE_TASK_URL "http://api.mindcraft.com.cn/v1/stream_asr/"

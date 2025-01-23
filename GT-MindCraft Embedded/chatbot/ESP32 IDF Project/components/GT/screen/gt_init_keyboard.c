@@ -21,6 +21,7 @@ static void screen_home_0_cb(gt_event_st * e) {
 
 static void k_ok_0_cb(gt_event_st * e) {
     gt_disp_stack_go_back(1);
+	change_wifi_connect_tip(0x04);
     reset_current_wifi_isConnected();
     redraw_wifi_list();
     ESP_LOGE(TAG, "---------------selected_idx: %u\n", selected_idx);
@@ -37,7 +38,6 @@ static void k_ok_0_cb(gt_event_st * e) {
         return;
     }
 
-    // change_wifi_connect_tip(0x04);
     strcpy(scan_wifi_list[selected_idx].password, (const char *)passwd);
     ESP_LOGE(TAG, "---------------scan_wifi_list[%d].password: %s\n", selected_idx, scan_wifi_list[selected_idx].password);
     //连接wifi代码

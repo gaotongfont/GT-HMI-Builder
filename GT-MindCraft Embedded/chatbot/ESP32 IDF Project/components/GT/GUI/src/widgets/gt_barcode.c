@@ -164,7 +164,7 @@ static inline void _gt_barcode_init_widget(gt_obj_st * barcode) {
 #endif
 
     // focus
-    draw_focus(barcode , 0);
+    draw_focus(barcode);
 
 RET_FREE:
     if (NULL != style->pdat) {
@@ -180,7 +180,7 @@ RET_FREE:
  * @param obj
  */
 static void _init_cb(gt_obj_st * obj) {
-    GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
+    // GT_LOGV(GT_LOG_TAG_GUI, "start init_cb");
 
     _gt_barcode_init_widget(obj);
 }

@@ -276,6 +276,8 @@ void gt_listview_set_icon_to_right(gt_obj_st * listview, bool enabled);
  */
 void gt_listview_set_item_height(gt_obj_st * listview, uint16_t height);
 
+uint16_t gt_listview_get_item_height(gt_obj_st * listview);
+
 /**
  * @brief Enabled the listview item selected effect
  *
@@ -332,13 +334,22 @@ void gt_listview_set_item_bg_color(gt_obj_st * listview, gt_color_t color);
  * @param show false[default]: hide; true: show
  */
 void gt_listview_show_item_bg(gt_obj_st * listview, bool show);
+
 /**
- * @brief Set the listview item reduce area value, default is 4
+ * @brief Set the listview item reduce area value, default is 2
  *
  * @param listview
- * @param reduce REDUCE_DEFAULT[default]: 4
+ * @param reduce FOCUS_W_DEFAULT[default]: 2
  */
 void gt_listview_set_item_reduce(gt_obj_st * listview, uint8_t reduce);
+
+/**
+ * @brief Set the listview item focus_w value, default is 2
+ *
+ * @param listview
+ * @param focus_w FOCUS_W_DEFAULT[default]: 2
+ */
+void gt_listview_set_item_focus_w(gt_obj_st * listview, uint8_t focus_w);
 
 /**
  * @brief Set the listview item radius
@@ -392,6 +403,7 @@ void gt_listview_set_septal_line(gt_obj_st * listview, bool enabled);
  * @param height the line height 1[default]: 1 pixel
  */
 void gt_listview_set_septal_line_size(gt_obj_st * listview, uint16_t width, uint16_t height);
+uint16_t gt_listview_get_septal_line_height(gt_obj_st * listview);
 
 /**
  * @brief Set the split line color between each row to be displayed
@@ -417,6 +429,17 @@ void gt_listview_set_septal_line_opa(gt_obj_st * listview, gt_opa_t opa);
  * @param ver
  */
 void gt_listview_set_item_space(gt_obj_st * listview, uint16_t hor, uint16_t ver);
+uint16_t gt_listview_get_item_space_y(gt_obj_st * listview);
+
+/**
+ * @brief According to the number of items want to display in the same time,
+ *      calculate the height of the listview widget, include reduce size, border size.
+ *
+ * @param listview
+ * @param item_count The number of items want to display in the same time
+ * @return uint16_t
+ */
+uint16_t gt_listview_get_resize_height(gt_obj_st * listview, uint16_t item_count);
 
 /**
  * @brief set listview show font size
@@ -446,12 +469,23 @@ void gt_listview_set_font_cjk(gt_obj_st* listview, gt_font_cjk_et cjk);
 void gt_listview_set_font_thick_en(gt_obj_st * listview, uint8_t thick);
 void gt_listview_set_font_thick_cn(gt_obj_st * listview, uint8_t thick);
 void gt_listview_set_font_encoding(gt_obj_st * listview, gt_encoding_et encoding);
+void gt_listview_set_font_style(gt_obj_st * listview, gt_font_style_et font_style);
 
 void gt_listview_set_font_space(gt_obj_st * listview, uint8_t space_x, uint8_t space_y);
 
 void gt_listview_set_label_omit_single_line_by(gt_obj_st * listview, bool is_omit);
 void gt_listview_set_label_auto_scroll_single_line_by(gt_obj_st * listview, bool is_auto_scroll);
 
+/**
+ * @brief  Set the font to be reversed color when the item is selected
+ *
+ * @param listview
+ * @param enabled 0[default]: no font change color when item selected; 1: font change color when item selected
+ */
+void gt_listview_set_selected_anti_font(gt_obj_st * listview, bool enabled);
+bool gt_listview_is_selected_anti_font(gt_obj_st * listview);
+void gt_listview_set_selected_anti_font_color(gt_obj_st * listview, gt_color_t anti_color);
+gt_color_t gt_listview_get_selected_anti_font_color(gt_obj_st * listview);
 
 
 #endif  /** GT_CFG_ENABLE_LISTVIEW */
